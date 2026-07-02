@@ -136,9 +136,9 @@ Once your server-side handler intercepts the submitted form, fetch our API gatew
   },
   "detection_details": {
     "is_ai_agent": false,
-    "agent_type": "none",
+    "agent_type": "none | replay_attack_agent | tempered_token_agent",
     "device_anomalies": [],
-    "behavior_flags": [],
+    "behavior_flags": ["token_expired_or_replayed", "token_signature_invalid", "token_signature_missing"],
     "network_flags": []
   },
   "timestamp": "2026-06-29T08:35:00Z"
@@ -148,7 +148,7 @@ Once your server-side handler intercepts the submitted form, fetch our API gatew
 #### Decision Guidelines:
 *   `allow` (Safe, low-friction entry): Proceed with transactions or user registration.
 *   `challenge` (Suspicious kinetics): The client was directed to complete visual slider checks. Verify that `behavior.challengeSolved` equals true.
-*   `block` (Bot/AI Scraper): Promptly terminate session requests to protect your endpoints.
+*   `block` (Bot/AI Scraper / Cryptographic Failure): Promptly terminate session requests to protect your endpoints. If `behavior_flags` contains `token_expired_or_replayed` or `token_signature_invalid`, it indicates active token manipulation or a replay attack.
 
 ---
 
