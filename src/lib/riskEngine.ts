@@ -471,11 +471,12 @@ export class ScoreCalculator {
       deviceAnomalies.push('headless_screen_dimensions_zeroed');
     }
     if (fingerprint.webdriverActive === true) {
-      isAiAgent = true; riskScore += 45; deviceRisk += 45;
+      isAiAgent = true; riskScore += 50; deviceRisk += 50;
       deviceAnomalies.push('navigator_webdriver_active');
     }
     if (fingerprint.webdriverSpoofed === true) {
-      isAiAgent = true; riskScore += 45; deviceRisk += 45;
+      // Privacy extensions often trigger this. Add risk but do NOT mark as isAiAgent to allow human challenges instead of blocking.
+      riskScore += 30; deviceRisk += 30;
       deviceAnomalies.push('navigator_webdriver_spoofed');
     }
     if (fingerprint.chromeRuntimeMissing === true) {
@@ -491,7 +492,8 @@ export class ScoreCalculator {
       deviceAnomalies.push('navigator_languages_empty');
     }
     if (fingerprint.permissionQueryMismatch === true) {
-      isAiAgent = true; riskScore += 35; deviceRisk += 35;
+      // Browser permissions can sometimes return inconsistent results in private windows.
+      riskScore += 20; deviceRisk += 20;
       deviceAnomalies.push('permission_notifications_discrepancy');
     }
     const glRenderer = fingerprint.webglRenderer || '';
@@ -521,7 +523,10 @@ export class ScoreCalculator {
     // ── Layer 2: Behavior Analysis ───────────────────────────────────────
     if (mouseAnalysis.perfectlyStraight)  { riskScore += 30; behaviorRisk += 30; behaviorFlags.push('perfectly_straight_mouse_trajectory'); }
     if (velAnalysis.zeroVariance)         { riskScore += 25; behaviorRisk += 25; behaviorFlags.push('zero_mouse_acceleration_variance'); }
-    if (velAnalysis.isIntegerAligned)     { riskScore += 20; behaviorRisk += 20; behaviorFlags.push('artificial_integer_aligned_coordinates'); }
+    // Only flag integer alignment if automation framework is active (webdriver, webdriverSpoofed, or headless indicators)
+    if (velAnalysis.isIntegerAligned && (fingerprint.webdriverActive || fingerprint.webdriverSpoofed || fingerprint.outerDimensionsZeroed)) {
+      riskScore += 20; behaviorRisk += 20; behaviorFlags.push('artificial_integer_aligned_coordinates');
+    }
     if (velAnalysis.entropyTooLow)        { riskScore += 15; behaviorRisk += 15; behaviorFlags.push('low_entropy_mouse_movement'); }
     if (keyAnalysis.perfectlyUniform)     { riskScore += 30; behaviorRisk += 30; behaviorFlags.push('perfectly_uniform_keystroke_cadence'); }
     if (keyAnalysis.entropyTooLow)        { riskScore += 15; behaviorRisk += 15; behaviorFlags.push('low_entropy_keystroke_dynamics'); }
@@ -532,7 +537,11 @@ export class ScoreCalculator {
     const scrolls     = behavior.scrollsCount     || 0;
     if (mouseEvents === 0 && !fingerprint.isMobile) { trustScore -= 50; behaviorFlags.push('zero_mouse_kinetics'); }
     else if (mouseEvents > 0 && mouseEvents < 3)    { trustScore -= 20; behaviorFlags.push('abnormally_low_mouse_dynamics'); }
-    if (keyPresses === 0 && !fingerprint.isMobile)  { trustScore -= 15; behaviorFlags.push('zero_keystroke_cadence'); }
+    
+    // Bypass zero keystroke cadence if paste/autofill was detected
+    if (keyPresses === 0 && !fingerprint.isMobile && (behavior.lastPasteTime || 0) === 0) {
+      trustScore -= 15; behaviorFlags.push('zero_keystroke_cadence');
+    }
     if (scrolls === 0    && !fingerprint.isMobile)  { trustScore -= 10; behaviorFlags.push('no_page_scroll_activity'); }
 
     const clickAnomalies = behavior.clickAnomalies || 0;

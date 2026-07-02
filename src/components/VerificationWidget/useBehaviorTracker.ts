@@ -82,7 +82,7 @@ export const useBehaviorTracker = () => {
       clickCount.current++;
       if (lastMouseDownTime.current > 0) {
         const dur = Date.now() - lastMouseDownTime.current;
-        if (dur < 5 || dur % 10 === 0) clickAnomalies.current++;
+        if (dur < 5) clickAnomalies.current++;
       }
       const target = e.target as Element;
       if (target?.getBoundingClientRect) {
@@ -267,7 +267,12 @@ export const useBehaviorTracker = () => {
     try {
       const desc = Object.getOwnPropertyDescriptor(Navigator.prototype, 'webdriver');
       if (desc?.get && desc.get.toString().indexOf('[native code]') === -1) return true;
-      if (Object.prototype.hasOwnProperty.call(navigator, 'webdriver')) return true;
+      // Check if navigator has own property 'webdriver' which overrides the prototype (stealth behavior)
+      const hasDirectProperty = Object.prototype.hasOwnProperty.call(navigator, 'webdriver');
+      const isProtoWebdriver = 'webdriver' in Navigator.prototype;
+      if (hasDirectProperty && isProtoWebdriver && navigator.webdriver === undefined) {
+        return true; // stealth faked it to undefined
+      }
       return false;
     } catch { return false; }
   };
