@@ -277,6 +277,16 @@ export const useBehaviorTracker = () => {
     } catch { return false; }
   };
 
+  const detectDebugger = (): boolean => {
+    try {
+      const startTime = performance.now();
+      // eslint-disable-next-line no-debugger
+      debugger;
+      const endTime = performance.now();
+      return (endTime - startTime) > 100;
+    } catch { return false; }
+  };
+
   const computeEntropy = (values: number[]): number => {
     if (values.length < 4) return 0;
     const mean = values.reduce((a, b) => a + b, 0) / values.length;
@@ -351,6 +361,7 @@ export const useBehaviorTracker = () => {
         languagesEmpty:           !navigator.languages || navigator.languages.length === 0,
         permissionQueryMismatch:  permissionQueryMismatch.current,
         outerDimensionsZeroed:    window.outerWidth === 0 && window.outerHeight === 0,
+        debuggerDetected:         detectDebugger(),
         canvasFingerprint:    getCanvasFingerprint(),
         fontDetectionHash:    getFontDetectionHash(),
         webglRenderer:        glInfo.renderer,

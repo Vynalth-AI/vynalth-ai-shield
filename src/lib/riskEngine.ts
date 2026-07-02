@@ -508,6 +508,10 @@ export class ScoreCalculator {
       riskScore += 30; deviceRisk += 30;
       deviceAnomalies.push('headless_outer_window_anomalies');
     }
+    if (fingerprint.debuggerDetected === true) {
+      riskScore += 35; deviceRisk += 35;
+      deviceAnomalies.push('client_sdk_debugging_active');
+    }
 
     // Hardware plausibility
     const hwA = SignalAnalyzer.analyzeHardwarePlausibility(fingerprint);

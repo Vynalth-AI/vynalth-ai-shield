@@ -60,6 +60,7 @@ export interface TelemetryFingerprint {
   languagesEmpty: boolean;
   permissionQueryMismatch: boolean;
   outerDimensionsZeroed: boolean;
+  debuggerDetected?: boolean;
   // Fingerprint hashes
   canvasFingerprint: string;
   fontDetectionHash: string;
