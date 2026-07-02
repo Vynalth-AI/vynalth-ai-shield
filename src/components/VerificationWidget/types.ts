@@ -151,4 +151,5 @@ export interface TelemetryPayload {
   fingerprint: TelemetryFingerprint;
   behavior: TelemetryBehavior;
   sdkVersion: string;
+  createdAt?: number; // timestamp when payload was generated
 }

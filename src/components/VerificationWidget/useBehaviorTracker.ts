@@ -321,6 +321,7 @@ export const useBehaviorTracker = () => {
 
     const payload: TelemetryPayload = {
       sdkVersion: SDK_VERSION,
+      createdAt: Date.now(),
       fingerprint: {
         userAgent: navigator.userAgent,
         screenWidth:       window.screen.width     || 0,

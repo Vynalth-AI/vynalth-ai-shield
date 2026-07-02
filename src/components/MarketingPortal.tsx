@@ -63,7 +63,8 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
           clientIp,
           userAgent,
           hasForwardedFor,
-          isBotUA
+          isBotUA,
+          telemetry.createdAt
         );
         
         const mousePoints = behavior.mousePoints || [];

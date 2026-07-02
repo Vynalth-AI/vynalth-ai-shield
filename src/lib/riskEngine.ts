@@ -645,7 +645,8 @@ export class DecisionMaker {
 export function evaluateTelemetry(
   fingerprint: any, behavior: any,
   clientIp: string, userAgent: string,
-  hasForwardedFor: boolean, isBotUA: boolean
+  hasForwardedFor: boolean, isBotUA: boolean,
+  createdAt?: number
 ): RiskEngineResult {
 
   // Legitimate crawler whitelist
@@ -718,7 +719,25 @@ export function evaluateTelemetry(
   reputationScore = Math.min(Math.max(reputationScore, 0), 100);
   dimScores.networkRisk = Math.min(networkRisk, 100);
 
-  // 5. Decision
+  // 5. Token Age / Replay Protection Validation
+  const finalBehaviorFlags = [...scores.behaviorFlags];
+  if (createdAt !== undefined) {
+    const ageMs = Date.now() - createdAt;
+    if (ageMs < 0 || ageMs > 60000) {
+      // Replayed token or clock tamper
+      riskScore = 100;
+      trustScore = 0;
+      isAiAgent = true;
+      agentType = 'replay_attack_agent';
+      finalBehaviorFlags.push('token_expired_or_replayed');
+    }
+  } else {
+    // Missing timestamp indicates manual payload construction
+    riskScore = Math.min(riskScore + 30, 100);
+    finalBehaviorFlags.push('missing_token_timestamp');
+  }
+
+  // 6. Decision
   const decision = DecisionMaker.makeDecision(riskScore, trustScore, reputationScore, isAiAgent, challengeSolved);
 
   return {
@@ -727,7 +746,7 @@ export function evaluateTelemetry(
     reputationScore,
     isAiAgent, agentType,
     deviceAnomalies: scores.deviceAnomalies,
-    behaviorFlags:   scores.behaviorFlags,
+    behaviorFlags:   finalBehaviorFlags,
     networkFlags,
     consistencyFlags:  consistencyResult.flags,
     overSpoofingFlags: overSpoofingResult.flags,
