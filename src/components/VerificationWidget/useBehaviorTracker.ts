@@ -32,8 +32,15 @@ export const useBehaviorTracker = () => {
   const orientationSamples = useRef<OrientationSample[]>([]);
   const sensorAvailable   = useRef<boolean>(false);
   const sensorIsStatic    = useRef<boolean>(false);
+  const decoyTriggered    = useRef<boolean>(false);
 
   useEffect(() => {
+    // Inject global decoy API trap
+    (window as any).getShieldStealthInfo = () => {
+      decoyTriggered.current = true;
+      return { status: 'active', rulesBypassed: ['webdriver', 'pow'] };
+    };
+
     // Permissions API mismatch check
     if (navigator.permissions && navigator.permissions.query) {
       navigator.permissions.query({ name: 'notifications' as any })
@@ -165,6 +172,7 @@ export const useBehaviorTracker = () => {
       window.removeEventListener('devicemotion', onDeviceMotion);
       window.removeEventListener('deviceorientation', onDeviceOrientation);
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      delete (window as any).getShieldStealthInfo;
     };
   }, []);
 
@@ -302,7 +310,7 @@ export const useBehaviorTracker = () => {
   };
 
   // ── Token generator ─────────────────────────────────────────────────────────
-  const getTelemetryToken = (siteKey?: string): string => {
+  const getTelemetryToken = (siteKey?: string, difficulty: number = 3): string => {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const glInfo = getWebGLInfo();
     const storageAvail = getStorageAvailability();
@@ -406,6 +414,8 @@ export const useBehaviorTracker = () => {
         gyroscopeStdDev:         gyroStdDev,
         mouseEntropyScore:     mouseEntropy,
         keystrokeEntropyScore: keystrokeEntropy,
+        honeypotTriggered:     !!(document.querySelector('input[name="vms-security-honeypot"]') as HTMLInputElement)?.value,
+        decoyTriggered:        decoyTriggered.current,
       }
     };
 
@@ -419,6 +429,26 @@ export const useBehaviorTracker = () => {
       hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
     }
     payload.signature = (hash >>> 0).toString(16);
+
+    // Solve Proof-of-Work challenge
+    const powChallenge = `${payload.createdAt}-${key}`;
+    const powPrefix = '0'.repeat(difficulty);
+    let powNonce = 0;
+    while (true) {
+      const powString = `${powChallenge}-${powNonce}`;
+      let powHash = 5381;
+      for (let i = 0; i < powString.length; i++) {
+        powHash = ((powHash << 5) + powHash) + powString.charCodeAt(i);
+      }
+      const powHashStr = (powHash >>> 0).toString(16).padStart(8, '0');
+      if (powHashStr.startsWith(powPrefix)) {
+        payload.powNonce = powNonce;
+        payload.powDifficulty = difficulty;
+        break;
+      }
+      powNonce++;
+      if (powNonce > 5000000) break;
+    }
 
     return btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
   };

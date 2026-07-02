@@ -26,6 +26,8 @@ export interface RiskEngineResult {
     consistencyRisk: number;        // fingerprint consistency score
     overSpoofingRisk: number;       // over-spoofing score
   };
+  autoencoderError?: number;
+  autoencoderTrainedCount?: number;
 }
 
 // ─── Legitimate Crawler Whitelist ─────────────────────────────────────────────
@@ -548,6 +550,19 @@ export class ScoreCalculator {
     }
     if (scrolls === 0    && !fingerprint.isMobile)  { trustScore -= 10; behaviorFlags.push('no_page_scroll_activity'); }
 
+    if (behavior.honeypotTriggered === true) {
+      isAiAgent = true;
+      riskScore = 100;
+      behaviorRisk = 100;
+      behaviorFlags.push('honeypot_trap_triggered');
+    }
+    if (behavior.decoyTriggered === true) {
+      isAiAgent = true;
+      riskScore = 100;
+      behaviorRisk = 100;
+      behaviorFlags.push('decoy_trap_triggered');
+    }
+
     const clickAnomalies = behavior.clickAnomalies || 0;
     if (clickAnomalies > 0) {
       const cap = Math.min(clickAnomalies, 3);
@@ -645,6 +660,147 @@ export class DecisionMaker {
   }
 }
 
+// ─── Online Autoencoder & Clustering (在線機器人學習與聚類分類) ─────────────
+export class OnlineAutoencoder {
+  weights1: number[][]; // 4x2
+  weights2: number[][]; // 2x4
+  bias1: number[];      // 2
+  bias2: number[];      // 4
+  learningRate: number = 0.08;
+  trainedSamplesCount: number = 0;
+
+  constructor() {
+    this.weights1 = Array.from({ length: 4 }, () => [Math.random() * 0.2 - 0.1, Math.random() * 0.2 - 0.1]);
+    this.weights2 = Array.from({ length: 2 }, () => Array.from({ length: 4 }, () => Math.random() * 0.2 - 0.1));
+    this.bias1 = [0.1, 0.1];
+    this.bias2 = [0.1, 0.1, 0.1, 0.1];
+  }
+
+  private sigmoid(x: number): number {
+    return 1 / (1 + Math.exp(-x));
+  }
+
+  private normalize(straightness: number, keystrokeSD: number, mouseEntropy: number, durationMs: number): number[] {
+    const s = Math.max(0, Math.min(1, (straightness - 1.0) / 1.5));
+    const sd = Math.max(0, Math.min(1, keystrokeSD / 80));
+    const ent = Math.max(0, Math.min(1, mouseEntropy / 6));
+    const dur = Math.max(0, Math.min(1, durationMs / 6000));
+    return [s, sd, ent, dur];
+  }
+
+  evaluate(straightness: number, keystrokeSD: number, mouseEntropy: number, durationMs: number): { error: number, output: number[] } {
+    const x = this.normalize(straightness, keystrokeSD, mouseEntropy, durationMs);
+    const h = [0, 0];
+    for (let j = 0; j < 2; j++) {
+      let sum = this.bias1[j];
+      for (let i = 0; i < 4; i++) {
+        sum += x[i] * this.weights1[i][j];
+      }
+      h[j] = this.sigmoid(sum);
+    }
+
+    const y = [0, 0, 0, 0];
+    for (let k = 0; k < 4; k++) {
+      let sum = this.bias2[k];
+      for (let j = 0; j < 2; j++) {
+        sum += h[j] * this.weights2[j][k];
+      }
+      y[k] = this.sigmoid(sum);
+    }
+
+    let err = 0;
+    for (let i = 0; i < 4; i++) {
+      err += Math.pow(x[i] - y[i], 2);
+    }
+    return { error: err / 4, output: y };
+  }
+
+  train(straightness: number, keystrokeSD: number, mouseEntropy: number, durationMs: number) {
+    const x = this.normalize(straightness, keystrokeSD, mouseEntropy, durationMs);
+    const h = [0, 0];
+    const netH = [0, 0];
+    for (let j = 0; j < 2; j++) {
+      let sum = this.bias1[j];
+      for (let i = 0; i < 4; i++) {
+        sum += x[i] * this.weights1[i][j];
+      }
+      netH[j] = sum;
+      h[j] = this.sigmoid(sum);
+    }
+
+    const y = [0, 0, 0, 0];
+    const netY = [0, 0, 0, 0];
+    for (let k = 0; k < 4; k++) {
+      let sum = this.bias2[k];
+      for (let j = 0; j < 2; j++) {
+        sum += h[j] * this.weights2[j][k];
+      }
+      netY[k] = sum;
+      y[k] = this.sigmoid(sum);
+    }
+
+    const deltaY = [0, 0, 0, 0];
+    for (let k = 0; k < 4; k++) {
+      deltaY[k] = (y[k] - x[k]) * y[k] * (1 - y[k]);
+    }
+
+    const deltaH = [0, 0];
+    for (let j = 0; j < 2; j++) {
+      let sum = 0;
+      for (let k = 0; k < 4; k++) {
+        sum += deltaY[k] * this.weights2[j][k];
+      }
+      deltaH[j] = sum * h[j] * (1 - h[j]);
+    }
+
+    for (let j = 0; j < 2; j++) {
+      for (let k = 0; k < 4; k++) {
+        this.weights2[j][k] -= this.learningRate * deltaY[k] * h[j];
+      }
+    }
+    for (let k = 0; k < 4; k++) {
+      this.bias2[k] -= this.learningRate * deltaY[k];
+    }
+
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 2; j++) {
+        this.weights1[i][j] -= this.learningRate * deltaH[j] * x[i];
+      }
+    }
+    for (let j = 0; j < 2; j++) {
+      this.bias1[j] -= this.learningRate * deltaH[j];
+    }
+
+    this.trainedSamplesCount++;
+  }
+}
+
+export const globalAutoencoder = new OnlineAutoencoder();
+
+// Dynamic traffic load PoW difficulty tuning states
+let lastRequestTime = 0;
+let recentRequestIntervals: number[] = [];
+
+export function getDynamicDifficulty(): number {
+  const now = Date.now();
+  const gap = lastRequestTime > 0 ? (now - lastRequestTime) : 5000;
+  lastRequestTime = now;
+
+  recentRequestIntervals.push(gap);
+  if (recentRequestIntervals.length > 5) {
+    recentRequestIntervals.shift();
+  }
+
+  const avgInterval = recentRequestIntervals.reduce((a, b) => a + b, 0) / recentRequestIntervals.length;
+
+  if (avgInterval < 800) {
+    return 5;
+  } else if (avgInterval < 2000) {
+    return 4;
+  }
+  return 3;
+}
+
 // ─── Main Evaluation Entry Point ──────────────────────────────────────────────
 export function evaluateTelemetry(
   fingerprint: any, behavior: any,
@@ -652,7 +808,9 @@ export function evaluateTelemetry(
   hasForwardedFor: boolean, isBotUA: boolean,
   createdAt?: number,
   signature?: string,
-  siteKey?: string
+  siteKey?: string,
+  powNonce?: number,
+  powDifficulty?: number
 ): RiskEngineResult {
 
   // Legitimate crawler whitelist
@@ -743,6 +901,41 @@ export function evaluateTelemetry(
     finalBehaviorFlags.push('missing_token_timestamp');
   }
 
+  // 5.5 Proof-of-Work (PoW) Puzzle Verification
+  const expectedDifficulty = getDynamicDifficulty();
+  if (powNonce !== undefined && powDifficulty !== undefined) {
+    if (powDifficulty < expectedDifficulty) {
+      riskScore = 100;
+      trustScore = 0;
+      isAiAgent = true;
+      agentType = 'pow_bypass_agent';
+      finalBehaviorFlags.push('pow_difficulty_insufficient');
+    } else {
+      const powPrefix = '0'.repeat(powDifficulty);
+      const key = siteKey || "default_site_key";
+      const powString = `${createdAt || 0}-${key}-${powNonce}`;
+      let powHash = 5381;
+      for (let i = 0; i < powString.length; i++) {
+        powHash = ((powHash << 5) + powHash) + powString.charCodeAt(i);
+      }
+      const calculatedHashStr = (powHash >>> 0).toString(16).padStart(8, '0');
+      if (!calculatedHashStr.startsWith(powPrefix)) {
+        riskScore = 100;
+        trustScore = 0;
+        isAiAgent = true;
+        agentType = 'pow_bypass_agent';
+        finalBehaviorFlags.push('pow_signature_invalid');
+      }
+    }
+  } else {
+    // Missing PoW properties
+    riskScore = 100;
+    trustScore = 0;
+    isAiAgent = true;
+    agentType = 'pow_bypass_agent';
+    finalBehaviorFlags.push('pow_signature_missing');
+  }
+
   // 6. Token Cryptographic Integrity Signature Check
   if (signature !== undefined) {
     const salt = "vms_client_shield_salt_2026_q2";
@@ -770,6 +963,35 @@ export function evaluateTelemetry(
     finalBehaviorFlags.push('token_signature_missing');
   }
 
+  // 6.5 Online Autoencoder Anomaly Detection & Learning
+  let straightRatio = 1.25;
+  if (mousePointsList.length >= 4) {
+    let pathLen = 0;
+    for (let i = 1; i < mousePointsList.length; i++) {
+      pathLen += Math.sqrt(Math.pow(mousePointsList[i].x - mousePointsList[i-1].x, 2) + Math.pow(mousePointsList[i].y - mousePointsList[i-1].y, 2));
+    }
+    const first = mousePointsList[0];
+    const last = mousePointsList[mousePointsList.length - 1];
+    const straight = Math.sqrt(Math.pow(last.x - first.x, 2) + Math.pow(last.y - first.y, 2));
+    straightRatio = pathLen / (straight || 1);
+  }
+
+  const keySD = keyTimingsList.length >= 2 ? stdDev(keyTimingsList) : 25;
+  const mouseEnt = behavior.mouseEntropyScore || 0;
+  
+  const aeResult = globalAutoencoder.evaluate(straightRatio, keySD, mouseEnt, durationMs);
+  const autoencoderError = aeResult.error;
+  const autoencoderTrainedCount = globalAutoencoder.trainedSamplesCount;
+
+  if (riskScore < 45 && !isAiAgent) {
+    // Train online on human telemetry patterns
+    globalAutoencoder.train(straightRatio, keySD, mouseEnt, durationMs);
+  } else if (globalAutoencoder.trainedSamplesCount >= 3 && aeResult.error > 0.18) {
+    // Flag anomaly if reconstruction error is high
+    riskScore = Math.min(riskScore + 30, 100);
+    finalBehaviorFlags.push('autoencoder_anomaly_detected');
+  }
+
   // 7. Decision
   const decision = DecisionMaker.makeDecision(riskScore, trustScore, reputationScore, isAiAgent, challengeSolved);
 
@@ -785,5 +1007,7 @@ export function evaluateTelemetry(
     overSpoofingFlags: overSpoofingResult.flags,
     decision,
     dimensionScores: dimScores,
+    autoencoderError,
+    autoencoderTrainedCount
   };
 }

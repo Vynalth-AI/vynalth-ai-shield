@@ -144,6 +144,8 @@ export interface TelemetryBehavior {
   // Entropy metrics
   mouseEntropyScore: number;
   keystrokeEntropyScore: number;
+  honeypotTriggered?: boolean;
+  decoyTriggered?: boolean;
 }
 
 // ─── Root Payload ─────────────────────────────────────────────────────────────
@@ -154,4 +156,6 @@ export interface TelemetryPayload {
   sdkVersion: string;
   createdAt?: number; // timestamp when payload was generated
   signature?: string; // integrity validation signature
+  powNonce?: number;
+  powDifficulty?: number;
 }
