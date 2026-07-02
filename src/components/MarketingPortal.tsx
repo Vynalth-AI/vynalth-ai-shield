@@ -311,15 +311,15 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
                   Human Verification AI
                 </span>
               </h2>
-              <p style={{ color: '#64748b', fontSize: '14px', lineHeight: 1.7, margin: '0 0 20px' }}>
-                每天完成一个 10 秒小挑战，你的自然行为数据将帮助 VitaShield 更好地区分真实人类与 AI Bot。
+              <p style={{ color: '#64748b', fontSize: '0.85rem', lineHeight: '1.6', marginBottom: '1.25rem' }}>
+                Completing a 10-second daily mini-challenge helps VitaShield distinguish genuine human interactions from AI bots using natural behavioral kinetics.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {[
-                  { icon: '🖱️', text: '收集真实鼠标轨迹、点击节奏、反应时间' },
-                  { icon: '🧠', text: '训练 VitaShield 行为识别 AI 模型' },
-                  { icon: '🎁', text: '连续 4 天 → 免费获得 Neuro Plan 3 个月' },
-                  { icon: '🔒', text: '数据严格保密，不出售给第三方 (PDPA 合规)' },
+                  { icon: '🖱️', text: 'Collect organic mouse trajectories, click pacing, and response times' },
+                  { icon: '🧠', text: 'Train the VitaShield behavioral recognition AI model' },
+                  { icon: '🎁', text: '4-day streak → Get 3 months of Neuro Plan for free' },
+                  { icon: '🔒', text: 'Strict data privacy, never sold to third parties (PDPA compliant)' },
                 ].map((item, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <span style={{ fontSize: '16px', width: '24px', textAlign: 'center' }}>{item.icon}</span>
@@ -1023,7 +1023,7 @@ curl -X POST https://vitashield.sleepsomno.com/api/verify \\
               {/* Interactive API Sandbox Simulator */}
               <div style={{ marginTop: '1.5rem', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '1.5rem' }}>
                 <h5 style={{ fontSize: '0.85rem', color: '#fff', margin: '0 0 8px 0', fontWeight: '800' }}>
-                  Interactive API Response Simulator (模拟 API 响应沙盒)
+                  Interactive API Response Simulator
                 </h5>
                 <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginBottom: '1.25rem', lineHeight: '1.4' }}>
                   Adjust parameters below to see how the client-side telemetry converts into backend risk decisions and JSON payloads.
@@ -1060,7 +1060,7 @@ curl -X POST https://vitashield.sleepsomno.com/api/verify \\
                           onChange={(e) => setMockWebdriver(e.target.checked)}
                           style={{ accentColor: 'var(--secondary)' }}
                         />
-                        <span>WebDriver Active (自动化测试)</span>
+                        <span>WebDriver Active (Automation Test)</span>
                       </label>
 
                       <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.74rem', color: '#fff', cursor: 'pointer' }}>
@@ -1070,7 +1070,7 @@ curl -X POST https://vitashield.sleepsomno.com/api/verify \\
                           onChange={(e) => setMockStraightMouse(e.target.checked)}
                           style={{ accentColor: 'var(--secondary)' }}
                         />
-                        <span>Straight Trajectory (匀速直线轨迹)</span>
+                        <span>Straight Trajectory (Constant Speed Linear)</span>
                       </label>
 
                       <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.74rem', color: '#fff', cursor: 'pointer' }}>
@@ -1080,7 +1080,7 @@ curl -X POST https://vitashield.sleepsomno.com/api/verify \\
                           onChange={(e) => setMockSwiftshader(e.target.checked)}
                           style={{ accentColor: 'var(--secondary)' }}
                         />
-                        <span>SwiftShader GPU (无头虚拟机环境)</span>
+                        <span>SwiftShader GPU (Headless VM Environment)</span>
                       </label>
                     </div>
                   </div>

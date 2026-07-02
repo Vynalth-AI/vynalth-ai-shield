@@ -119,11 +119,11 @@ const ConsentModal: React.FC<{ onAccept: () => void; onDecline: () => void }> = 
         borderRadius: '12px', padding: '16px', marginBottom: '20px', fontSize: '13px',
         color: '#94a3b8', lineHeight: 1.7,
       }}>
-        参与每日 VitaShield 签到互动，将帮助我们改进 AI 人机验证系统。<br />
+        Participating in the daily VitaShield check-in helps us improve our behavioral verification AI models.<br />
         <br />
-        收集内容：<strong style={{ color: '#e2e8f0' }}>点击序列、鼠标轨迹、反应时间、设备信号</strong><br />
-        用途：<strong style={{ color: '#e2e8f0' }}>训练 VitaShield 行为识别模型</strong><br />
-        不会出售给任何第三方。可随时在设置中撤回同意。
+        Collected telemetry: <strong style={{ color: '#e2e8f0' }}>Click sequences, cursor trajectories, reaction times, device signals</strong><br />
+        Use: <strong style={{ color: '#e2e8f0' }}>Train the VitaShield AI detection system</strong><br />
+        Your data is fully secure and will never be sold. Consent can be revoked at any time in settings.
       </div>
 
       <div style={{
@@ -133,8 +133,8 @@ const ConsentModal: React.FC<{ onAccept: () => void; onDecline: () => void }> = 
       }}>
         <span style={{ fontSize: '20px' }}>🎁</span>
         <div style={{ fontSize: '13px', color: '#94a3b8', lineHeight: 1.6 }}>
-          完成连续 <strong style={{ color: '#a855f7' }}>4 天签到</strong> → 自动获得{' '}
-          <strong style={{ color: '#a855f7' }}>Neuro Plan 3 个月</strong>（免费）
+          Complete a consecutive <strong style={{ color: '#a855f7' }}>4-day streak</strong> → Automatically receive{' '}
+          <strong style={{ color: '#a855f7' }}>3 months of Neuro Plan</strong> (free)
         </div>
       </div>
 
@@ -147,7 +147,7 @@ const ConsentModal: React.FC<{ onAccept: () => void; onDecline: () => void }> = 
             color: '#64748b', cursor: 'pointer', fontSize: '14px', fontWeight: 600,
           }}
         >
-          跳过
+          Skip
         </button>
         <button
           onClick={onAccept}
@@ -159,7 +159,7 @@ const ConsentModal: React.FC<{ onAccept: () => void; onDecline: () => void }> = 
             boxShadow: '0 0 20px rgba(0,242,254,0.3)',
           }}
         >
-          ✓ 我同意并开始签到
+          ✓ I Consent & Start Challenge
         </button>
       </div>
     </div>
@@ -229,7 +229,7 @@ const Task1ClickRobots: React.FC<{ onComplete: (r: Partial<TaskResult>) => void 
   return (
     <div>
       <p style={{ color: '#94a3b8', fontSize: '13px', textAlign: 'center', marginBottom: '20px' }}>
-        点击所有 <strong style={{ color: '#00f2fe' }}>机器人</strong>，跳过所有真人
+        Click all <strong style={{ color: '#00f2fe' }}>Robots</strong>, skip all human faces
       </p>
       <div style={{
         display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px',
@@ -354,7 +354,7 @@ const Task2FollowTarget: React.FC<{ onComplete: (r: Partial<TaskResult>) => void
   return (
     <div>
       <p style={{ color: '#94a3b8', fontSize: '13px', textAlign: 'center', marginBottom: '16px' }}>
-        用鼠标 / 手指跟随 <strong style={{ color: '#a855f7' }}>移动的目标</strong> · {captured}/{totalTargets} 捕获
+        Follow the moving target with your cursor/finger · {captured}/{totalTargets} captured
       </p>
       <div
         ref={areaRef}
@@ -523,7 +523,7 @@ const Task4ReactionTest: React.FC<{ onComplete: (r: Partial<TaskResult>) => void
   return (
     <div style={{ textAlign: 'center' }}>
       <p style={{ color: '#94a3b8', fontSize: '13px', marginBottom: '16px' }}>
-        盾牌变绿时 <strong style={{ color: '#10b981' }}>立刻点击</strong>！ ({tapCount}/{total})
+        Click immediately when the shield turns green! ({tapCount}/{total})
       </p>
       <div
         onClick={handleTap}
@@ -546,13 +546,13 @@ const Task4ReactionTest: React.FC<{ onComplete: (r: Partial<TaskResult>) => void
       </div>
       {reactions.length > 0 && (
         <div style={{ marginTop: '16px', color: '#64748b', fontSize: '12px' }}>
-          平均反应时间: <strong style={{ color: '#10b981' }}>{avgRt}ms</strong>
-          {avgRt < 200 && <span style={{ color: '#f59e0b', marginLeft: '8px' }}>⚡ 极速！</span>}
-          {avgRt > 500 && <span style={{ color: '#94a3b8', marginLeft: '8px' }}>🧘 沉稳</span>}
+          Average Reaction Time: <strong style={{ color: '#10b981' }}>{avgRt}ms</strong>
+          {avgRt < 200 && <span style={{ color: '#f59e0b', marginLeft: '8px' }}>⚡ Hyper-speed!</span>}
+          {avgRt > 500 && <span style={{ color: '#94a3b8', marginLeft: '8px' }}>🧘 Steady</span>}
         </div>
       )}
       {phase === 'done' && (
-        <div style={{ color: '#10b981', fontWeight: 700, marginTop: '8px' }}>✅ 人类反应确认！</div>
+        <div style={{ color: '#10b981', fontWeight: 700, marginTop: '8px' }}>✅ Human Reaction Confirmed!</div>
       )}
     </div>
   );
@@ -611,8 +611,8 @@ const TaskModal: React.FC<{
         ) : (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
             <div style={{ fontSize: '48px', marginBottom: '12px' }}>✅</div>
-            <div style={{ color: '#10b981', fontWeight: 700, fontSize: '18px' }}>验证完成！</div>
-            <div style={{ color: '#64748b', fontSize: '13px', marginTop: '8px' }}>数据已安全记录 · 感谢你的贡献</div>
+            <div style={{ color: '#10b981', fontWeight: 700, fontSize: '18px' }}>Verification Complete!</div>
+            <div style={{ color: '#64748b', fontSize: '13px', marginTop: '8px' }}>Data recorded securely · Thank you for your contribution</div>
           </div>
         )}
 
@@ -645,7 +645,7 @@ const RewardModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           Congratulations!
         </h2>
         <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '24px' }}>
-          你完成了连续 4 天的 VitaShield 验证签到！
+          You have completed the 4-day VitaShield verification streak!
         </p>
 
         <div style={{
@@ -655,10 +655,10 @@ const RewardModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         }}>
           <div style={{ fontSize: '32px', marginBottom: '8px' }}>🧠</div>
           <div style={{ color: '#a855f7', fontWeight: 800, fontSize: '20px', marginBottom: '4px' }}>
-            Neuro Plan · 3 个月
+            Neuro Plan · 3 Months
           </div>
           <div style={{ color: '#64748b', fontSize: '13px' }}>
-            已自动添加到你的 VitaMind AI 账户
+            Successfully applied to your VitaMind AI account
           </div>
         </div>
 
@@ -666,8 +666,8 @@ const RewardModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           background: 'rgba(0,242,254,0.06)', border: '1px solid rgba(0,242,254,0.15)',
           borderRadius: '12px', padding: '14px', marginBottom: '24px', fontSize: '12px', color: '#64748b',
         }}>
-          🛡️ 你的 4 次验证数据已安全用于训练 VitaShield AI 模型。<br />
-          感谢你帮助让互联网更安全。
+          🛡️ Your 4 verification payloads have been securely ingested to train VitaShield's AI model.<br />
+          Thank you for helping make the web safer.
         </div>
 
         <button
@@ -680,7 +680,7 @@ const RewardModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             cursor: 'pointer', boxShadow: '0 0 24px rgba(168,85,247,0.3)',
           }}
         >
-          开始使用 Neuro Plan →
+          Start Using Neuro Plan →
         </button>
       </div>
     </div>
