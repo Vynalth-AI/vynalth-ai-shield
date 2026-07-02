@@ -646,7 +646,9 @@ export function evaluateTelemetry(
   fingerprint: any, behavior: any,
   clientIp: string, userAgent: string,
   hasForwardedFor: boolean, isBotUA: boolean,
-  createdAt?: number
+  createdAt?: number,
+  signature?: string,
+  siteKey?: string
 ): RiskEngineResult {
 
   // Legitimate crawler whitelist
@@ -737,7 +739,34 @@ export function evaluateTelemetry(
     finalBehaviorFlags.push('missing_token_timestamp');
   }
 
-  // 6. Decision
+  // 6. Token Cryptographic Integrity Signature Check
+  if (signature !== undefined) {
+    const salt = "vms_client_shield_salt_2026_q2";
+    const key = siteKey || "default_site_key";
+    const rawString = `${createdAt || 0}-${behavior.mouseEventsCount || 0}-${behavior.keyPressesCount || 0}-${key}-${salt}`;
+    let hash = 2166136261;
+    for (let i = 0; i < rawString.length; i++) {
+      hash ^= rawString.charCodeAt(i);
+      hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+    }
+    const expectedSignature = (hash >>> 0).toString(16);
+    if (signature !== expectedSignature) {
+      riskScore = 100;
+      trustScore = 0;
+      isAiAgent = true;
+      agentType = 'tempered_token_agent';
+      finalBehaviorFlags.push('token_signature_invalid');
+    }
+  } else {
+    // Missing signature indicates payload bypassing signature check
+    riskScore = 100;
+    trustScore = 0;
+    isAiAgent = true;
+    agentType = 'tempered_token_agent';
+    finalBehaviorFlags.push('token_signature_missing');
+  }
+
+  // 7. Decision
   const decision = DecisionMaker.makeDecision(riskScore, trustScore, reputationScore, isAiAgent, challengeSolved);
 
   return {

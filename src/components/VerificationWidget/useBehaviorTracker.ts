@@ -292,7 +292,7 @@ export const useBehaviorTracker = () => {
   };
 
   // ── Token generator ─────────────────────────────────────────────────────────
-  const getTelemetryToken = (): string => {
+  const getTelemetryToken = (siteKey?: string): string => {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const glInfo = getWebGLInfo();
     const storageAvail = getStorageAvailability();
@@ -397,6 +397,17 @@ export const useBehaviorTracker = () => {
         keystrokeEntropyScore: keystrokeEntropy,
       }
     };
+
+    // Client-side integrity signature
+    const salt = "vms_client_shield_salt_2026_q2";
+    const key = siteKey || "default_site_key";
+    const rawString = `${payload.createdAt}-${payload.behavior.mouseEventsCount}-${payload.behavior.keyPressesCount}-${key}-${salt}`;
+    let hash = 2166136261;
+    for (let i = 0; i < rawString.length; i++) {
+      hash ^= rawString.charCodeAt(i);
+      hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+    }
+    payload.signature = (hash >>> 0).toString(16);
 
     return btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
   };

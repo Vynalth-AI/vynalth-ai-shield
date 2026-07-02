@@ -152,4 +152,5 @@ export interface TelemetryPayload {
   behavior: TelemetryBehavior;
   sdkVersion: string;
   createdAt?: number; // timestamp when payload was generated
+  signature?: string; // integrity validation signature
 }

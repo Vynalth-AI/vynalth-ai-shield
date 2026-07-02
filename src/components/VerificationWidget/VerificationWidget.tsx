@@ -41,7 +41,7 @@ export const VerificationWidget: React.FC<VerificationWidgetProps> = ({
         e.stopPropagation();
         setChallengeActive(true);
       } else {
-        const token = getTelemetryToken();
+        const token = getTelemetryToken(siteKey);
         
         // Inject token field into the parent form
         const oldInput = parentForm.querySelector('input[name="vms-shield-token"]');
@@ -61,7 +61,7 @@ export const VerificationWidget: React.FC<VerificationWidgetProps> = ({
     return () => {
       parentForm.removeEventListener('submit', handleFormSubmit);
     };
-  }, [verified, mouseEventsCount, isMobile, getTelemetryToken, onVerify]);
+  }, [verified, mouseEventsCount, isMobile, getTelemetryToken, onVerify, siteKey]);
 
   const handleSliderDrag = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     const handle = e.currentTarget;
@@ -100,7 +100,7 @@ export const VerificationWidget: React.FC<VerificationWidgetProps> = ({
       solveChallenge('slider');
       setVerified(true);
       setChallengeActive(false);
-      const token = getTelemetryToken();
+      const token = getTelemetryToken(siteKey);
       
       const parentForm = containerRef.current?.closest('form');
       if (parentForm) {

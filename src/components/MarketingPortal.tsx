@@ -64,7 +64,9 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
           userAgent,
           hasForwardedFor,
           isBotUA,
-          telemetry.createdAt
+          telemetry.createdAt,
+          telemetry.signature,
+          "vms_pub_live_demo"
         );
         
         const mousePoints = behavior.mousePoints || [];
