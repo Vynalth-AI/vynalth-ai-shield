@@ -759,8 +759,16 @@ export class OnlineAutoencoder {
   trainedSamplesCount: number = 0;
 
   constructor() {
-    this.weights1 = Array.from({ length: 4 }, () => [Math.random() * 0.2 - 0.1, Math.random() * 0.2 - 0.1]);
-    this.weights2 = Array.from({ length: 2 }, () => Array.from({ length: 4 }, () => Math.random() * 0.2 - 0.1));
+    this.weights1 = [
+      [0.05, -0.05],
+      [-0.08, 0.08],
+      [0.02, -0.02],
+      [-0.04, 0.04]
+    ];
+    this.weights2 = [
+      [0.05, -0.08, 0.02, -0.04],
+      [-0.05, 0.08, -0.02, 0.04]
+    ];
     this.bias1 = [0.1, 0.1];
     this.bias2 = [0.1, 0.1, 0.1, 0.1];
   }
@@ -863,9 +871,36 @@ export class OnlineAutoencoder {
     this.trainedSamplesCount++;
   }
 
+  exportState() {
+    return {
+      weights1: this.weights1,
+      weights2: this.weights2,
+      bias1: this.bias1,
+      bias2: this.bias2,
+      trainedSamplesCount: this.trainedSamplesCount
+    };
+  }
+
+  importState(state: any) {
+    if (!state) return;
+    if (state.weights1) this.weights1 = state.weights1;
+    if (state.weights2) this.weights2 = state.weights2;
+    if (state.bias1) this.bias1 = state.bias1;
+    if (state.bias2) this.bias2 = state.bias2;
+    if (state.trainedSamplesCount !== undefined) this.trainedSamplesCount = state.trainedSamplesCount;
+  }
+
   reset() {
-    this.weights1 = Array.from({ length: 4 }, () => [Math.random() * 0.2 - 0.1, Math.random() * 0.2 - 0.1]);
-    this.weights2 = Array.from({ length: 2 }, () => Array.from({ length: 4 }, () => Math.random() * 0.2 - 0.1));
+    this.weights1 = [
+      [0.05, -0.05],
+      [-0.08, 0.08],
+      [0.02, -0.02],
+      [-0.04, 0.04]
+    ];
+    this.weights2 = [
+      [0.05, -0.08, 0.02, -0.04],
+      [-0.05, 0.08, -0.02, 0.04]
+    ];
     this.bias1 = [0.1, 0.1];
     this.bias2 = [0.1, 0.1, 0.1, 0.1];
     this.trainedSamplesCount = 0;

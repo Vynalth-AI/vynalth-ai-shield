@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import crypto from 'crypto';
-import { evaluateTelemetry } from '../src/lib/riskEngine';
+import { evaluateTelemetry, globalAutoencoder } from '../src/lib/riskEngine';
 
 function decryptAES256GCM(ciphertextBase64: string, keySeed: string): string {
   const parts = ciphertextBase64.split(':');
@@ -131,6 +131,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     ];
     const isBotUA = aiAgentPatterns.some(pattern => pattern.test(userAgent));
     const hasForwardedFor = !!req.headers['x-forwarded-for'];
+    // Load latest Autoencoder state from Supabase if configured (P0 autoencoder persistence)
+    if (SUPABASE_URL && SUPABASE_KEY) {
+      try {
+        const aeLoadResponse = await fetch(`${SUPABASE_URL}/rest/v1/autoencoder_states?order=id.desc&limit=1`, {
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`
+          }
+        });
+        if (aeLoadResponse.ok) {
+          const aeData = await aeLoadResponse.json();
+          if (aeData && aeData.length > 0 && aeData[0].state) {
+            globalAutoencoder.importState(aeData[0].state);
+          }
+        }
+      } catch (err) {
+        console.error('Supabase load autoencoder state failed:', err);
+      }
+    }
+
+    const aeCountBefore = globalAutoencoder.trainedSamplesCount;
+
     const evaluation = evaluateTelemetry(
       fingerprint,
       behavior,
@@ -144,6 +166,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       telemetry.powNonce,
       telemetry.powDifficulty
     );
+
+    const aeCountAfter = globalAutoencoder.trainedSamplesCount;
+    if (aeCountAfter > aeCountBefore && SUPABASE_URL && SUPABASE_KEY) {
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/autoencoder_states`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`
+          },
+          body: JSON.stringify({
+            state: globalAutoencoder.exportState(),
+            created_at: new Date().toISOString()
+          })
+        });
+      } catch (err) {
+        console.error('Supabase save autoencoder state failed:', err);
+      }
+    }
 
     const {
       riskScore,
