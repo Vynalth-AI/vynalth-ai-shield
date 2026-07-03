@@ -32,7 +32,7 @@
         return u.origin + '/api/model/train';
       } catch (_) { return null; }
     })() ||
-    'https://vitashield-dun.vercel.app/api/model/train';
+    'https://vita-shield.vercel.app/api/model/train';
 
   var MIN_MS         = 8000;   // 至少采集 8 秒
   var MAX_POINTS     = 80;     // 最多存 80 个鼠标点
