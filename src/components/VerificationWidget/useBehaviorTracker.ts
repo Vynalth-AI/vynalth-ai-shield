@@ -450,7 +450,13 @@ export const useBehaviorTracker = () => {
       if (powNonce > 5000000) break;
     }
 
-    return btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+    const rawJson = JSON.stringify(payload);
+    const encodedText = encodeURIComponent(rawJson);
+    let encrypted = '';
+    for (let i = 0; i < encodedText.length; i++) {
+      encrypted += String.fromCharCode(encodedText.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+    }
+    return btoa(encrypted);
   };
 
   const solveChallenge = (method: string) => {

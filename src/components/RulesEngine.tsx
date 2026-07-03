@@ -11,44 +11,56 @@ interface Rule {
 }
 
 export const RulesEngine: React.FC = () => {
-  const [rules, setRules] = useState<Rule[]>([
-    {
-      id: 'rule-1',
-      field: 'IP VPN / Proxy',
-      operator: '==',
-      value: 'true',
-      action: 'challenge',
-      enabled: true,
-      desc: 'If request originates from a known VPN or proxy pool, force challenge verification.'
-    },
-    {
-      id: 'rule-2',
-      field: 'User Agent',
-      operator: 'contains',
-      value: 'OpenAI-Operator',
-      action: 'block',
-      enabled: true,
-      desc: 'If request is initiated by the OpenAI Operator AI Agent, block access instantly.'
-    },
-    {
-      id: 'rule-3',
-      field: 'Risk Score',
-      operator: '>',
-      value: '75',
-      action: 'block',
-      enabled: true,
-      desc: 'If session evaluation exceeds 75/100 danger threshold, drop connection.'
-    },
-    {
-      id: 'rule-4',
-      field: 'Country Code',
-      operator: '==',
-      value: 'KP',
-      action: 'block',
-      enabled: false,
-      desc: 'If origin country is North Korea (KP), apply strict block gate.'
+  const [rules, setRules] = useState<Rule[]>(() => {
+    const saved = localStorage.getItem('vitashield_custom_rules');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {}
     }
-  ]);
+    return [
+      {
+        id: 'rule-1',
+        field: 'IP VPN / Proxy',
+        operator: '==',
+        value: 'true',
+        action: 'challenge',
+        enabled: true,
+        desc: 'If request originates from a known VPN or proxy pool, force challenge verification.'
+      },
+      {
+        id: 'rule-2',
+        field: 'User Agent',
+        operator: 'contains',
+        value: 'OpenAI-Operator',
+        action: 'block',
+        enabled: true,
+        desc: 'If request is initiated by the OpenAI Operator AI Agent, block access instantly.'
+      },
+      {
+        id: 'rule-3',
+        field: 'Risk Score',
+        operator: '>',
+        value: '75',
+        action: 'block',
+        enabled: true,
+        desc: 'If session evaluation exceeds 75/100 danger threshold, drop connection.'
+      },
+      {
+        id: 'rule-4',
+        field: 'Country Code',
+        operator: '==',
+        value: 'KP',
+        action: 'block',
+        enabled: false,
+        desc: 'If origin country is North Korea (KP), apply strict block gate.'
+      }
+    ];
+  });
+
+  React.useEffect(() => {
+    localStorage.setItem('vitashield_custom_rules', JSON.stringify(rules));
+  }, [rules]);
 
   const [newField, setNewField] = useState('Risk Score');
   const [newOperator, setNewOperator] = useState('>');

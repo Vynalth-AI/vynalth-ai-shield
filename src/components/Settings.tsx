@@ -233,6 +233,36 @@ export const Settings: React.FC<SettingsProps> = ({ config, setConfig }) => {
                   <span style={styles.slider} />
                 </label>
               </div>
+
+              <div style={styles.toggleRow}>
+                <div>
+                  <div style={styles.toggleTitle}>Edge CDN Acceleration</div>
+                  <div style={styles.toggleDesc}>Distribute the client SDK widget dynamically via edge CDN nodes.</div>
+                </div>
+                <label style={styles.switch}>
+                  <input 
+                    type="checkbox" 
+                    checked={localConfig.cdnEnabled !== false} 
+                    onChange={(e) => setLocalConfig(prev => ({ ...prev, cdnEnabled: e.target.checked }))}
+                  />
+                  <span style={styles.slider} />
+                </label>
+              </div>
+
+              <div style={styles.toggleRow}>
+                <div>
+                  <div style={styles.toggleTitle}>Token Gzip Compression</div>
+                  <div style={styles.toggleDesc}>Compress outbound telemetry payloads to minimize client load times.</div>
+                </div>
+                <label style={styles.switch}>
+                  <input 
+                    type="checkbox" 
+                    checked={localConfig.gzipEnabled !== false} 
+                    onChange={(e) => setLocalConfig(prev => ({ ...prev, gzipEnabled: e.target.checked }))}
+                  />
+                  <span style={styles.slider} />
+                </label>
+              </div>
             </div>
           </div>
 

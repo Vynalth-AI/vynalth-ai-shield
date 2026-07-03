@@ -16,9 +16,15 @@ console.log(`${BOLD}${CYAN}=== VITASHIELD ANTI-BOT SIMULATOR TEST SUITE ===${RES
 // 1. Core Mathematical Risk Evaluation Model (Replicated from riskEngine.ts for instant execution)
 function runLocalVerify(token, clientIp, userAgent) {
   let telemetry = {};
+  const key = "vms_pub_live_demo";
   try {
-    const decoded = Buffer.from(token, 'base64').toString('utf-8');
-    telemetry = JSON.parse(decoded);
+    const encryptedText = Buffer.from(token, 'base64').toString('binary');
+    let decrypted = '';
+    for (let i = 0; i < encryptedText.length; i++) {
+      decrypted += String.fromCharCode(encryptedText.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+    }
+    const rawJson = decodeURIComponent(decrypted);
+    telemetry = JSON.parse(rawJson);
   } catch (e) {
     return { success: false, error: 'Malformed token payload.' };
   }
@@ -162,7 +168,16 @@ function runLocalVerify(token, clientIp, userAgent) {
 }
 
 // Helper to encode JSON payloads into tokens
-const encodePayload = (p) => Buffer.from(JSON.stringify(p)).toString('base64');
+const encodePayload = (p) => {
+  const key = "vms_pub_live_demo";
+  const rawJson = JSON.stringify(p);
+  const encodedText = encodeURIComponent(rawJson);
+  let encrypted = '';
+  for (let i = 0; i < encodedText.length; i++) {
+    encrypted += String.fromCharCode(encodedText.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+  }
+  return Buffer.from(encrypted, 'binary').toString('base64');
+};
 
 // ==========================================
 // SCENARIO 1: Organic Human Telemetry

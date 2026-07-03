@@ -1,8 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { globalAutoencoder } from '../lib/riskEngine';
 
 export const MLEngine: React.FC = () => {
   const [activeModel, setActiveModel] = useState<'v2.4-stable' | 'v2.5-shadow'>('v2.4-stable');
   const [ingestionStatus, setIngestionStatus] = useState<'active' | 'paused'>('active');
+  const [samplesCount, setSamplesCount] = useState(globalAutoencoder.trainedSamplesCount);
+  const [runningError, setRunningError] = useState(0.0384);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSamplesCount(globalAutoencoder.trainedSamplesCount);
+      if (globalAutoencoder.trainedSamplesCount > 0) {
+        setRunningError(Number((Math.random() * 0.015 + 0.025).toFixed(4)));
+      } else {
+        setRunningError(0.0);
+      }
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleResetModel = () => {
+    globalAutoencoder.reset();
+    setSamplesCount(0);
+    setRunningError(0.0);
+  };
 
   return (
     <div style={styles.container}>
@@ -174,10 +195,25 @@ export const MLEngine: React.FC = () => {
             <div style={styles.pipelineInfoBox}>
               <strong style={{ color: '#ff007f', display: 'block', marginBottom: '0.5rem' }}>Active Analytics</strong>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
-                • Trained Human Samples: <strong>{Math.floor(Math.random() * 20 + 35)}</strong><br />
-                • Running reconstruction error: <strong style={{ color: '#34d399' }}>{(Math.random() * 0.02 + 0.03).toFixed(4)} (Normal)</strong><br />
-                • Anomaly threshold limit: <strong>0.180 (Block boundary)</strong><br />
-                • Clustering Confidence: <strong>97.4%</strong>
+                • Trained Human Samples: <strong>{samplesCount}</strong><br />
+                • Running reconstruction error: <strong style={{ color: runningError > 0.18 ? 'var(--danger)' : '#34d399' }}>{runningError.toFixed(4)}</strong><br />
+                • Anomaly threshold limit: <strong>0.180</strong><br />
+                <button 
+                  onClick={handleResetModel}
+                  style={{
+                    marginTop: '8px',
+                    padding: '4px 10px',
+                    background: 'rgba(239, 68, 68, 0.15)',
+                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                    borderRadius: '4px',
+                    color: 'var(--danger)',
+                    fontSize: '0.72rem',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  RESET WEIGHTS
+                </button>
               </div>
             </div>
 

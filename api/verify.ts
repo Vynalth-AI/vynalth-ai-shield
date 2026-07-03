@@ -65,11 +65,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // 1. Decode token payload (Base64 encrypted by client-side widget.js)
+    const siteKey = secret ? secret.replace('vms_sec_', 'vms_pub_') : 'default_site_key';
+
+    // 1. Decode token payload (XOR encrypted by client-side)
     let telemetry: any = {};
     try {
-      const decoded = Buffer.from(token, 'base64').toString('utf-8');
-      telemetry = JSON.parse(decoded);
+      const encryptedText = Buffer.from(token, 'base64').toString('binary');
+      let decrypted = '';
+      for (let i = 0; i < encryptedText.length; i++) {
+        decrypted += String.fromCharCode(encryptedText.charCodeAt(i) ^ siteKey.charCodeAt(i % siteKey.length));
+      }
+      const rawJson = decodeURIComponent(decrypted);
+      telemetry = JSON.parse(rawJson);
     } catch (e) {
       return res.status(400).json({ success: false, error: 'Invalid or malformed verification token.' });
     }
@@ -83,8 +90,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const userAgent = fingerprint.userAgent || req.headers['user-agent'] || '';
 
     // 2. Run Risk Engine v2 Layered Security Models
-    // Note: Legitimate crawlers (googlebot, bingbot, etc.) are handled by
-    // the whitelist inside evaluateTelemetry() and will always get decision=allow.
     const aiAgentPatterns = [
       /openai/i, /gptbot/i, /chatgpt/i, /chat-gpt/i, /claude/i, /anthropic/i,
       /google-extended/i, /python-urllib/i, /axios/i, /headless/i,
@@ -92,9 +97,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     ];
     const isBotUA = aiAgentPatterns.some(pattern => pattern.test(userAgent));
     const hasForwardedFor = !!req.headers['x-forwarded-for'];
-
-    const siteKey = secret ? secret.replace('vms_sec_', 'vms_pub_') : 'default_site_key';
-
     const evaluation = evaluateTelemetry(
       fingerprint,
       behavior,

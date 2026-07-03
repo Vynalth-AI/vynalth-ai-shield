@@ -21,6 +21,8 @@ export interface ShieldConfig {
   themePrimary: string;
   themeBg: string;
   themeText: string;
+  cdnEnabled?: boolean;
+  gzipEnabled?: boolean;
 }
 
 export interface DeveloperKeys {

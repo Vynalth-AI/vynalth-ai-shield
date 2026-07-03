@@ -40,7 +40,13 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
     
     setTimeout(() => {
       try {
-        const decodedString = atob(token);
+        const key = "vms_pub_live_demo";
+        const encrypted = atob(token);
+        let decrypted = '';
+        for (let i = 0; i < encrypted.length; i++) {
+          decrypted += String.fromCharCode(encrypted.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+        }
+        const decodedString = decodeURIComponent(decrypted);
         const telemetry = JSON.parse(decodedString);
         
         const fingerprint = telemetry.fingerprint || {};
@@ -134,7 +140,13 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
     const interval = setInterval(() => {
       try {
         const token = getTelemetryToken();
-        const decodedString = atob(token);
+        const key = "default_site_key";
+        const encrypted = atob(token);
+        let decrypted = '';
+        for (let i = 0; i < encrypted.length; i++) {
+          decrypted += String.fromCharCode(encrypted.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+        }
+        const decodedString = decodeURIComponent(decrypted);
         const telemetry = JSON.parse(decodedString);
         
         const fingerprint = telemetry.fingerprint || {};

@@ -342,6 +342,35 @@ export class SignalAnalyzer {
       score += 15;
     }
 
+    // 18. Screen orientation dimensions mismatch
+    const width = fp.screenWidth || 0;
+    const height = fp.screenHeight || 0;
+    const orientation = (fp.screenOrientation || '').toLowerCase();
+    if (width > height && orientation.includes('portrait')) {
+      flags.push('screen_orientation_dimension_mismatch');
+      score += 15;
+    }
+    if (height > width && orientation.includes('landscape')) {
+      flags.push('screen_orientation_dimension_mismatch');
+      score += 15;
+    }
+
+    // 19. Operating system platform string mismatch
+    if (platform === 'macintel' && !/macintosh|mac os|iphone|ipad|ipod/i.test(ua)) {
+      flags.push('mac_platform_non_mac_user_agent');
+      score += 25;
+    }
+    if (platform === 'win32' && !/windows|win64/i.test(ua)) {
+      flags.push('windows_platform_non_windows_user_agent');
+      score += 25;
+    }
+
+    // 20. Missing Service Worker support in modern desktop browsers
+    if (/chrome|firefox|safari/i.test(ua) && fp.hasServiceWorker === false && !isMobile) {
+      flags.push('modern_browser_missing_serviceworker');
+      score += 10;
+    }
+
     return { flags, score: Math.min(score, 100) };
   }
 
@@ -433,6 +462,18 @@ export class SignalAnalyzer {
       // Form submitted before the page even finished loading → scripted
       flags.push('form_submitted_before_page_loaded');
       score += 30;
+    }
+
+    // 11. Empty plugins array on desktop modern browser (classic automation signature)
+    if (fp.pluginsArrayEmpty === true && !fp.isMobile && /chrome|firefox|safari/i.test(ua)) {
+      flags.push('desktop_browser_missing_plugins');
+      score += 25;
+    }
+
+    // 12. Blank or disabled Canvas fingerprint
+    if (fp.canvasFingerprint === '0' || fp.canvasFingerprint === '') {
+      flags.push('canvas_fingerprint_tampered_or_disabled');
+      score += 25;
     }
 
     return { flags, score: Math.min(score, 100) };
@@ -773,6 +814,14 @@ export class OnlineAutoencoder {
 
     this.trainedSamplesCount++;
   }
+
+  reset() {
+    this.weights1 = Array.from({ length: 4 }, () => [Math.random() * 0.2 - 0.1, Math.random() * 0.2 - 0.1]);
+    this.weights2 = Array.from({ length: 2 }, () => Array.from({ length: 4 }, () => Math.random() * 0.2 - 0.1));
+    this.bias1 = [0.1, 0.1];
+    this.bias2 = [0.1, 0.1, 0.1, 0.1];
+    this.trainedSamplesCount = 0;
+  }
 }
 
 export const globalAutoencoder = new OnlineAutoencoder();
@@ -993,7 +1042,11 @@ export function evaluateTelemetry(
   }
 
   // 7. Decision
-  const decision = DecisionMaker.makeDecision(riskScore, trustScore, reputationScore, isAiAgent, challengeSolved);
+  let decision = DecisionMaker.makeDecision(riskScore, trustScore, reputationScore, isAiAgent, challengeSolved);
+  const customDecision = applyCustomRules(riskScore, clientIp, userAgent, reputationScore);
+  if (customDecision !== null) {
+    decision = customDecision;
+  }
 
   return {
     riskScore:       Math.min(Math.max(riskScore, 0), 100),
@@ -1010,4 +1063,56 @@ export function evaluateTelemetry(
     autoencoderError,
     autoencoderTrainedCount
   };
+}
+
+function applyCustomRules(
+  riskScore: number,
+  clientIp: string,
+  userAgent: string,
+  reputationScore: number
+): 'allow' | 'challenge' | 'block' | null {
+  if (typeof window === 'undefined') return null;
+  const saved = window.localStorage.getItem('vitashield_custom_rules');
+  if (!saved) return null;
+
+  try {
+    const rules = JSON.parse(saved);
+    for (const rule of rules) {
+      if (!rule.enabled) continue;
+
+      let match = false;
+      const field = rule.field;
+      const op = rule.operator;
+      const val = rule.value;
+
+      if (field === 'Risk Score') {
+        const scoreNum = Number(val);
+        if (op === '>' && riskScore > scoreNum) match = true;
+        if (op === '<' && riskScore < scoreNum) match = true;
+        if (op === '==' && riskScore === scoreNum) match = true;
+      } else if (field === 'User Agent') {
+        if (op === 'contains' && userAgent.toLowerCase().includes(val.toLowerCase())) match = true;
+        if (op === '==' && userAgent.toLowerCase() === val.toLowerCase()) match = true;
+      } else if (field === 'IP VPN / Proxy') {
+        const isSuspicious = reputationScore < 70;
+        if (op === '==' && String(isSuspicious) === val) match = true;
+      } else if (field === 'Country Code') {
+        let country = 'US';
+        if (clientIp.startsWith('185.220.')) country = 'DE';
+        if (clientIp.startsWith('103.149.')) country = 'CN';
+        if (clientIp.startsWith('45.89.')) country = 'RU';
+        if (clientIp.startsWith('175.')) country = 'KP';
+
+        if (op === '==' && country.toLowerCase() === val.toLowerCase()) match = true;
+      }
+
+      if (match) {
+        return rule.action;
+      }
+    }
+  } catch (e) {
+    console.warn("Error running custom rules:", e);
+  }
+
+  return null;
 }

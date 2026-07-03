@@ -555,11 +555,58 @@
         }
 
         var now = Date.now();
+        telemetry.createdAt = now;
         telemetry.behavior.durationMs  = now - startTime;
         if (lastMouseMoveTime > 0) telemetry.behavior.submitPauseMs = now - lastMouseMoveTime;
         if (telemetry.behavior.lastPasteTime > 0) telemetry.behavior.lastPasteTime = now - telemetry.behavior.lastPasteTime;
 
-        var b64Token = btoa(unescape(encodeURIComponent(JSON.stringify(telemetry))));
+        var siteKey = container.getAttribute('data-sitekey') || 'default_site_key';
+
+        // 1. Signature generation (FNV-1a checksum)
+        var salt = "vms_client_shield_salt_2026_q2";
+        var rawString = telemetry.createdAt + "-" + (telemetry.behavior.mouseEventsCount || 0) + "-" + (telemetry.behavior.keyPressesCount || 0) + "-" + siteKey + "-" + salt;
+        var hash = 2166136261;
+        for (var i = 0; i < rawString.length; i++) {
+          hash ^= rawString.charCodeAt(i);
+          hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+        }
+        telemetry.signature = (hash >>> 0).toString(16);
+
+        // 2. Proof of Work (PoW) Solver
+        var difficulty = 3;
+        var nowTime = Date.now();
+        if (window.lastSubmissionTime && (nowTime - window.lastSubmissionTime < 800)) {
+          difficulty = 5;
+        }
+        window.lastSubmissionTime = nowTime;
+
+        var powChallenge = telemetry.createdAt + "-" + siteKey;
+        var powPrefix = "0".repeat(difficulty);
+        var powNonce = 0;
+        while (true) {
+          var powString = powChallenge + "-" + powNonce;
+          var powHash = 5381;
+          for (var i = 0; i < powString.length; i++) {
+            powHash = ((powHash << 5) + powHash) + powString.charCodeAt(i);
+          }
+          var calculatedHashStr = (powHash >>> 0).toString(16).padStart(8, '0');
+          if (calculatedHashStr.indexOf(powPrefix) === 0) {
+            telemetry.powNonce = powNonce;
+            telemetry.powDifficulty = difficulty;
+            break;
+          }
+          powNonce++;
+          if (powNonce > 5000000) break;
+        }
+
+        // 3. Encrypt payload
+        var rawJson = JSON.stringify(telemetry);
+        var encodedText = encodeURIComponent(rawJson);
+        var encrypted = "";
+        for (var i = 0; i < encodedText.length; i++) {
+          encrypted += String.fromCharCode(encodedText.charCodeAt(i) ^ siteKey.charCodeAt(i % siteKey.length));
+        }
+        var b64Token = btoa(encrypted);
 
         if (debugMode) {
           log('v' + SDK_VERSION + ' token ready, size:', JSON.stringify(telemetry).length, 'bytes');

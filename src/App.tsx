@@ -116,7 +116,9 @@ function App() {
     blockIpList: [],
     themePrimary: '#00f2fe',
     themeBg: '#0b1329',
-    themeText: '#a5f3fc'
+    themeText: '#a5f3fc',
+    cdnEnabled: true,
+    gzipEnabled: true
   });
 
   const [logs, setLogs] = useState<VerificationLog[]>([]);
@@ -133,7 +135,9 @@ function App() {
         blockIpList: [],
         themePrimary: '#00f2fe',
         themeBg: '#0b1329',
-        themeText: '#a5f3fc'
+        themeText: '#a5f3fc',
+        cdnEnabled: true,
+        gzipEnabled: true
       });
       return;
     }
