@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import type { ShieldConfig } from '../types';
 
 interface IPOverride {
   id: string;
@@ -15,7 +16,11 @@ interface ReviewSession {
   trigger: string;
 }
 
-export const AdminPortal: React.FC = () => {
+interface AdminPortalProps {
+  config: ShieldConfig;
+}
+
+export const AdminPortal: React.FC<AdminPortalProps> = ({ config }) => {
   const [overrides, setOverrides] = useState<IPOverride[]>([
     {
       id: 'ov-1',
@@ -91,18 +96,26 @@ export const AdminPortal: React.FC = () => {
       <div style={styles.statsGrid}>
         <div className="glass-panel" style={styles.statCard}>
           <span style={styles.statLabel}>Gateway Health</span>
-          <div style={styles.statVal}>99.997%</div>
+          <div style={styles.statVal}>{config?.cdnEnabled !== false ? '99.999%' : '99.50%'}</div>
           <span style={styles.statSub}>Edge routing stability SLA</span>
         </div>
         <div className="glass-panel" style={styles.statCard}>
-          <span style={styles.statLabel}>Avg Latency</span>
-          <div style={styles.statVal}>112ms</div>
-          <span style={styles.statSub}><strong style={{ color: 'var(--success)' }}>&lt; 200ms Target</strong></span>
+          <span style={styles.statLabel}>Avg Verification Latency</span>
+          <div style={styles.statVal}>{config?.cdnEnabled !== false ? '38ms' : '154ms'}</div>
+          <span style={styles.statSub}>
+            <strong style={{ color: config?.cdnEnabled !== false ? 'var(--success)' : 'var(--warning)' }}>
+              {config?.cdnEnabled !== false ? '< 50ms Target (CDN Active)' : '< 200ms Target'}
+            </strong>
+          </span>
         </div>
         <div className="glass-panel" style={styles.statCard}>
-          <span style={styles.statLabel}>Challenge Pass Rate</span>
-          <div style={styles.statVal}>94.8%</div>
-          <span style={styles.statSub}>12,408 successful solves</span>
+          <span style={styles.statLabel}>Average Token Size</span>
+          <div style={styles.statVal}>{config?.gzipEnabled !== false ? '4.8 KB' : '28.6 KB'}</div>
+          <span style={styles.statSub}>
+            <strong style={{ color: config?.gzipEnabled !== false ? 'var(--success)' : 'var(--text-muted)' }}>
+              {config?.gzipEnabled !== false ? 'Gzip Compressed (83% saved)' : 'Uncompressed payload'}
+            </strong>
+          </span>
         </div>
         <div className="glass-panel" style={styles.statCard}>
           <span style={styles.statLabel}>Threat Mitigation</span>

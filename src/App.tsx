@@ -273,7 +273,7 @@ function App() {
       case 'rules':
         return <RulesEngine />;
       case 'admin':
-        return <AdminPortal />;
+        return <AdminPortal config={config} />;
       case 'ml_pipeline':
         return <MLEngine />;
       case 'alerts':
