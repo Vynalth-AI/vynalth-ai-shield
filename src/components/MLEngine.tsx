@@ -363,12 +363,29 @@ export const MLEngine: React.FC = () => {
             </div>
 
             <div style={styles.pipelineInfoBox}>
-              <strong style={{ color: '#ff007f', display: 'block', marginBottom: '0.5rem' }}>Active Analytics</strong>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
-                • Trained Human Samples: <strong>{samplesCount}</strong><br />
+              <strong style={{ color: '#ff007f', display: 'block', marginBottom: '0.5rem' }}>
+                Active Analytics
+                <span style={{
+                  marginLeft: '0.5rem',
+                  fontSize: '0.65rem',
+                  background: 'rgba(16,185,129,0.15)',
+                  border: '1px solid rgba(16,185,129,0.35)',
+                  color: '#10b981',
+                  padding: '1px 6px',
+                  borderRadius: '4px',
+                  fontWeight: 400
+                }}>
+                  ● LIVE
+                </span>
+              </strong>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: '1.8' }}>
+                • Total trained samples: <strong style={{ color: '#fff' }}>{samplesCount}</strong><br />
+                &nbsp;&nbsp;<span style={{ fontSize: '0.72rem', color: '#10b981' }}>
+                  ↳ Includes real visitor traffic from VitaShield &amp; sleepsomno.com
+                </span><br />
                 • Running reconstruction error: <strong style={{ color: runningError > 0.18 ? 'var(--danger)' : '#34d399' }}>{runningError.toFixed(4)}</strong><br />
                 • Anomaly threshold limit: <strong>0.180</strong><br />
-                <button 
+                <button
                   onClick={handleResetModel}
                   style={{
                     marginTop: '8px',

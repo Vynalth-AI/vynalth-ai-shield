@@ -302,6 +302,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const keyPresses = behavior.keyPressesCount || 0;
     const scrolls = behavior.scrollsCount || 0;
     const clientIp = ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+
+    // Extract raw behavior payload for online training
+    const rawMousePoints  = behavior.mousePoints  || [];
+    const rawKeyTimings   = behavior.keyTimings   || [];
+    const rawFormDuration = behavior.durationMs   ?? 0;
     const userAgent = fingerprint.userAgent || req.headers['user-agent'] || '';
 
     // 6. Run Risk Engine Layered Security Models
@@ -445,6 +450,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       } catch (dbError) {
         console.error('Supabase write logging failed:', dbError);
       }
+    }
+
+    // ── Online training: use real human visitor data to continuously improve model ──
+    // Only train on human-classified (allow) traffic to keep the autoencoder
+    // calibrated on genuine human behaviour patterns.
+    if (decision === 'allow') {
+      const trainBaseUrl = process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : 'http://localhost:3000';
+
+      // Fire-and-forget — do not block the response
+      fetch(`${trainBaseUrl}/api/model/train`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mousePoints:  rawMousePoints,
+          keyTimings:   rawKeyTimings,
+          formDuration: rawFormDuration,
+          label: 'human',
+          epochs: 1
+        })
+      }).catch(err => console.error('Online training call failed:', err));
     }
 
     // 8. Output Response
