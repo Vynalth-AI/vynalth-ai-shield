@@ -93,13 +93,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const isBotUA = aiAgentPatterns.some(pattern => pattern.test(userAgent));
     const hasForwardedFor = !!req.headers['x-forwarded-for'];
 
+    const siteKey = secret ? secret.replace('vms_sec_', 'vms_pub_') : 'default_site_key';
+
     const evaluation = evaluateTelemetry(
       fingerprint,
       behavior,
       clientIp,
       userAgent,
       hasForwardedFor,
-      isBotUA
+      isBotUA,
+      telemetry.createdAt,
+      telemetry.signature,
+      siteKey,
+      telemetry.powNonce,
+      telemetry.powDifficulty
     );
 
     const {
