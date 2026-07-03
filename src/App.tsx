@@ -14,6 +14,7 @@ import { MarketingPortal } from './components/MarketingPortal';
 import { AuthPortal } from './components/AuthPortal';
 import { ChecklistPage } from './components/ChecklistPage';
 import { NegativeTraining } from './components/NegativeTraining';
+import { getApiBaseUrl } from './lib/api';
 import type { ShieldConfig, VerificationLog } from './types';
 
 // Initial dummy logs that feed the dashboard charts and tables
@@ -146,7 +147,7 @@ function App() {
     const email = user.user?.email || user.email || 'guest';
     
     // Load real logs from database
-    fetch('/api/logs')
+    fetch(`${getApiBaseUrl()}/api/logs`)
       .then(res => res.json())
       .then(data => {
         if (data && data.logs && data.logs.length > 0) {

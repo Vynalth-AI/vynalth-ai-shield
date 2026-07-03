@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { globalAutoencoder } from '../lib/riskEngine';
+import { getApiBaseUrl } from '../lib/api';
 
 export const NegativeTraining: React.FC = () => {
   const [inputText, setInputText] = useState('');
@@ -40,7 +41,7 @@ export const NegativeTraining: React.FC = () => {
   // Load latest stats from backend
   const fetchStats = async () => {
     try {
-      const res = await fetch('/api/model/train');
+      const res = await fetch(`${getApiBaseUrl()}/api/model/train`);
       if (res.ok) {
         const data = await res.json();
         setSamplesCount(data.trained_samples_count || 0);
@@ -206,7 +207,7 @@ export const NegativeTraining: React.FC = () => {
   const handleDeployModel = async () => {
     setDeployStatus('Uploading adversarial-trained weights to production database...');
     try {
-      const response = await fetch('/api/model/deploy', {
+      const response = await fetch(`${getApiBaseUrl()}/api/model/deploy`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

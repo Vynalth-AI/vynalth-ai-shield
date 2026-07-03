@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { globalAutoencoder } from '../lib/riskEngine';
+import { getApiBaseUrl } from '../lib/api';
 
 export const MLEngine: React.FC = () => {
   const [activeModel, setActiveModel] = useState<'v2.4-stable' | 'v2.5-shadow'>('v2.4-stable');
@@ -29,7 +30,7 @@ export const MLEngine: React.FC = () => {
 
   useEffect(() => {
     // Fetch active production model from database
-    fetch('/api/model/latest')
+    fetch(`${getApiBaseUrl()}/api/model/latest`)
       .then(res => res.json())
       .then(data => {
         if (data && data.weights1) {
@@ -66,7 +67,7 @@ export const MLEngine: React.FC = () => {
   const handleDeployModel = async () => {
     setDeployStatus('Deploying neural weights to Supabase live gateway...');
     try {
-      const response = await fetch('/api/model/deploy', {
+      const response = await fetch(`${getApiBaseUrl()}/api/model/deploy`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

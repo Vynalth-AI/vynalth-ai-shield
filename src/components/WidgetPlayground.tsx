@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { ShieldConfig } from '../types';
 import { VerificationWidget } from './VerificationWidget/VerificationWidget';
+import { getApiBaseUrl } from '../lib/api';
 
 interface WidgetPlaygroundProps {
   config: ShieldConfig;
@@ -43,7 +44,7 @@ export const WidgetPlayground: React.FC<WidgetPlaygroundProps> = ({ config, onAd
     addTerminalLog('SECURE GATEWAY: Connection initialized. Uploading encrypted kinetics packet...');
 
     try {
-      const response = await fetch('/api/verify', {
+      const response = await fetch(`${getApiBaseUrl()}/api/verify`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
