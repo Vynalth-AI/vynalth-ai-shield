@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 export const Integration: React.FC = () => {
-  const [activeCodeTab, setActiveCodeTab] = useState<'javascript' | 'react' | 'vue' | 'svelte' | 'nodejs' | 'python' | 'go' | 'java' | 'php' | 'curl' | 'supabase'>('javascript');
+  const [activeCodeTab, setActiveCodeTab] = useState<'javascript' | 'react' | 'vue' | 'svelte' | 'ios_swift' | 'android_kotlin' | 'nodejs' | 'python' | 'go' | 'java' | 'php' | 'curl' | 'supabase'>('javascript');
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   
   const [keys, setKeys] = useState({
@@ -137,6 +137,127 @@ const handleSubmit = async () => {
   
   <button type="submit" disabled={!token}>Submit</button>
 </form>`,
+
+    ios_swift: `// iOS Native Swift SDK Integration Example
+import Foundation
+import CoreMotion
+import UIKit
+
+class VitaShieldSDK {
+    private let siteKey: String
+    private let motionManager = CMMotionManager()
+    private var motionSamples: [[String: Any]] = []
+
+    init(siteKey: String) {
+        self.siteKey = siteKey
+        startSensorCollection()
+    }
+
+    private func startSensorCollection() {
+        guard motionManager.isAccelerometerAvailable && motionManager.isGyroAvailable else { return }
+        motionManager.accelerometerUpdateInterval = 0.1
+        motionManager.gyroUpdateInterval = 0.1
+        
+        motionManager.startAccelerometerUpdates(to: .main) { [weak self] data, _ in
+            guard let self = self, let accel = data else { return }
+            self.motionSamples.append([
+                "type": "accel",
+                "x": accel.acceleration.x,
+                "y": accel.acceleration.y,
+                "z": accel.acceleration.z,
+                "t": Date().timeIntervalSince1970 * 1000
+            ])
+        }
+    }
+
+    func generateToken(touchEvents: [[String: Any]], completion: @escaping (String) -> Void) {
+        let fingerprint: [String: Any] = [
+            "isNativeApp": true,
+            "deviceModel": UIDevice.current.model,
+            "deviceBrand": "Apple",
+            "cpuArchitecture": "arm64",
+            "isJailbroken": false
+        ]
+        
+        let behavior: [String: Any] = [
+            "touchEvents": touchEvents,
+            "motionSamples": motionSamples,
+            "durationMs": 1500
+        ]
+        
+        let payload: [String: Any] = [
+            "siteKey": siteKey,
+            "fingerprint": fingerprint,
+            "behavior": behavior,
+            "createdAt": Int(Date().timeIntervalSince1970 * 1000)
+        ]
+        
+        // Encrypt the payload and prefix with "aes:"
+        let token = "aes:" + encryptAES256GCM(payload)
+        completion(token)
+    }
+}`,
+
+    android_kotlin: `// Android Native Kotlin SDK Integration Example
+package com.vitashield.sdk
+
+import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import android.os.Build
+import org.json.JSONObject
+
+class VitaShieldSDK(private val context: Context, private val siteKey: String) : SensorEventListener {
+    private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    private val motionSamples = mutableListOf<JSONObject>()
+
+    init {
+        val accel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        sensorManager.registerListener(this, accel, SensorManager.SENSOR_DELAY_NORMAL)
+    }
+
+    override fun onSensorChanged(event: SensorEvent) {
+        if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
+            val sample = JSONObject().apply {
+                put("type", "accel")
+                put("x", event.values[0])
+                put("y", event.values[1])
+                put("z", event.values[2])
+                put("t", System.currentTimeMillis())
+            }
+            motionSamples.add(sample)
+        }
+    }
+
+    fun generateToken(touchPoints: List<Map<String, Any>>): String {
+        val fingerprint = JSONObject().apply {
+            put("isNativeApp", true)
+            put("deviceModel", Build.MODEL)
+            put("deviceBrand", Build.BRAND)
+            put("cpuArchitecture", Build.SUPPORTED_ABIS.firstOrNull() ?: "unknown")
+            put("isJailbroken", false)
+        }
+        
+        val behavior = JSONObject().apply {
+            put("touchEvents", touchPoints)
+            put("motionSamples", motionSamples)
+            put("durationMs", 1200)
+        }
+
+        val payload = JSONObject().apply {
+            put("siteKey", siteKey)
+            put("fingerprint", fingerprint)
+            put("behavior", behavior)
+            put("createdAt", System.currentTimeMillis())
+        }
+
+        return "aes:" + encryptAES256GCM(payload.toString())
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
+}`,
 
     nodejs: `const express = require('express');
 const fetch = require('node-fetch'); // or native fetch in Node 18+
@@ -428,13 +549,13 @@ async function signInWithVitaShield() {
           <div className="code-panel" style={{ marginTop: '1.25rem' }}>
             <div className="code-header">
               <div className="code-tabs">
-                {(['javascript', 'react', 'vue', 'svelte', 'nodejs', 'python', 'go', 'java', 'php', 'curl', 'supabase'] as const).map((tab) => (
+                {(['javascript', 'react', 'vue', 'svelte', 'ios_swift', 'android_kotlin', 'nodejs', 'python', 'go', 'java', 'php', 'curl', 'supabase'] as const).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveCodeTab(tab)}
                     className={`code-tab ${activeCodeTab === tab ? 'active' : ''}`}
                   >
-                    {tab.toUpperCase()}
+                    {tab === 'ios_swift' ? 'iOS (Swift)' : tab === 'android_kotlin' ? 'Android (Kotlin)' : tab.toUpperCase()}
                   </button>
                 ))}
               </div>

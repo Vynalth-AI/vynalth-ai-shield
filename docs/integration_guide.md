@@ -30,6 +30,27 @@ For traditional multipage static HTML forms, inject the CDN script and place the
 <script src="https://vitashield.sleepsomno.com/widget.js" defer></script>
 ```
 
+#### Programmatic Initialization (Flexible Options & Custom Themes)
+For more advanced setups or single-page integrations, initialize the widget programmatically:
+
+```javascript
+window.onVitaShieldReady = function() {
+  window.VitaShield.init({
+    siteKey: 'your_public_sitekey_here',
+    theme: {
+      primary: '#00f2fe',
+      background: 'rgba(13, 20, 35, 0.55)',
+      text: '#94a3b8'
+    },
+    callbacks: {
+      onSuccess: function(token) {
+        console.log('Verification success token:', token);
+      }
+    }
+  });
+};
+```
+
 #### How it works:
 *   Upon form submission, the script intercepts the submit handler.
 *   It packages client-side device signals (WebGL vendor, window dimension matches, timezone) and kinetics (mouse coordinate velocity vectors, key timing variances).
