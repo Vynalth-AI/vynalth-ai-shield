@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { ShieldConfig } from '../types';
+import { VerificationWidget } from './VerificationWidget/VerificationWidget';
 
 interface WidgetPlaygroundProps {
   config: ShieldConfig;
@@ -15,22 +16,9 @@ export const WidgetPlayground: React.FC<WidgetPlaygroundProps> = ({ config, onAd
   const [prompt, setPrompt] = useState('Generate an optimized React table component.');
   
   // Widget states
-  const [widgetActive, setWidgetActive] = useState(false);
-  const [currentMethod, setCurrentMethod] = useState<'behavioral_telemetry' | 'captcha_3d' | 'biometric_scan' | 'cryptographic_pow'>('behavioral_telemetry');
   const [widgetState, setWidgetState] = useState<'idle' | 'running' | 'interactive' | 'success' | 'failed'>('idle');
   const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
-  
-  // 3D CAPTCHA states
-  const [captchaRotation, setCaptchaRotation] = useState(135); // Start off-center
-  const [isCaptchaTargetReached, setIsCaptchaTargetReached] = useState(false);
-
-  // Biometric Scan states
-  const [bioProgress, setBioProgress] = useState(0);
-
-  // PoW puzzle states
-  const [powProgress, setPowProgress] = useState(0);
-  const [powNonce, setPowNonce] = useState('0x00000000');
-  const [powConsoleLines, setPowConsoleLines] = useState<string[]>([]);
+  const [realResponseJson, setRealResponseJson] = useState<any>(null);
 
   // Ref to automatically scroll terminal to bottom
   const terminalEndRef = useRef<HTMLDivElement>(null);
@@ -46,183 +34,66 @@ export const WidgetPlayground: React.FC<WidgetPlaygroundProps> = ({ config, onAd
     setTerminalLogs((prev) => [...prev, `[${time}] ${msg}`]);
   };
 
-  const startVerification = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (widgetState === 'running' || widgetState === 'success') return;
-
-    setWidgetActive(true);
+  const handleRealVerify = async (token: string) => {
     setWidgetState('running');
     setTerminalLogs([]);
-    addTerminalLog('CLIENT SDK: Telemetry active. Collecting client device info (screen resolution, WebGL vendor)...');
-    addTerminalLog('CLIENT SDK: Telemetry active. Collecting client browser info (locales, user-agent details)...');
-    addTerminalLog('CLIENT SDK: Telemetry active. Monitoring user behavior (mouse trajectory kinematics, typing intervals)...');
-    addTerminalLog('CLIENT SDK: Compiling telemetry payload and dispatching to Secure Gateway...');
+    setRealResponseJson(null);
+    addTerminalLog('CLIENT SDK: Real-time telemetry token generated successfully.');
+    addTerminalLog(`TOKEN SCHEMA: ${token.substring(0, 50)}...`);
+    addTerminalLog('SECURE GATEWAY: Connection initialized. Uploading encrypted kinetics packet...');
 
-    // Determine verification method
-    let method = config.forcedMethod;
-    if (method === 'auto') {
-      if (config.preset === 'social') {
-        method = 'captcha_3d';
-      } else if (config.preset === 'ai_apps') {
-        method = 'cryptographic_pow';
-      } else if (config.preset === 'crypto') {
-        method = 'biometric_scan';
-      } else if (config.preset === 'gaming') {
-        method = 'behavioral_telemetry';
-      } else {
-        // general preset uses strictness
-        if (config.strictness === 'high') {
-          method = 'biometric_scan';
-        } else if (config.strictness === 'medium') {
-          method = 'captcha_3d';
-        } else {
-          method = 'behavioral_telemetry';
-        }
+    try {
+      const response = await fetch('/api/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          token,
+          secret: 'vms_sec_live_9c0f73b18274d8a21f7c' // default live key for testing
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server returned HTTP ${response.status}: ${response.statusText}`);
       }
-    }
 
-    setCurrentMethod(method);
-    
-    setTimeout(() => {
-      addTerminalLog('SECURE GATEWAY: Connection established. Routing metadata packet to Risk Engine...');
+      const result = await response.json();
+      setRealResponseJson(result);
       
-      if (method === 'behavioral_telemetry') {
-        addTerminalLog('RISK ENGINE V2: Scoring client telemetry... Risk Score: 12/100, Trust Score: 92/100, Reputation Score: 94/100.');
-        addTerminalLog('VERIFICATION ENGINE: Classification -> HUMAN. Adaptive Challenge state -> SILENT.');
-        addTerminalLog('SECURE GATEWAY: Decision -> ALLOW. Form submission authorized silently.');
-        simulateInvisibleTelemetry();
-      } else if (method === 'captcha_3d') {
-        addTerminalLog('RISK ENGINE V2: Scoring client telemetry... Risk Score: 48/100, Trust Score: 88/100, Reputation Score: 90/100.');
-        addTerminalLog('VERIFICATION ENGINE: Classification -> SUSPECT. Adaptive Challenge state -> INTERACTIVE_SLIDER.');
-        addTerminalLog('SECURE GATEWAY: Decision -> CHALLENGE. Directing client to slider challenge alignment...');
-        simulate3DCaptcha();
-      } else if (method === 'biometric_scan') {
-        addTerminalLog('RISK ENGINE V2: Scoring client telemetry... Risk Score: 62/100, Trust Score: 85/100, Reputation Score: 88/100.');
-        addTerminalLog('VERIFICATION ENGINE: Classification -> HIGH_RISK. Adaptive Challenge state -> FACIAL_GEOMETRIC_SCAN.');
-        addTerminalLog('SECURE GATEWAY: Decision -> CHALLENGE. Requesting biometric facial sweep...');
-        simulateBiometricScan();
-      } else if (method === 'cryptographic_pow') {
-        addTerminalLog('RISK ENGINE V2: Scoring client telemetry... Risk Score: 68/100, Trust Score: 78/100, Reputation Score: 80/100.');
-        addTerminalLog('VERIFICATION ENGINE: Classification -> AUTOMATED_THREAT. Adaptive Challenge state -> CLIENT_POW_HASH.');
-        addTerminalLog('SECURE GATEWAY: Decision -> CHALLENGE. Initializing cryptographic Proof-of-Work...');
-        simulateProofOfWork();
+      addTerminalLog('SECURE GATEWAY: Connection successful. Analyzing response payload...');
+      addTerminalLog(`RISK ENGINE: Classification -> ${result.decision.toUpperCase()}. Risk Score: ${result.scores?.risk_score || 0}/100, Trust Score: ${result.scores?.trust_score || 0}/100, Reputation Score: ${result.scores?.reputation_score || 0}/100.`);
+      
+      if (result.detection_details?.device_anomalies?.length > 0) {
+        addTerminalLog(`ANOMALIES DETECTED: ${JSON.stringify(result.detection_details.device_anomalies)}`);
       }
-    }, 600);
-  };
+      if (result.detection_details?.behavior_flags?.length > 0) {
+        addTerminalLog(`BEHAVIOR FLAGS DETECTED: ${JSON.stringify(result.detection_details.behavior_flags)}`);
+      }
 
-  // 1. Silent invisible check simulation
-  const simulateInvisibleTelemetry = () => {
-    setTimeout(() => {
-      addTerminalLog('GATEWAY: Signature payload finalized. Verification token created.');
-      setWidgetState('success');
-      onAddLog('behavioral_telemetry', 'passed', 12);
-    }, 800);
-  };
-
-  // 2. 3D alignment puzzle
-  const simulate3DCaptcha = () => {
-    setCaptchaRotation(120 + Math.floor(Math.random() * 80)); // random rotation offset
-    setIsCaptchaTargetReached(false);
-    setWidgetState('interactive');
-  };
-
-  const handleCaptchaSlider = (val: number) => {
-    setCaptchaRotation(val);
-    const tolerance = 8;
-    const diff = Math.abs(val);
-    if (diff <= tolerance) {
-      setIsCaptchaTargetReached(true);
-    } else {
-      setIsCaptchaTargetReached(false);
-    }
-  };
-
-  const submitCaptcha = () => {
-    if (isCaptchaTargetReached) {
-      addTerminalLog('CLIENT SDK: Interactive alignment successfully solved by user (upright visual target match).');
-      addTerminalLog('VERIFICATION ENGINE: Slider pattern matches human kinematics. Classification -> HUMAN.');
-      addTerminalLog('SECURE GATEWAY: Decision -> ALLOW. Granting clearance token.');
-      
-      setTimeout(() => {
+      if (result.success) {
+        addTerminalLog('SECURE GATEWAY: Decision -> ALLOW. Transaction successfully authorized!');
         setWidgetState('success');
-        onAddLog('captcha_3d', 'passed', 18);
-      }, 600);
-    } else {
-      addTerminalLog('CLIENT SDK: Object rotation incorrect. Solve failed.');
+        onAddLog('behavioral_telemetry', 'passed', result.scores?.risk_score || 0);
+      } else {
+        const dec = result.decision || 'block';
+        addTerminalLog(`SECURE GATEWAY: Decision -> ${dec.toUpperCase()}. Verification blocked due to high anomaly index.`);
+        setWidgetState('failed');
+        onAddLog('behavioral_telemetry', dec === 'challenge' ? 'flagged' : 'blocked', result.scores?.risk_score || 95);
+      }
+    } catch (error: any) {
+      addTerminalLog(`SECURE GATEWAY: Verification call failed: ${error.message}`);
+      setWidgetState('failed');
     }
   };
 
-  // 3. Biometric scanning
-  const simulateBiometricScan = () => {
-    setBioProgress(0);
-    setWidgetState('running');
-    
-    setTimeout(() => {
-      let currentProgress = 0;
-      const interval = setInterval(() => {
-        currentProgress += 10;
-        setBioProgress(currentProgress);
-        if (currentProgress >= 100) {
-          clearInterval(interval);
-          addTerminalLog('CLIENT SDK: Liveness checks and geometric facial mesh mapping finished.');
-          addTerminalLog('VERIFICATION ENGINE: Mathematical model returns HUMAN liveness signature.');
-          addTerminalLog('SECURE GATEWAY: Decision -> ALLOW. Granting clearance token.');
-          
-          setTimeout(() => {
-            setWidgetState('success');
-            onAddLog('biometric_scan', 'passed', 15);
-          }, 500);
-        }
-      }, 150);
-    }, 400);
-  };
-
-  // 4. Client-side Proof of Work math puzzle
-  const simulateProofOfWork = () => {
-    setPowProgress(0);
-    setPowConsoleLines(['[CLIENT SDK] Initializing SHA-256 loop...']);
-    setWidgetState('running');
-
-    setTimeout(() => {
-      let currentPercent = 0;
-      const lines = [
-        'Nonce check: 0x0ea82b1d -> Hash: a2fd...',
-        'Nonce check: 0x3d0b2f9a -> Hash: 91fa...',
-        'Nonce check: 0x9a8f27c3 -> Hash: 00b4...',
-        'Nonce check: 0x1f9e2d3c -> Hash: 000c...',
-        'Nonce check: 0x7c9b8e21 -> Hash: 00000a7b...'
-      ];
-
-      const interval = setInterval(() => {
-        currentPercent += 20;
-        setPowProgress(currentPercent);
-        
-        const lineIdx = Math.floor((currentPercent / 100) * (lines.length - 1));
-        setPowConsoleLines((prev) => [...prev, lines[lineIdx]]);
-
-        if (currentPercent >= 100) {
-          clearInterval(interval);
-          setPowNonce('0x7c9b8e21');
-          addTerminalLog('CLIENT SDK: SHA-256 collision nonce calculated.');
-          addTerminalLog('VERIFICATION ENGINE: Hash verified against difficulty envelope. Classification -> HUMAN.');
-          addTerminalLog('SECURE GATEWAY: Decision -> ALLOW. Granting clearance token.');
-          
-          setTimeout(() => {
-            setWidgetState('success');
-            onAddLog('cryptographic_pow', 'passed', 8);
-          }, 500);
-        }
-      }, 300);
-    }, 400);
+  const startVerification = (e: React.FormEvent) => {
+    e.preventDefault();
+    addTerminalLog('CLIENT SDK: Form submit triggered. Real-time behavior verification is active.');
   };
 
   const resetForm = () => {
-    setWidgetActive(false);
     setWidgetState('idle');
-    setCaptchaRotation(135);
-    setIsCaptchaTargetReached(false);
-    setBioProgress(0);
-    setPowProgress(0);
   };
 
   return (
@@ -308,131 +179,15 @@ export const WidgetPlayground: React.FC<WidgetPlaygroundProps> = ({ config, onAd
               </>
             )}
 
-            {/* Simulated VitaShield widget container */}
+            {/* Real VitaShield widget container */}
             <div style={styles.widgetContainerOuter}>
-              {!widgetActive ? (
-                <div style={styles.widgetPlaceholder}>
-                  <div style={styles.widgetLogoPlaceholder}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" strokeWidth="2.5">
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                    </svg>
-                  </div>
-                  <span style={styles.widgetPlaceholderText}>VitaShield protects this form submit trigger.</span>
-                </div>
-              ) : (
-                <div className="glass-panel" style={styles.widgetBox}>
-                  {/* Widget Running state */}
-                  {widgetState === 'running' && (
-                    <div style={styles.widgetSubState}>
-                      {currentMethod === 'biometric_scan' ? (
-                        <>
-                          <div className={`biometric-scanner-box scanning`}>
-                            <div className="biometric-grid" />
-                            <div className="biometric-face-path">
-                              <div className="biometric-eye-line">
-                                <span className="biometric-eye-dot" />
-                                <span className="biometric-eye-dot" />
-                              </div>
-                            </div>
-                            <div className="biometric-sweep-line" />
-                          </div>
-                          <span style={styles.widgetStatusMain}>Biometric Facial Geometry Sweep...</span>
-                          <span style={styles.widgetStatusSub}>{bioProgress}% mesh scanning completed</span>
-                        </>
-                      ) : currentMethod === 'cryptographic_pow' ? (
-                        <>
-                          <div className="pow-progress-box">
-                            <div style={styles.powStatusRow}>
-                              <span style={{color: '#fff'}}>Proof of Work Math Solver {powProgress === 100 && `(Nonce: ${powNonce})`}</span>
-                              <span style={{fontFamily: 'var(--font-mono)'}}>{powProgress}%</span>
-                            </div>
-                            <div className="pow-loading-bar">
-                              <div className="pow-loading-progress" style={{ width: `${powProgress}%` }} />
-                            </div>
-                            <div className="pow-puzzle-console">
-                              {powConsoleLines.map((line, idx) => (
-                                <div key={idx}>{line}</div>
-                              ))}
-                            </div>
-                          </div>
-                          <span style={{ ...styles.widgetStatusSub, marginTop: '0.5rem' }}>Solving client-side cryptographic puzzles (non-interactive bot mitigation)...</span>
-                        </>
-                      ) : (
-                        <>
-                          <div style={styles.spinner} />
-                          <span style={styles.widgetStatusMain}>Analyzing browser telemetry dynamics...</span>
-                          <span style={styles.widgetStatusSub}>Checking device markers & request environment</span>
-                        </>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Widget Interactive 3D CAPTCHA state */}
-                  {widgetState === 'interactive' && currentMethod === 'captcha_3d' && (
-                    <div style={styles.widgetSubState}>
-                      <div className="captcha-container-box">
-                        <div className={`captcha-viewport ${isCaptchaTargetReached ? 'verified' : ''}`}>
-                          <div className="captcha-success-glow" />
-                          
-                          {/* target silhouette outline */}
-                          <div className="captcha-target-silhouette" />
-                          
-                          {/* rotatable wireframe shape */}
-                          <div 
-                            className="captcha-object-wrapper"
-                            style={{ transform: `rotate(${captchaRotation}deg)` }}
-                          >
-                            <div className="captcha-wireframe-cube">
-                              <div className="captcha-wireframe-indicator" />
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="captcha-slider-bar">
-                          <input
-                            type="range"
-                            min="-180"
-                            max="180"
-                            value={captchaRotation}
-                            onChange={(e) => handleCaptchaSlider(Number(e.target.value))}
-                            className="captcha-slider-input"
-                          />
-                        </div>
-                      </div>
-
-                      <span style={{ ...styles.widgetStatusMain, marginTop: '0.75rem' }}>Align Upright Challenge</span>
-                      <span style={styles.widgetStatusSub}>Rotate the 3D cube model until the dot matches the top slot.</span>
-                      
-                      <button 
-                        type="button" 
-                        onClick={submitCaptcha}
-                        style={{
-                          ...styles.widgetSubmitBtn,
-                          opacity: isCaptchaTargetReached ? 1 : 0.5,
-                          cursor: isCaptchaTargetReached ? 'pointer' : 'not-allowed'
-                        }}
-                      >
-                        Confirm Alignment
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Widget Success state */}
-                  {widgetState === 'success' && (
-                    <div style={styles.widgetSuccessState}>
-                      <div style={styles.successIcon}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3">
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                      </div>
-                      <div style={styles.successTextContainer}>
-                        <div style={styles.successTitle}>Security Clearance Verified</div>
-                        <div style={styles.successDesc}>Token: <code>vmt_live_{Math.floor(Math.random()*100000)}...</code></div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
+              <VerificationWidget
+                siteKey="vms_pub_live_9c0f73b18274d8a21f7c"
+                onVerify={handleRealVerify}
+                themePrimary={config.themePrimary}
+                themeBg="rgba(13, 20, 35, 0.55)"
+                themeText={config.themeText}
+              />
             </div>
 
             {/* Submission Actions */}
@@ -474,42 +229,13 @@ export const WidgetPlayground: React.FC<WidgetPlaygroundProps> = ({ config, onAd
                     {log}
                   </div>
                 ))}
-                {widgetState === 'success' && (
-                  <div style={styles.jsonOutput}>
-                    {`// POST /v1/verify response payload:
-{
-  "success": true,
-  "decision": "allow",
-  "scores": {
-    "risk_score": ${currentMethod === 'behavioral_telemetry' ? 12 : currentMethod === 'captcha_3d' ? 48 : currentMethod === 'biometric_scan' ? 62 : 68},
-    "trust_score": ${currentMethod === 'behavioral_telemetry' ? 92 : currentMethod === 'captcha_3d' ? 88 : currentMethod === 'biometric_scan' ? 85 : 78},
-    "reputation_score": ${currentMethod === 'behavioral_telemetry' ? 94 : currentMethod === 'captcha_3d' ? 90 : currentMethod === 'biometric_scan' ? 88 : 80}
-  },
-  "detection_details": {
-    "is_ai_agent": false,
-    "agent_type": "none",
-    "device_anomalies": ${
-      currentMethod === 'behavioral_telemetry' ? '[]' :
-      currentMethod === 'captcha_3d' ? '["automated_user_agent_signature"]' :
-      currentMethod === 'biometric_scan' ? '["headless_screen_dimensions_zeroed"]' :
-      '["navigator_webdriver_active"]'
-    },
-    "behavior_flags": ${
-      currentMethod === 'behavioral_telemetry' ? '[]' :
-      currentMethod === 'captcha_3d' ? '["abnormally_low_mouse_dynamics"]' :
-      currentMethod === 'biometric_scan' ? '["abnormally_low_mouse_dynamics"]' :
-      '["zero_mouse_kinetics"]'
-    },
-    "network_flags": ${
-      currentMethod === 'behavioral_telemetry' ? '[]' :
-      currentMethod === 'captcha_3d' ? '[]' :
-      currentMethod === 'biometric_scan' ? '["forwarded_proxy_detected"]' :
-      '["datacenter_asn_subnet"]'
-    }
-  },
-  "timestamp": "${new Date().toISOString()}"
-}`}
-                  </div>
+                {realResponseJson && (
+                   <div style={styles.jsonOutput}>
+                     <pre style={{ margin: 0, fontFamily: 'var(--font-mono)', fontSize: '0.74rem', color: '#10B981' }}>
+                       {`// POST /v1/verify response payload:
+` + JSON.stringify(realResponseJson, null, 2)}
+                     </pre>
+                   </div>
                 )}
                 <div ref={terminalEndRef} />
               </div>
