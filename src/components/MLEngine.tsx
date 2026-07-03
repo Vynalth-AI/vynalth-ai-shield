@@ -25,7 +25,24 @@ export const MLEngine: React.FC = () => {
 
   const [weights1, setWeights1] = useState<number[][]>([...globalAutoencoder.weights1.map(r => [...r])]);
 
+  const [deployStatus, setDeployStatus] = useState<string>('');
+
   useEffect(() => {
+    // Fetch active production model from database
+    fetch('/api/model/latest')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.weights1) {
+          globalAutoencoder.weights1 = data.weights1;
+          globalAutoencoder.bias1 = data.bias1 || globalAutoencoder.bias1;
+          globalAutoencoder.bias2 = data.bias2 || globalAutoencoder.bias2;
+          globalAutoencoder.trainedSamplesCount = data.trained_samples_count || 0;
+          setSamplesCount(globalAutoencoder.trainedSamplesCount);
+          setWeights1([...globalAutoencoder.weights1.map(r => [...r])]);
+        }
+      })
+      .catch(err => console.error('Error loading latest weights:', err));
+
     const timer = setInterval(() => {
       setSamplesCount(globalAutoencoder.trainedSamplesCount);
       if (globalAutoencoder.trainedSamplesCount > 0) {
@@ -44,6 +61,34 @@ export const MLEngine: React.FC = () => {
     setWeights1([...globalAutoencoder.weights1.map(r => [...r])]);
     setPreError(null);
     setPostError(null);
+  };
+
+  const handleDeployModel = async () => {
+    setDeployStatus('Deploying neural weights to Supabase live gateway...');
+    try {
+      const response = await fetch('/api/model/deploy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          weights1: globalAutoencoder.weights1,
+          bias1: globalAutoencoder.bias1,
+          bias2: globalAutoencoder.bias2,
+          trained_samples_count: samplesCount
+        })
+      });
+
+      const result = await response.json();
+      if (response.ok && result.success) {
+        setDeployStatus('🚀 Neural weights successfully deployed to live gateways!');
+        setTimeout(() => setDeployStatus(''), 4000);
+      } else {
+        setDeployStatus(`Deployment failed: ${result.error}`);
+      }
+    } catch (err: any) {
+      setDeployStatus(`Deployment error: ${err.message}`);
+    }
   };
 
   const handleCanvasMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -460,6 +505,45 @@ export const MLEngine: React.FC = () => {
                   </div>
                 </div>
               )}
+
+              {/* Deploy weights button */}
+              <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px dashed rgba(255,255,255,0.06)' }}>
+                <button
+                  disabled={isTraining || samplesCount === 0}
+                  onClick={handleDeployModel}
+                  style={{
+                    width: '100%',
+                    border: 'none',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    color: '#fff',
+                    fontWeight: '700',
+                    fontSize: '0.85rem',
+                    cursor: (isTraining || samplesCount === 0) ? 'not-allowed' : 'pointer',
+                    opacity: (isTraining || samplesCount === 0) ? 0.5 : 1,
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 0 10px rgba(16,185,129,0.15)'
+                  }}
+                >
+                  🚀 DEPLOY NEW WEIGHTS TO PRODUCTION GATEWAY
+                </button>
+                {deployStatus && (
+                  <div style={{ 
+                    marginTop: '0.75rem', 
+                    padding: '0.5rem 0.75rem', 
+                    borderRadius: '6px', 
+                    background: deployStatus.includes('failed') || deployStatus.includes('error') ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+                    border: `1px solid ${deployStatus.includes('failed') || deployStatus.includes('error') ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)'}`,
+                    color: deployStatus.includes('failed') || deployStatus.includes('error') ? 'var(--danger)' : 'var(--success)',
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    textAlign: 'center'
+                  }}>
+                    {deployStatus}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Right: Captured Variables & Weights */}
