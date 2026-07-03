@@ -38,23 +38,43 @@ function runLocalVerify(token, clientIp, userAgent) {
   const flags = [];
 
   // Webdriver & Headless Checks
-  if (fingerprint.webdriverActive) {
+  const ua = (userAgent || '').toLowerCase();
+  const isNativeApp = fingerprint.isNativeApp === true ||
+                      /cfnetwork|darwin|okhttp|retrofit|android client|ios client/i.test(ua);
+
+  if (!isNativeApp && fingerprint.webdriverActive) {
     riskScore += 45;
     anomalies.push('navigator_webdriver_active');
   }
-  if (fingerprint.screenHeight === 0 || fingerprint.screenWidth === 0) {
+  if (!isNativeApp && (fingerprint.screenHeight === 0 || fingerprint.screenWidth === 0)) {
     riskScore += 25;
     anomalies.push('headless_screen_dimensions_zeroed');
   }
-  if (fingerprint.outerDimensionsZeroed) {
+  if (!isNativeApp && fingerprint.outerDimensionsZeroed) {
     riskScore += 30;
     anomalies.push('headless_outer_window_anomalies');
   }
   
   const webgl = fingerprint.webglRenderer || '';
-  if (/swiftshader|llvmpipe|software rasterizer|vmware/i.test(webgl)) {
+  if (!isNativeApp && /swiftshader|llvmpipe|software rasterizer|vmware/i.test(webgl)) {
     riskScore += 40;
     anomalies.push('virtualized_gpu_environment');
+  }
+
+  if (isNativeApp) {
+    const devModel = (fingerprint.deviceModel || '').toLowerCase();
+    const devBrand = (fingerprint.deviceBrand || '').toLowerCase();
+    const cpuArch  = (fingerprint.cpuArchitecture || '').toLowerCase();
+    if (/emulator|simulator|sdk_gphone|google_sdk/i.test(devModel) ||
+        /emulator|simulator/i.test(devBrand) ||
+        /x86|i386|amd64/i.test(cpuArch)) {
+      riskScore += 50;
+      anomalies.push('mobile_emulator_environment');
+    }
+    if (fingerprint.isRooted === true || fingerprint.isJailbroken === true) {
+      riskScore += 35;
+      anomalies.push('mobile_root_or_jailbreak_detected');
+    }
   }
 
   // Trajectory Straightness check (Euclidean vs path length)
@@ -299,5 +319,33 @@ console.log(`- Decision: ${RED}${BOLD}${crawlerResult.decision.toUpperCase()}${R
 console.log(`- Risk Score: ${crawlerResult.scores.risk_score}, Trust Score: ${crawlerResult.scores.trust_score}`);
 console.log(`- Anomalies: ${RED}${JSON.stringify(crawlerResult.anomalies)}${RESET}`);
 console.log(`- Behavior Flags: ${RED}${JSON.stringify(crawlerResult.behavior_flags)}${RESET}\n`);
+
+// ==========================================
+// SCENARIO 4: Mobile Native Emulator Application
+// ==========================================
+console.log(`${BOLD}Running Scenario 4: Mobile Native iOS Simulator App${RESET}`);
+
+const nativePayload = encodePayload({
+  fingerprint: {
+    isNativeApp: true,
+    deviceModel: 'iPhone Simulator',
+    deviceBrand: 'Apple',
+    cpuArchitecture: 'x86_64',
+    isJailbroken: false
+  },
+  behavior: {
+    mouseEventsCount: 0,
+    keyPressesCount: 0,
+    scrollsCount: 0,
+    touchEventsCount: 0,
+    motionSamples: []
+  }
+});
+
+const nativeResult = runLocalVerify(nativePayload, '192.168.1.12', 'iOS App (CFNetwork)');
+console.log(`- Decision: ${RED}${BOLD}${nativeResult.decision.toUpperCase()}${RESET}`);
+console.log(`- Risk Score: ${nativeResult.scores.risk_score}, Trust Score: ${nativeResult.scores.trust_score}`);
+console.log(`- Anomalies: ${RED}${JSON.stringify(nativeResult.anomalies)}${RESET}`);
+console.log(`- Behavior Flags: ${RED}${JSON.stringify(nativeResult.behavior_flags)}${RESET}\n`);
 
 console.log(`${BOLD}${GREEN}✔ All test cases executed successfully! Risk scoring calculations align perfectly.${RESET}`);

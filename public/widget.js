@@ -8,6 +8,18 @@
   // ────────────────────────────────────────────────────────────────────────────
   var SDK_VERSION = '2.2';
 
+  var globalDebuggerDetected = false;
+  try {
+    setInterval(function() {
+      var t0 = performance.now();
+      debugger;
+      var t1 = performance.now();
+      if (t1 - t0 > 100) {
+        globalDebuggerDetected = true;
+      }
+    }, 1000);
+  } catch(e) {}
+
   function initVitaShield() {
     var startTime = Date.now();
     var container = document.getElementById('vitashield-widget') || document.querySelector('[data-sitekey]');
@@ -258,6 +270,7 @@
         webdriverActive: navigator.webdriver || false,
         webdriverSpoofed: isWebdriverSpoofed(),
         chromeRuntimeMissing: /chrome/i.test(navigator.userAgent) && (!window.chrome || !window.chrome.runtime),
+        debuggerDetected: globalDebuggerDetected,
         pluginsArrayEmpty: !isMobile && (!navigator.plugins || navigator.plugins.length === 0),
         languagesEmpty: !navigator.languages || navigator.languages.length === 0,
         permissionQueryMismatch: false, // filled async

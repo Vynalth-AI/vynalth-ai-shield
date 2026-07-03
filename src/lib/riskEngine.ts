@@ -212,10 +212,16 @@ export class SignalAnalyzer {
     flags: string[];
     score: number; // 0-100 risk contribution
   } {
+    const ua: string = (fp.userAgent || '').toLowerCase();
+    const isNativeApp = fp.isNativeApp === true ||
+                        /cfnetwork|darwin|okhttp|retrofit|android client|ios client/i.test(ua);
+    if (isNativeApp) {
+      return { flags: [], score: 0 };
+    }
+
     const flags: string[] = [];
     let score = 0;
 
-    const ua: string = (fp.userAgent || '').toLowerCase();
     const vendor: string = (fp.navigatorVendor || '').toLowerCase();
     const platform: string = (fp.navigatorPlatform || '').toLowerCase();
     const isMobile: boolean = fp.isMobile || false;
@@ -381,10 +387,15 @@ export class SignalAnalyzer {
     flags: string[];
     score: number;
   } {
+    const ua: string = fp.userAgent || '';
+    const isNativeApp = fp.isNativeApp === true ||
+                        /cfnetwork|darwin|okhttp|retrofit|android client|ios client/i.test(ua);
+    if (isNativeApp) {
+      return { flags: [], score: 0 };
+    }
+
     const flags: string[] = [];
     let score = 0;
-
-    const ua: string = fp.userAgent || '';
 
     // 1. webdriverSpoofed=true means defineProperty was used to hide it
     //    This IS the stealth plugin operating — strongest over-spoof signal
@@ -502,6 +513,10 @@ export class ScoreCalculator {
     let deviceRisk = 0, behaviorRisk = 0, biometricRisk = 0, sensorRisk = 0;
 
     // ── Layer 1: Automation Markers ──────────────────────────────────────
+    const ua = (fingerprint.userAgent || '').toLowerCase();
+    const isNativeApp = fingerprint.isNativeApp === true ||
+                        /cfnetwork|darwin|okhttp|retrofit|android client|ios client/i.test(ua);
+
     if (isBotUA) {
       isAiAgent = true; riskScore += 70; deviceRisk += 70;
       deviceAnomalies.push('automated_ai_agent_signature');
@@ -513,47 +528,76 @@ export class ScoreCalculator {
       riskScore += 25; deviceRisk += 25;
       deviceAnomalies.push('headless_screen_dimensions_zeroed');
     }
-    if (fingerprint.webdriverActive === true) {
+    if (!isNativeApp && fingerprint.webdriverActive === true) {
       isAiAgent = true; riskScore += 50; deviceRisk += 50;
       deviceAnomalies.push('navigator_webdriver_active');
     }
-    if (fingerprint.webdriverSpoofed === true) {
+    if (!isNativeApp && fingerprint.webdriverSpoofed === true) {
       // Privacy extensions often trigger this. Add risk but do NOT mark as isAiAgent to allow human challenges instead of blocking.
       riskScore += 30; deviceRisk += 30;
       deviceAnomalies.push('navigator_webdriver_spoofed');
     }
-    if (fingerprint.chromeRuntimeMissing === true) {
+    if (!isNativeApp && fingerprint.chromeRuntimeMissing === true) {
       riskScore += 25; deviceRisk += 25;
       deviceAnomalies.push('chrome_runtime_object_missing');
     }
-    if (fingerprint.pluginsArrayEmpty === true) {
+    if (!isNativeApp && fingerprint.pluginsArrayEmpty === true) {
       riskScore += 20; deviceRisk += 20;
       deviceAnomalies.push('desktop_plugins_array_empty');
     }
-    if (fingerprint.languagesEmpty === true) {
+    if (!isNativeApp && fingerprint.languagesEmpty === true) {
       riskScore += 20; deviceRisk += 20;
       deviceAnomalies.push('navigator_languages_empty');
     }
-    if (fingerprint.permissionQueryMismatch === true) {
+    if (!isNativeApp && fingerprint.permissionQueryMismatch === true) {
       // Browser permissions can sometimes return inconsistent results in private windows.
       riskScore += 20; deviceRisk += 20;
       deviceAnomalies.push('permission_notifications_discrepancy');
     }
     const glRenderer = fingerprint.webglRenderer || '';
-    if (glRenderer) {
+    if (!isNativeApp && glRenderer) {
       const virtualGPUs = [/swiftshader/i, /llvmpipe/i, /software rasterizer/i, /virtualbox/i, /vmware/i];
       if (virtualGPUs.some(p => p.test(glRenderer))) {
         isAiAgent = true; riskScore += 40; deviceRisk += 40;
         deviceAnomalies.push('virtualized_gpu_environment');
       }
     }
-    if (fingerprint.outerDimensionsZeroed === true) {
+    if (!isNativeApp && fingerprint.outerDimensionsZeroed === true) {
       riskScore += 30; deviceRisk += 30;
       deviceAnomalies.push('headless_outer_window_anomalies');
     }
     if (fingerprint.debuggerDetected === true) {
       riskScore += 35; deviceRisk += 35;
       deviceAnomalies.push('client_sdk_debugging_active');
+    }
+
+    // Native Application Specific Detections
+    if (isNativeApp) {
+      const devModel = (fingerprint.deviceModel || '').toLowerCase();
+      const devBrand = (fingerprint.deviceBrand || '').toLowerCase();
+      const cpuArch  = (fingerprint.cpuArchitecture || '').toLowerCase();
+      if (/emulator|simulator|sdk_gphone|google_sdk|genymotion|nox|bluestacks/i.test(devModel) ||
+          /emulator|simulator/i.test(devBrand) ||
+          /x86|i386|amd64/i.test(cpuArch)) {
+        isAiAgent = true;
+        riskScore += 50;
+        deviceRisk += 50;
+        deviceAnomalies.push('mobile_emulator_environment');
+        agentType = 'mobile_emulator_agent';
+      }
+
+      if (fingerprint.isRooted === true || fingerprint.isJailbroken === true) {
+        riskScore += 35;
+        deviceRisk += 35;
+        deviceAnomalies.push('mobile_root_or_jailbreak_detected');
+      }
+
+      const touchCount = behavior.touchEventsCount || 0;
+      if (touchCount === 0 && (behavior.motionSamples || []).length === 0) {
+        riskScore += 20;
+        deviceRisk += 20;
+        deviceAnomalies.push('native_missing_sensor_biometrics');
+      }
     }
 
     // Hardware plausibility
