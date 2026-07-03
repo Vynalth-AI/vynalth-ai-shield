@@ -16,5 +16,32 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
+  ],
+  "headers": [
+    {
+      "source": "/collector.js",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET" },
+        { "key": "Content-Type", "value": "application/javascript; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
+    },
+    {
+      "source": "/widget.js",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Content-Type", "value": "application/javascript; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+      ]
+    }
   ]
 }

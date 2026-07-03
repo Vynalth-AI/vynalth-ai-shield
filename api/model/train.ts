@@ -197,17 +197,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // sendBeacon may POST with Content-Type: text/plain — parse body manually
+    let rawBody = req.body;
+    if (typeof rawBody === 'string') {
+      try { rawBody = JSON.parse(rawBody); } catch {
+        return res.status(400).json({ error: 'Invalid JSON body' });
+      }
+    }
     const {
       // Accept pre-computed features OR raw behavior payload
       straightness, typing_sd, entropy, duration,
-      // Raw behavior (from verify.ts internal call)
+      // Raw behavior (from verify.ts internal call or collector.js)
       mousePoints, keyTimings, formDuration,
       // Already-computed weights (from frontend deploy)
       weights1: inW1, bias1: inB1, bias2: inB2, trained_samples_count: inCount,
       // Control
       epochs = 1,
-      label = 'human'
-    } = req.body ?? {};
+      label = 'human',
+      source = 'unknown',
+      page = '/'
+    } = rawBody ?? {};
 
     // Only train on human-labelled data to keep the model calibrated
     if (label !== 'human') {
@@ -262,7 +271,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       trained_samples_count: count,
       loss: parseFloat(loss.toFixed(6)),
       features: input,
-      message: `✅ Model trained on 1 real visitor sample (total: ${count})`
+      source,
+      page,
+      message: `✅ Model trained on real visitor from [${source}${page}] (total: ${count})`
     });
 
   } catch (err: any) {
