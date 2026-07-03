@@ -144,18 +144,30 @@ function App() {
     }
     const email = user.user?.email || user.email || 'guest';
     
-    // Load scoped logs
-    const cachedLogs = localStorage.getItem(`vms_logs_${email}`);
-    if (cachedLogs) {
-      try {
-        setLogs(JSON.parse(cachedLogs));
-      } catch {
-        setLogs(INITIAL_LOGS);
-      }
-    } else {
-      setLogs(INITIAL_LOGS);
-      localStorage.setItem(`vms_logs_${email}`, JSON.stringify(INITIAL_LOGS));
-    }
+    // Load real logs from database
+    fetch('/api/logs')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.logs && data.logs.length > 0) {
+          setLogs(data.logs);
+          localStorage.setItem(`vms_logs_${email}`, JSON.stringify(data.logs));
+        } else {
+          const cachedLogs = localStorage.getItem(`vms_logs_${email}`);
+          if (cachedLogs) {
+            setLogs(JSON.parse(cachedLogs));
+          } else {
+            setLogs(INITIAL_LOGS);
+          }
+        }
+      })
+      .catch(() => {
+        const cachedLogs = localStorage.getItem(`vms_logs_${email}`);
+        if (cachedLogs) {
+          setLogs(JSON.parse(cachedLogs));
+        } else {
+          setLogs(INITIAL_LOGS);
+        }
+      });
 
     // Load scoped config
     const cachedConfig = localStorage.getItem(`vms_config_${email}`);
