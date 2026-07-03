@@ -12,6 +12,7 @@ import { MLEngine } from './components/MLEngine';
 import { AlertsManager } from './components/AlertsManager';
 import { MarketingPortal } from './components/MarketingPortal';
 import { AuthPortal } from './components/AuthPortal';
+import { ChecklistPage } from './components/ChecklistPage';
 import type { ShieldConfig, VerificationLog } from './types';
 
 // Initial dummy logs that feed the dashboard charts and tables
@@ -277,6 +278,8 @@ function App() {
         return <MLEngine />;
       case 'alerts':
         return <AlertsManager />;
+      case 'checklist':
+        return <ChecklistPage />;
       default:
         return <Dashboard config={config} logs={logs} />;
     }
