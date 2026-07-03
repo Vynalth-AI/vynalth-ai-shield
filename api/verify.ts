@@ -45,7 +45,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { secret, token, ip } = req.body;
 
     // Validate Private API Key (Secret Key)
-    if (secret && !secret.startsWith('vms_sec_')) {
+    if (!secret || !secret.startsWith('vms_sec_') || secret.length < 32) {
+      return res.status(401).json({ success: false, error: 'Unauthorized. Missing or invalid secret key.' });
+    }
+    const hexPart = secret.replace('vms_sec_live_', '').replace('vms_sec_', '');
+    if (!/^[0-9a-fA-F]+$/.test(hexPart)) {
       return res.status(401).json({ success: false, error: 'Unauthorized. Invalid Secret API Key format.' });
     }
 
@@ -53,10 +57,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ success: false, error: 'Missing verification token.' });
     }
 
-    // Handle No-JS graceful fallback verification request
+    // DoS Protection: check token length
+    if (token.length > 65536) {
+      return res.status(400).json({ success: false, error: 'Token size exceeds the maximum limit of 64KB.' });
+    }
+
+    // Strictly enforce AES-256-GCM token encryption. Disable legacy XOR downgrade.
+    if (!token.startsWith('aes:')) {
+      return res.status(400).json({ success: false, error: 'Verification failed. Legacy XOR encryption is no longer supported.' });
+    }
+
+    // Handle No-JS graceful fallback verification request (only reachable if token was mocked/bypassed)
     if (token === 'no-js-fallback') {
       return res.status(200).json({
-        success: true,
+        success: false,
         decision: 'block',
         scores: {
           risk_score: 95,
@@ -95,13 +109,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const decryptedJson = decryptAES256GCM(rawCiphertext, siteKey);
         telemetry = JSON.parse(decryptedJson);
       } else {
-        const encryptedText = Buffer.from(token, 'base64').toString('binary');
-        let decrypted = '';
-        for (let i = 0; i < encryptedText.length; i++) {
-          decrypted += String.fromCharCode(encryptedText.charCodeAt(i) ^ siteKey.charCodeAt(i % siteKey.length));
-        }
-        const rawJson = decodeURIComponent(decrypted);
-        telemetry = JSON.parse(rawJson);
+        throw new Error('XOR encryption no longer supported');
       }
     } catch (e) {
       return res.status(400).json({ success: false, error: 'Invalid or malformed verification token.' });
@@ -219,7 +227,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // 5. Output Risk Engine v2 Verification Payload Response
     return res.status(200).json({
-      success: true,
+      success: decision === 'allow',
       decision,
       engine_version: 'v2.2',
       // Flat aliases for backwards compatibility

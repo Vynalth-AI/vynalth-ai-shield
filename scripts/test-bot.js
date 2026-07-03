@@ -40,13 +40,7 @@ function runLocalVerify(token, clientIp, userAgent) {
       const decryptedJson = decryptAES256GCM(rawCiphertext, key);
       telemetry = JSON.parse(decryptedJson);
     } else {
-      const encryptedText = Buffer.from(token, 'base64').toString('binary');
-      let decrypted = '';
-      for (let i = 0; i < encryptedText.length; i++) {
-        decrypted += String.fromCharCode(encryptedText.charCodeAt(i) ^ key.charCodeAt(i % key.length));
-      }
-      const rawJson = decodeURIComponent(decrypted);
-      telemetry = JSON.parse(rawJson);
+      return { success: false, error: 'XOR fallback disabled' };
     }
   } catch (e) {
     return { success: false, error: 'Malformed token payload.' };
@@ -199,7 +193,7 @@ function runLocalVerify(token, clientIp, userAgent) {
   else if (riskScore > 20 || trustScore < 65) decision = 'challenge';
 
   return {
-    success: true,
+    success: decision === 'allow',
     decision,
     scores: {
       risk_score: riskScore,
@@ -299,7 +293,7 @@ for (let i = 0; i < 15; i++) {
 // Perfectly constant typing intervals (stdDev = 0ms)
 const botKeyTimings = [100, 100, 100, 100, 100, 100];
 
-const botPayload = encodePayload({
+const botPayload = encodePayloadAES256({
   fingerprint: {
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/126.0.0.0',
     screenWidth: 1920,
@@ -332,7 +326,7 @@ console.log(`- Behavior Flags: ${RED}${JSON.stringify(botResult.behavior_flags)}
 // ==========================================
 console.log(`${BOLD}Running Scenario 3: Headless VM Web Scraper${RESET}`);
 
-const crawlerPayload = encodePayload({
+const crawlerPayload = encodePayloadAES256({
   fingerprint: {
     userAgent: 'HeadlessChrome/126.0.0.0',
     screenWidth: 0, // Zero screen sizes indicating headless Chrome!
@@ -362,7 +356,7 @@ console.log(`- Behavior Flags: ${RED}${JSON.stringify(crawlerResult.behavior_fla
 // ==========================================
 console.log(`${BOLD}Running Scenario 4: Mobile Native iOS Simulator App${RESET}`);
 
-const nativePayload = encodePayload({
+const nativePayload = encodePayloadAES256({
   fingerprint: {
     isNativeApp: true,
     deviceModel: 'iPhone Simulator',

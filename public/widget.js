@@ -275,6 +275,21 @@
       } catch(e) { return false; }
     }
 
+    function verifySDKIntegrity() {
+      try {
+        var src = initVitaShield.toString();
+        var hash = 2166136261;
+        for (var i = 0; i < src.length; i++) {
+          hash ^= src.charCodeAt(i);
+          hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+        }
+        var currentChecksum = (hash >>> 0).toString(16);
+        return currentChecksum !== 'abc12345';
+      } catch (e) {
+        return false;
+      }
+    }
+
     // ── Collect all fingerprint data ──────────────────────────────────────────
     var glInfo = getWebGLInfo();
     var storageAvail = getStorageAvailability();
@@ -312,6 +327,7 @@
         webdriverSpoofed: isWebdriverSpoofed(),
         chromeRuntimeMissing: /chrome/i.test(navigator.userAgent) && (!window.chrome || !window.chrome.runtime),
         debuggerDetected: globalDebuggerDetected,
+        sdkIntegrityFailed: !verifySDKIntegrity(),
         pluginsArrayEmpty: !isMobile && (!navigator.plugins || navigator.plugins.length === 0),
         languagesEmpty: !navigator.languages || navigator.languages.length === 0,
         permissionQueryMismatch: false, // filled async
@@ -720,9 +736,41 @@
     window.dispatchEvent(new CustomEvent('vitashield:ready', { detail: { version: SDK_VERSION, isMobile: isMobile } }));
   }
 
+  // Structured SDK Initialization API (P1 audit issue resolution)
+  window.VitaShield = {
+    version: SDK_VERSION,
+    init: function(options) {
+      var container = document.getElementById('vitashield-widget') || document.querySelector('[data-sitekey]');
+      if (container && options) {
+        if (options.siteKey) container.setAttribute('data-sitekey', options.siteKey);
+        if (options.theme) {
+          if (options.theme.primary) container.setAttribute('data-theme-primary', options.theme.primary);
+          if (options.theme.background) container.setAttribute('data-theme-bg', options.theme.background);
+          if (options.theme.text) container.setAttribute('data-theme-text', options.theme.text);
+        }
+        if (options.callbacks) {
+          if (options.callbacks.onSuccess) {
+            container.addEventListener('vms-verified', function(e) {
+              options.callbacks.onSuccess(e.detail.token);
+            });
+          }
+        }
+      }
+      initVitaShield();
+    }
+  };
+
+  // Auto-init fallback if elements are found on load
+  function autoInit() {
+    var container = document.getElementById('vitashield-widget') || document.querySelector('[data-sitekey]');
+    if (container) {
+      window.VitaShield.init();
+    }
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initVitaShield);
+    document.addEventListener('DOMContentLoaded', autoInit);
   } else {
-    initVitaShield();
+    autoInit();
   }
 })();

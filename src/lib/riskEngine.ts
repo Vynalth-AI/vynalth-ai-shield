@@ -570,6 +570,10 @@ export class ScoreCalculator {
       riskScore += 35; deviceRisk += 35;
       deviceAnomalies.push('client_sdk_debugging_active');
     }
+    if (fingerprint.sdkIntegrityFailed === true) {
+      riskScore += 45; deviceRisk += 45;
+      deviceAnomalies.push('client_sdk_tampered_integrity_failed');
+    }
 
     // Native Application Specific Detections
     if (isNativeApp) {
@@ -968,8 +972,16 @@ export function evaluateTelemetry(
   let reputationScore = 95, networkRisk = 0;
   const networkFlags: string[] = [];
   const isPrivateIP = /^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|127\.|::1$|fc00:|fe80:)/.test(clientIp);
-  if (!isPrivateIP && Math.random() > 0.85) {
-    reputationScore -= 30; networkRisk += 30; networkFlags.push('datacenter_asn_subnet');
+  if (!isPrivateIP) {
+    let ipHash = 2166136261;
+    for (let i = 0; i < clientIp.length; i++) {
+      ipHash ^= clientIp.charCodeAt(i);
+      ipHash += (ipHash << 1) + (ipHash << 4) + (ipHash << 7) + (ipHash << 8) + (ipHash << 24);
+    }
+    const hashVal = (ipHash >>> 0) % 100;
+    if (hashVal > 85) {
+      reputationScore -= 30; networkRisk += 30; networkFlags.push('datacenter_asn_subnet');
+    }
   }
   if (hasForwardedFor) { reputationScore -= 15; networkRisk += 15; networkFlags.push('forwarded_proxy_detected'); }
   if (isBotUA)         { reputationScore -= 50; networkRisk += 50; networkFlags.push('ai_agent_crawler_network'); }
