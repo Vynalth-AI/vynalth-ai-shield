@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 export const Integration: React.FC = () => {
-  const [activeCodeTab, setActiveCodeTab] = useState<'javascript' | 'nodejs' | 'python' | 'go' | 'java' | 'php' | 'curl' | 'supabase'>('javascript');
+  const [activeCodeTab, setActiveCodeTab] = useState<'javascript' | 'react' | 'vue' | 'svelte' | 'nodejs' | 'python' | 'go' | 'java' | 'php' | 'curl' | 'supabase'>('javascript');
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   
   const [keys, setKeys] = useState({
@@ -46,6 +46,97 @@ export const Integration: React.FC = () => {
       console.log('Verification token generated:', event.detail.token);
     });
 </script>`,
+
+    react: `import React, { useState } from 'react';
+import { VerificationWidget } from '@vitashield/react-sdk';
+
+export const LoginForm = () => {
+  const [token, setToken] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // Submit token and form values to backend API
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, username: 'human_user' })
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="text" placeholder="Username" required />
+      <VerificationWidget
+        siteKey="${keys.publicKey}"
+        onVerify={(t) => setToken(t)}
+        themePrimary="#00f2fe"
+      />
+      <button type="submit" disabled={!token}>Submit</button>
+    </form>
+  );
+};`,
+
+    vue: `<template>
+  <form @submit.prevent="handleSubmit">
+    <input type="text" v-model="username" placeholder="Username" required />
+    
+    <!-- VitaShield Vue 3 Component -->
+    <VerificationWidget
+      :siteKey="siteKey"
+      @verify="handleVerify"
+      themePrimary="#00f2fe"
+    />
+    <button type="submit" :disabled="!token">Submit</button>
+  </form>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import { VerificationWidget } from '@vitashield/vue-sdk';
+
+const siteKey = ref('${keys.publicKey}');
+const username = ref('');
+const token = ref('');
+
+const handleVerify = (t) => {
+  token.value = t;
+};
+
+const handleSubmit = async () => {
+  const res = await fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: token.value, username: username.value })
+  });
+};
+</script>`,
+
+    svelte: `<script>
+  import { VerificationWidget } from '@vitashield/svelte-sdk';
+  
+  let token = '';
+  let username = '';
+  
+  async function handleSubmit() {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, username })
+    });
+  }
+</script>
+
+<form on:submit|preventDefault={handleSubmit}>
+  <input type="text" bind:value={username} placeholder="Username" required />
+  
+  <VerificationWidget
+    siteKey="${keys.publicKey}"
+    themePrimary="#00f2fe"
+    on:verify={(e) => token = e.detail.token}
+  />
+  
+  <button type="submit" disabled={!token}>Submit</button>
+</form>`,
 
     nodejs: `const express = require('express');
 const fetch = require('node-fetch'); // or native fetch in Node 18+
@@ -337,7 +428,7 @@ async function signInWithVitaShield() {
           <div className="code-panel" style={{ marginTop: '1.25rem' }}>
             <div className="code-header">
               <div className="code-tabs">
-                {(['javascript', 'nodejs', 'python', 'go', 'java', 'php', 'curl', 'supabase'] as const).map((tab) => (
+                {(['javascript', 'react', 'vue', 'svelte', 'nodejs', 'python', 'go', 'java', 'php', 'curl', 'supabase'] as const).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveCodeTab(tab)}
