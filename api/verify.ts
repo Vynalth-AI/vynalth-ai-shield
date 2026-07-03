@@ -2,31 +2,187 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import crypto from 'crypto';
 import { evaluateTelemetry, globalAutoencoder } from '../src/lib/riskEngine';
 
-function decryptAES256GCM(ciphertextBase64: string, keySeed: string): string {
-  const parts = ciphertextBase64.split(':');
-  if (parts.length !== 3) {
-    throw new Error('Invalid AES token format');
-  }
-  const iv = Buffer.from(parts[0], 'hex');
-  const authTag = Buffer.from(parts[1], 'hex');
-  const encrypted = Buffer.from(parts[2], 'hex');
+// ─────────────────────────────────────────────────────────────────────────────
+// 密钥管理服务 (Key Management Service)
+// ─────────────────────────────────────────────────────────────────────────────
 
-  const key = crypto.createHash('sha256').update(keySeed).digest();
-
-  const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
-  decipher.setAuthTag(authTag);
-
-  let decrypted = decipher.update(encrypted, undefined, 'utf8');
-  decrypted += decipher.final('utf8');
-  return decrypted;
+interface KeyMetadata {
+  id: string;
+  secret: string;
+  createdAt: Date;
+  expiresAt?: Date;
+  isRevoked: boolean;
+  revokedAt?: Date;
 }
 
-// Fallback Supabase settings if environment variables are not set on Vercel yet
+class KeyManagementService {
+  private keyCache: Map<string, KeyMetadata> = new Map();
+  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 mins
+  private lastCacheRefresh = 0;
+
+  async validateSecretKey(secret: string): Promise<{
+    isValid: boolean;
+    reason?: string;
+    metadata?: KeyMetadata;
+  }> {
+    if (!secret || typeof secret !== 'string') {
+      return { isValid: false, reason: 'Secret must be a non-empty string' };
+    }
+    if (!secret.startsWith('vms_sec_')) {
+      return { isValid: false, reason: 'Invalid secret key format (must start with vms_sec_)' };
+    }
+    if (secret.length < 32) {
+      return { isValid: false, reason: 'Secret key too short (minimum 32 characters)' };
+    }
+
+    const hexPart = secret.replace('vms_sec_live_', '').replace('vms_sec_', '');
+    if (!/^[0-9a-fA-F]+$/.test(hexPart)) {
+      return { isValid: false, reason: 'Invalid Secret API Key format.' };
+    }
+
+    if (this.keyCache.has(secret)) {
+      const cached = this.keyCache.get(secret)!;
+      if (Date.now() - this.lastCacheRefresh < this.CACHE_TTL) {
+        return this.validateKeyMetadata(cached);
+      }
+    }
+
+    try {
+      const metadata = await this.fetchKeyMetadata(secret);
+      if (!metadata) {
+        // Fallback metadata for local/demo keys to allow seamless offline operations
+        const fallbackMetadata: KeyMetadata = {
+          id: crypto.randomUUID(),
+          secret,
+          createdAt: new Date(),
+          isRevoked: false
+        };
+        this.keyCache.set(secret, fallbackMetadata);
+        this.lastCacheRefresh = Date.now();
+        return this.validateKeyMetadata(fallbackMetadata);
+      }
+
+      this.keyCache.set(secret, metadata);
+      this.lastCacheRefresh = Date.now();
+      return this.validateKeyMetadata(metadata);
+    } catch (error) {
+      return { isValid: false, reason: 'Key validation service error' };
+    }
+  }
+
+  private validateKeyMetadata(metadata: KeyMetadata): {
+    isValid: boolean;
+    reason?: string;
+    metadata?: KeyMetadata;
+  } {
+    if (metadata.isRevoked) {
+      return { isValid: false, reason: 'Secret key has been revoked' };
+    }
+    if (metadata.expiresAt && new Date() > metadata.expiresAt) {
+      return { isValid: false, reason: 'Secret key has expired' };
+    }
+    return { isValid: true, metadata };
+  }
+
+  private async fetchKeyMetadata(secret: string): Promise<KeyMetadata | null> {
+    if (!process.env.KEY_MANAGEMENT_URL) {
+      return null;
+    }
+    try {
+      const response = await fetch(`${process.env.KEY_MANAGEMENT_URL}/keys/${secret}`, {
+        headers: {
+          'Authorization': `Bearer ${process.env.KEY_MANAGEMENT_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) return null;
+      return await response.json();
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async getDecryptionKey(secret: string): Promise<Buffer | null> {
+    const validation = await this.validateSecretKey(secret);
+    if (!validation.isValid) return null;
+
+    if (process.env.KEY_MANAGEMENT_URL) {
+      try {
+        const response = await fetch(`${process.env.KEY_MANAGEMENT_URL}/keys/${secret}/decrypt-key`, {
+          headers: {
+            'Authorization': `Bearer ${process.env.KEY_MANAGEMENT_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          return Buffer.from(data.key, 'base64');
+        }
+      } catch (error) {
+        console.error('Error fetching decrypt key from KMS:', error);
+      }
+    }
+
+    // Local deterministic key derivation fallback
+    const keySeed = secret.replace('vms_sec_', 'vms_pub_');
+    return crypto.createHash('sha256').update(keySeed).digest();
+  }
+}
+
+const keyManagementService = new KeyManagementService();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 改进的 Token 解密与验证 (GCM Authentication Check)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const MAX_TOKEN_SIZE = 65536; // 64KB
+
+function decryptAES256GCM(ciphertextBase64: string, decryptionKey: Buffer): string {
+  try {
+    if (ciphertextBase64.length > MAX_TOKEN_SIZE) {
+      throw new Error('Token size exceeds maximum limit');
+    }
+
+    const parts = ciphertextBase64.split(':');
+    if (parts.length !== 3) {
+      throw new Error('Invalid AES token format (expected 3 parts separated by :)');
+    }
+
+    const [ivHex, authTagHex, encryptedHex] = parts;
+    if (!/^[0-9a-f]*$/i.test(ivHex) || !/^[0-9a-f]*$/i.test(authTagHex) || !/^[0-9a-f]*$/i.test(encryptedHex)) {
+      throw new Error('Invalid token encoding (must be hex)');
+    }
+
+    if (ivHex.length !== 24) {
+      throw new Error('Invalid IV length (expected 12 bytes = 24 hex characters)');
+    }
+    if (authTagHex.length !== 32) {
+      throw new Error('Invalid auth tag length (expected 16 bytes = 32 hex characters)');
+    }
+
+    const iv = Buffer.from(ivHex, 'hex');
+    const authTag = Buffer.from(authTagHex, 'hex');
+    const encrypted = Buffer.from(encryptedHex, 'hex');
+
+    const decipher = crypto.createDecipheriv('aes-256-gcm', decryptionKey, iv);
+    decipher.setAuthTag(authTag);
+
+    let decrypted = decipher.update(encrypted, undefined, 'utf8');
+    decrypted += decipher.final('utf8');
+
+    return decrypted;
+  } catch (error: any) {
+    throw new Error(`Token decryption failed: ${error.message}`);
+  }
+}
+
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://qgoelcorfcqxberbayul.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY || '';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Enable CORS
+  const requestId = crypto.randomUUID();
+
+  // CORS Settings
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -38,40 +194,51 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed. Use POST.' });
+    return res.status(405).json({
+      success: false,
+      error: 'Method Not Allowed. Use POST.',
+      request_id: requestId
+    });
   }
 
   try {
     const { secret, token, ip } = req.body;
 
-    // Validate Private API Key (Secret Key)
-    if (!secret || !secret.startsWith('vms_sec_') || secret.length < 32) {
-      return res.status(401).json({ success: false, error: 'Unauthorized. Missing or invalid secret key.' });
-    }
-    const hexPart = secret.replace('vms_sec_live_', '').replace('vms_sec_', '');
-    if (!/^[0-9a-fA-F]+$/.test(hexPart)) {
-      return res.status(401).json({ success: false, error: 'Unauthorized. Invalid Secret API Key format.' });
+    // 1. Validate Secret API Key
+    if (!secret) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing secret API key.',
+        request_id: requestId
+      });
     }
 
+    const keyValidation = await keyManagementService.validateSecretKey(secret);
+    if (!keyValidation.isValid) {
+      return res.status(401).json({
+        success: false,
+        error: `Unauthorized. ${keyValidation.reason || 'Invalid secret key.'}`,
+        request_id: requestId
+      });
+    }
+
+    // 2. Validate Token Present
     if (!token) {
-      return res.status(400).json({ success: false, error: 'Missing verification token.' });
+      return res.status(400).json({
+        success: false,
+        error: 'Missing verification token.',
+        request_id: requestId
+      });
     }
 
-    // DoS Protection: check token length
-    if (token.length > 65536) {
-      return res.status(400).json({ success: false, error: 'Token size exceeds the maximum limit of 64KB.' });
-    }
-
-    // Strictly enforce AES-256-GCM token encryption. Disable legacy XOR downgrade.
-    if (!token.startsWith('aes:')) {
-      return res.status(400).json({ success: false, error: 'Verification failed. Legacy XOR encryption is no longer supported.' });
-    }
-
-    // Handle No-JS graceful fallback verification request (only reachable if token was mocked/bypassed)
+    // 3. Handle No-JS graceful fallback verification request
     if (token === 'no-js-fallback') {
       return res.status(200).json({
         success: false,
         decision: 'block',
+        engine_version: 'v2.2',
+        risk_score: 95,
+        trust_score: 5,
         scores: {
           risk_score: 95,
           trust_score: 5,
@@ -95,24 +262,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           is_ai_agent: true,
           agent_type: 'no_js_crawler',
           automation_likelihood: 0.95
-        }
+        },
+        timestamp: new Date().toISOString(),
+        request_id: requestId
       });
     }
 
-    const siteKey = secret ? secret.replace('vms_sec_', 'vms_pub_') : 'default_site_key';
+    // 4. Retrieve Decryption Key from KMS
+    const decryptionKey = await keyManagementService.getDecryptionKey(secret);
+    if (!decryptionKey) {
+      return res.status(500).json({
+        success: false,
+        error: 'Internal server error: Key retrieval failed.',
+        request_id: requestId
+      });
+    }
 
-    // 1. Decode token payload (AES-256-GCM or legacy XOR decrypted by client-side)
+    // 5. Decrypt Token GCM
     let telemetry: any = {};
     try {
       if (token.startsWith('aes:')) {
         const rawCiphertext = Buffer.from(token.slice(4), 'base64').toString('utf8');
-        const decryptedJson = decryptAES256GCM(rawCiphertext, siteKey);
+        const decryptedJson = decryptAES256GCM(rawCiphertext, decryptionKey);
         telemetry = JSON.parse(decryptedJson);
       } else {
         throw new Error('XOR encryption no longer supported');
       }
-    } catch (e) {
-      return res.status(400).json({ success: false, error: 'Invalid or malformed verification token.' });
+    } catch (e: any) {
+      return res.status(400).json({
+        success: false,
+        error: `Invalid or malformed verification token: ${e.message}`,
+        request_id: requestId
+      });
     }
 
     const fingerprint = telemetry.fingerprint || {};
@@ -123,7 +304,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const clientIp = ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
     const userAgent = fingerprint.userAgent || req.headers['user-agent'] || '';
 
-    // 2. Run Risk Engine v2 Layered Security Models
+    // 6. Run Risk Engine Layered Security Models
     const aiAgentPatterns = [
       /openai/i, /gptbot/i, /chatgpt/i, /chat-gpt/i, /claude/i, /anthropic/i,
       /google-extended/i, /python-urllib/i, /axios/i, /headless/i,
@@ -131,7 +312,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     ];
     const isBotUA = aiAgentPatterns.some(pattern => pattern.test(userAgent));
     const hasForwardedFor = !!req.headers['x-forwarded-for'];
-    // Load latest Autoencoder state from Supabase if configured (P0 autoencoder persistence)
+    
+    // Load Autoencoder state
     if (SUPABASE_URL && SUPABASE_KEY) {
       try {
         const aeLoadResponse = await fetch(`${SUPABASE_URL}/rest/v1/autoencoder_states?order=id.desc&limit=1`, {
@@ -152,6 +334,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const aeCountBefore = globalAutoencoder.trainedSamplesCount;
+    const siteKey = secret.replace('vms_sec_', 'vms_pub_');
 
     const evaluation = evaluateTelemetry(
       fingerprint,
@@ -202,13 +385,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       dimensionScores
     } = evaluation;
 
-    // 3. Make Adaptive Gate Decisions (use engine decision, override for challenge logic)
-    let decision: 'allow' | 'challenge' | 'block' = engineDecision;
+    const decision: 'allow' | 'challenge' | 'block' = engineDecision;
 
-    // 4. Log Session & Telemetry directly to Supabase REST API
+    // 7. Log Session & Telemetry directly to Supabase
     if (SUPABASE_URL && SUPABASE_KEY) {
       try {
-        // First, insert session
         const sessionResponse = await fetch(`${SUPABASE_URL}/rest/v1/sessions`, {
           method: 'POST',
           headers: {
@@ -227,7 +408,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           const sessionId = sessionData[0]?.id;
 
           if (sessionId) {
-            // Second, insert telemetry log
             await fetch(`${SUPABASE_URL}/rest/v1/telemetry_logs`, {
               method: 'POST',
               headers: {
@@ -267,12 +447,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    // 5. Output Risk Engine v2 Verification Payload Response
+    // 8. Output Response
     return res.status(200).json({
       success: decision === 'allow',
       decision,
       engine_version: 'v2.2',
-      // Flat aliases for backwards compatibility
       risk_score: riskScore,
       trust_score: trustScore,
       scores: {
@@ -280,7 +459,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         trust_score: trustScore,
         reputation_score: reputationScore
       },
-      // Granular dimension scores (Report §2.2.3)
       dimension_scores: {
         device_risk:         dimensionScores.deviceRisk,
         behavior_risk:       dimensionScores.behaviorRisk,
@@ -296,11 +474,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         device_anomalies:   deviceAnomalies,
         behavior_flags:     behaviorFlags,
         network_flags:      networkFlags,
-        // New v2.2 fields
         consistency_flags:  consistencyFlags,
         over_spoofing_flags: overSpoofingFlags,
       },
-      // Backwards compatibility
       human_score: trustScore,
       risk_level: riskScore >= 60 ? 'high' : riskScore > 20 ? 'medium' : 'low',
       trust_and_reputation: {
@@ -312,10 +488,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         is_ai_agent: isAiAgent,
         agent_type: agentType,
         automation_likelihood: riskScore / 100
-      }
+      },
+      timestamp: new Date().toISOString(),
+      request_id: requestId
     });
 
   } catch (error: any) {
-    return res.status(500).json({ success: false, error: 'Internal gateway verification error.' });
+    return res.status(500).json({
+      success: false,
+      error: `Internal gateway verification error: ${error.message}`,
+      request_id: requestId
+    });
   }
 }

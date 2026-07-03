@@ -9,6 +9,19 @@
   var SDK_VERSION = '2.2';
 
   var globalDebuggerDetected = false;
+  function detectDevTools() {
+    try {
+      var element = document.createElement('div');
+      Object.defineProperty(element, 'id', {
+        get: function() {
+          globalDebuggerDetected = true;
+          throw new Error('DevTools detected');
+        }
+      });
+      console.log(element);
+    } catch(e) {}
+  }
+
   try {
     setInterval(function() {
       var t0 = performance.now();
@@ -17,7 +30,24 @@
       if (t1 - t0 > 100) {
         globalDebuggerDetected = true;
       }
+      detectDevTools();
     }, 1000);
+  } catch(e) {}
+
+  var sdkIntegrityFailed = false;
+  try {
+    fetch('/api/sdk-integrity-hash')
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (d && d.hash) {
+          // Confirm global VitaShield namespace hasn't been intercepted or modified
+          var isTampered = typeof window.VitaShield !== 'object' || typeof window.VitaShield.init !== 'function';
+          if (isTampered) {
+            sdkIntegrityFailed = true;
+          }
+        }
+      })
+      .catch(function() {});
   } catch(e) {}
 
   function encryptAES256GCM(text, keySeed) {
@@ -327,7 +357,7 @@
         webdriverSpoofed: isWebdriverSpoofed(),
         chromeRuntimeMissing: /chrome/i.test(navigator.userAgent) && (!window.chrome || !window.chrome.runtime),
         debuggerDetected: globalDebuggerDetected,
-        sdkIntegrityFailed: !verifySDKIntegrity(),
+        sdkIntegrityFailed: sdkIntegrityFailed || !verifySDKIntegrity(),
         pluginsArrayEmpty: !isMobile && (!navigator.plugins || navigator.plugins.length === 0),
         languagesEmpty: !navigator.languages || navigator.languages.length === 0,
         permissionQueryMismatch: false, // filled async
