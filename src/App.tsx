@@ -13,6 +13,7 @@ import { AlertsManager } from './components/AlertsManager';
 import { MarketingPortal } from './components/MarketingPortal';
 import { AuthPortal } from './components/AuthPortal';
 import { ChecklistPage } from './components/ChecklistPage';
+import { NegativeTraining } from './components/NegativeTraining';
 import type { ShieldConfig, VerificationLog } from './types';
 
 // Initial dummy logs that feed the dashboard charts and tables
@@ -288,6 +289,8 @@ function App() {
         return <AdminPortal config={config} />;
       case 'ml_pipeline':
         return <MLEngine />;
+      case 'adversarial_training':
+        return <NegativeTraining />;
       case 'alerts':
         return <AlertsManager />;
       case 'checklist':

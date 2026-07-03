@@ -812,7 +812,7 @@ export class OnlineAutoencoder {
     return { error: err / 4, output: y };
   }
 
-  train(straightness: number, keystrokeSD: number, mouseEntropy: number, durationMs: number) {
+  train(straightness: number, keystrokeSD: number, mouseEntropy: number, durationMs: number, isBot?: boolean) {
     const x = this.normalize(straightness, keystrokeSD, mouseEntropy, durationMs);
     const h = [0, 0];
     const netH = [0, 0];
@@ -850,22 +850,26 @@ export class OnlineAutoencoder {
       deltaH[j] = sum * h[j] * (1 - h[j]);
     }
 
+    // For normal training: W = W - LR * grad (gradient descent)
+    // For bot/adversarial training: W = W + LR * grad (gradient ascent to maximize error)
+    const factor = isBot ? 1 : -1;
+
     for (let j = 0; j < 2; j++) {
       for (let k = 0; k < 4; k++) {
-        this.weights2[j][k] -= this.learningRate * deltaY[k] * h[j];
+        this.weights2[j][k] += factor * this.learningRate * deltaY[k] * h[j];
       }
     }
     for (let k = 0; k < 4; k++) {
-      this.bias2[k] -= this.learningRate * deltaY[k];
+      this.bias2[k] += factor * this.learningRate * deltaY[k];
     }
 
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 2; j++) {
-        this.weights1[i][j] -= this.learningRate * deltaH[j] * x[i];
+        this.weights1[i][j] += factor * this.learningRate * deltaH[j] * x[i];
       }
     }
     for (let j = 0; j < 2; j++) {
-      this.bias1[j] -= this.learningRate * deltaH[j];
+      this.bias1[j] += factor * this.learningRate * deltaH[j];
     }
 
     this.trainedSamplesCount++;
