@@ -20,6 +20,47 @@
     }, 1000);
   } catch(e) {}
 
+  function encryptAES256GCM(text, keySeed) {
+    if (!window.crypto || !window.crypto.subtle) {
+      return Promise.resolve(null);
+    }
+    try {
+      var encoder = new TextEncoder();
+      var data = encoder.encode(text);
+      return window.crypto.subtle.digest('SHA-256', encoder.encode(keySeed))
+        .then(function(hashBuffer) {
+          return window.crypto.subtle.importKey(
+            'raw',
+            hashBuffer,
+            { name: 'AES-GCM' },
+            false,
+            ['encrypt']
+          );
+        })
+        .then(function(key) {
+          var iv = window.crypto.getRandomValues(new Uint8Array(12));
+          return window.crypto.subtle.encrypt(
+            { name: 'AES-GCM', iv: iv },
+            key,
+            data
+          ).then(function(encrypted) {
+            var ivHex = Array.from(iv).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+            var encryptedBytes = new Uint8Array(encrypted);
+            var authTagBytes = encryptedBytes.slice(-16);
+            var encryptedDataBytes = encryptedBytes.slice(0, -16);
+            var authTagHex = Array.from(authTagBytes).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+            var encryptedHex = Array.from(encryptedDataBytes).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+            return 'aes:' + btoa(ivHex + ':' + authTagHex + ':' + encryptedHex);
+          });
+        })
+        .catch(function() {
+          return null;
+        });
+    } catch(err) {
+      return Promise.resolve(null);
+    }
+  }
+
   function initVitaShield() {
     var startTime = Date.now();
     var container = document.getElementById('vitashield-widget') || document.querySelector('[data-sitekey]');
@@ -503,7 +544,16 @@
 
     // ── Form interception & token packaging ───────────────────────────────────
     if (parentForm) {
+      var tokenGenerated = false;
+
       parentForm.addEventListener('submit', function(e) {
+        if (tokenGenerated) {
+          return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
         // Flush accumulated data
         telemetry.fingerprint.permissionQueryMismatch = permissionQueryMismatch;
         telemetry.behavior.mousePoints      = mousePoints;
@@ -559,94 +609,105 @@
           && telemetry.behavior.touchEventsCount === 0;
 
         if (isSuspicious) {
-          e.preventDefault();
-          e.stopPropagation();
           triggerSliderChallenge(function() {
-            setTimeout(function() { parentForm.submit(); }, 800);
+            setTimeout(function() { encryptAndSubmit(); }, 100);
           });
           return false;
         }
 
-        var now = Date.now();
-        telemetry.createdAt = now;
-        telemetry.behavior.durationMs  = now - startTime;
-        if (lastMouseMoveTime > 0) telemetry.behavior.submitPauseMs = now - lastMouseMoveTime;
-        if (telemetry.behavior.lastPasteTime > 0) telemetry.behavior.lastPasteTime = now - telemetry.behavior.lastPasteTime;
+        encryptAndSubmit();
 
-        var siteKey = container.getAttribute('data-sitekey') || 'default_site_key';
+        function encryptAndSubmit() {
+          var now = Date.now();
+          telemetry.createdAt = now;
+          telemetry.behavior.durationMs  = now - startTime;
+          if (lastMouseMoveTime > 0) telemetry.behavior.submitPauseMs = now - lastMouseMoveTime;
+          if (telemetry.behavior.lastPasteTime > 0) telemetry.behavior.lastPasteTime = now - telemetry.behavior.lastPasteTime;
 
-        // 1. Signature generation (FNV-1a checksum)
-        var salt = "vms_client_shield_salt_2026_q2";
-        var rawString = telemetry.createdAt + "-" + (telemetry.behavior.mouseEventsCount || 0) + "-" + (telemetry.behavior.keyPressesCount || 0) + "-" + siteKey + "-" + salt;
-        var hash = 2166136261;
-        for (var i = 0; i < rawString.length; i++) {
-          hash ^= rawString.charCodeAt(i);
-          hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
-        }
-        telemetry.signature = (hash >>> 0).toString(16);
+          var siteKey = container.getAttribute('data-sitekey') || 'default_site_key';
 
-        // 2. Proof of Work (PoW) Solver
-        var difficulty = 3;
-        var nowTime = Date.now();
-        if (window.lastSubmissionTime && (nowTime - window.lastSubmissionTime < 800)) {
-          difficulty = 5;
-        }
-        window.lastSubmissionTime = nowTime;
-
-        var powChallenge = telemetry.createdAt + "-" + siteKey;
-        var powPrefix = "0".repeat(difficulty);
-        var powNonce = 0;
-        while (true) {
-          var powString = powChallenge + "-" + powNonce;
-          var powHash = 5381;
-          for (var i = 0; i < powString.length; i++) {
-            powHash = ((powHash << 5) + powHash) + powString.charCodeAt(i);
+          // 1. Signature generation (FNV-1a checksum)
+          var salt = "vms_client_shield_salt_2026_q2";
+          var rawString = telemetry.createdAt + "-" + (telemetry.behavior.mouseEventsCount || 0) + "-" + (telemetry.behavior.keyPressesCount || 0) + "-" + siteKey + "-" + salt;
+          var hash = 2166136261;
+          for (var i = 0; i < rawString.length; i++) {
+            hash ^= rawString.charCodeAt(i);
+            hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
           }
-          var calculatedHashStr = (powHash >>> 0).toString(16).padStart(8, '0');
-          if (calculatedHashStr.indexOf(powPrefix) === 0) {
-            telemetry.powNonce = powNonce;
-            telemetry.powDifficulty = difficulty;
-            break;
+          telemetry.signature = (hash >>> 0).toString(16);
+
+          // 2. Proof of Work (PoW) Solver
+          var difficulty = 3;
+          var nowTime = Date.now();
+          if (window.lastSubmissionTime && (nowTime - window.lastSubmissionTime < 800)) {
+            difficulty = 5;
           }
-          powNonce++;
-          if (powNonce > 5000000) break;
+          window.lastSubmissionTime = nowTime;
+
+          var powChallenge = telemetry.createdAt + "-" + siteKey;
+          var powPrefix = "0".repeat(difficulty);
+          var powNonce = 0;
+          while (true) {
+            var powString = powChallenge + "-" + powNonce;
+            var powHash = 5381;
+            for (var i = 0; i < powString.length; i++) {
+              powHash = ((powHash << 5) + powHash) + powString.charCodeAt(i);
+            }
+            var calculatedHashStr = (powHash >>> 0).toString(16).padStart(8, '0');
+            if (calculatedHashStr.indexOf(powPrefix) === 0) {
+              telemetry.powNonce = powNonce;
+              telemetry.powDifficulty = difficulty;
+              break;
+            }
+            powNonce++;
+            if (powNonce > 5000000) break;
+          }
+
+          var rawJson = JSON.stringify(telemetry);
+
+          encryptAES256GCM(rawJson, siteKey).then(function(aesToken) {
+            var finalToken = aesToken;
+            if (!finalToken) {
+              // Fallback to legacy XOR
+              var encodedText = encodeURIComponent(rawJson);
+              var encrypted = "";
+              for (var i = 0; i < encodedText.length; i++) {
+                encrypted += String.fromCharCode(encodedText.charCodeAt(i) ^ siteKey.charCodeAt(i % siteKey.length));
+              }
+              finalToken = btoa(encrypted);
+            }
+
+            if (debugMode) {
+              log('v' + SDK_VERSION + ' token ready, size:', JSON.stringify(telemetry).length, 'bytes');
+              log('Fingerprint consistency data: vendor=' + telemetry.fingerprint.navigatorVendor +
+                  ' platform=' + telemetry.fingerprint.navigatorPlatform);
+              log('WebGL: renderer=' + telemetry.fingerprint.webglRenderer +
+                  ' vendor=' + telemetry.fingerprint.webglVendor +
+                  ' maxTexture=' + telemetry.fingerprint.webglMaxTextureSize);
+              log('Font hash:', telemetry.fingerprint.fontDetectionHash);
+              log('Perf timing: load=' + telemetry.fingerprint.performanceTiming.pageLoadTimeMs +
+                  'ms domReady=' + telemetry.fingerprint.performanceTiming.domReadyTimeMs + 'ms');
+              log('Accelerometer: hasGravity=' + telemetry.behavior.accelerometerHasGravity +
+                  ' stddev=' + telemetry.behavior.accelerometerStdDev);
+              log('Gyroscope stddev:', telemetry.behavior.gyroscopeStdDev);
+              log('Touch rotation variance:', telemetry.behavior.touchRotationVariance);
+              log('Mouse entropy:', telemetry.behavior.mouseEntropyScore,
+                  'Keystroke entropy:', telemetry.behavior.keystrokeEntropyScore);
+              log('Network:', JSON.stringify(telemetry.fingerprint.networkInfo));
+            }
+
+            var old = parentForm.querySelector('input[name="vms-shield-token"]');
+            if (old) old.remove();
+            var inp = document.createElement('input');
+            inp.type = 'hidden'; inp.name = 'vms-shield-token'; inp.value = finalToken;
+            parentForm.appendChild(inp);
+
+            tokenGenerated = true;
+            container.dispatchEvent(new CustomEvent('vms-verified', { detail: { token: finalToken } }));
+
+            parentForm.submit();
+          });
         }
-
-        // 3. Encrypt payload
-        var rawJson = JSON.stringify(telemetry);
-        var encodedText = encodeURIComponent(rawJson);
-        var encrypted = "";
-        for (var i = 0; i < encodedText.length; i++) {
-          encrypted += String.fromCharCode(encodedText.charCodeAt(i) ^ siteKey.charCodeAt(i % siteKey.length));
-        }
-        var b64Token = btoa(encrypted);
-
-        if (debugMode) {
-          log('v' + SDK_VERSION + ' token ready, size:', JSON.stringify(telemetry).length, 'bytes');
-          log('Fingerprint consistency data: vendor=' + telemetry.fingerprint.navigatorVendor +
-              ' platform=' + telemetry.fingerprint.navigatorPlatform);
-          log('WebGL: renderer=' + telemetry.fingerprint.webglRenderer +
-              ' vendor=' + telemetry.fingerprint.webglVendor +
-              ' maxTexture=' + telemetry.fingerprint.webglMaxTextureSize);
-          log('Font hash:', telemetry.fingerprint.fontDetectionHash);
-          log('Perf timing: load=' + telemetry.fingerprint.performanceTiming.pageLoadTimeMs +
-              'ms domReady=' + telemetry.fingerprint.performanceTiming.domReadyTimeMs + 'ms');
-          log('Accelerometer: hasGravity=' + telemetry.behavior.accelerometerHasGravity +
-              ' stddev=' + telemetry.behavior.accelerometerStdDev);
-          log('Gyroscope stddev:', telemetry.behavior.gyroscopeStdDev);
-          log('Touch rotation variance:', telemetry.behavior.touchRotationVariance);
-          log('Mouse entropy:', telemetry.behavior.mouseEntropyScore,
-              'Keystroke entropy:', telemetry.behavior.keystrokeEntropyScore);
-          log('Network:', JSON.stringify(telemetry.fingerprint.networkInfo));
-        }
-
-        var old = parentForm.querySelector('input[name="vms-shield-token"]');
-        if (old) old.remove();
-        var inp = document.createElement('input');
-        inp.type = 'hidden'; inp.name = 'vms-shield-token'; inp.value = b64Token;
-        parentForm.appendChild(inp);
-
-        container.dispatchEvent(new CustomEvent('vms-verified', { detail: { token: b64Token } }));
       });
     }
 

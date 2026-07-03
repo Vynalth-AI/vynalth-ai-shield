@@ -2,6 +2,7 @@
 // Run this file in your terminal: node scripts/test-bot.js
 
 import { Buffer } from 'buffer';
+import crypto from 'crypto';
 
 // Color codes for beautiful console formatting
 const GREEN = '\x1b[32m';
@@ -13,18 +14,40 @@ const BOLD = '\x1b[1m';
 
 console.log(`${BOLD}${CYAN}=== VITASHIELD ANTI-BOT SIMULATOR TEST SUITE ===${RESET}\n`);
 
+function decryptAES256GCM(ciphertextBase64, keySeed) {
+  const parts = ciphertextBase64.split(':');
+  if (parts.length !== 3) throw new Error('Invalid format');
+  const iv = Buffer.from(parts[0], 'hex');
+  const authTag = Buffer.from(parts[1], 'hex');
+  const encrypted = Buffer.from(parts[2], 'hex');
+  
+  const key = crypto.createHash('sha256').update(keySeed).digest();
+  const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+  decipher.setAuthTag(authTag);
+  
+  let decrypted = decipher.update(encrypted, undefined, 'utf8');
+  decrypted += decipher.final('utf8');
+  return decrypted;
+}
+
 // 1. Core Mathematical Risk Evaluation Model (Replicated from riskEngine.ts for instant execution)
 function runLocalVerify(token, clientIp, userAgent) {
   let telemetry = {};
   const key = "vms_pub_live_demo";
   try {
-    const encryptedText = Buffer.from(token, 'base64').toString('binary');
-    let decrypted = '';
-    for (let i = 0; i < encryptedText.length; i++) {
-      decrypted += String.fromCharCode(encryptedText.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+    if (token.startsWith('aes:')) {
+      const rawCiphertext = Buffer.from(token.slice(4), 'base64').toString('utf8');
+      const decryptedJson = decryptAES256GCM(rawCiphertext, key);
+      telemetry = JSON.parse(decryptedJson);
+    } else {
+      const encryptedText = Buffer.from(token, 'base64').toString('binary');
+      let decrypted = '';
+      for (let i = 0; i < encryptedText.length; i++) {
+        decrypted += String.fromCharCode(encryptedText.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+      }
+      const rawJson = decodeURIComponent(decrypted);
+      telemetry = JSON.parse(rawJson);
     }
-    const rawJson = decodeURIComponent(decrypted);
-    telemetry = JSON.parse(rawJson);
   } catch (e) {
     return { success: false, error: 'Malformed token payload.' };
   }
@@ -187,7 +210,7 @@ function runLocalVerify(token, clientIp, userAgent) {
   };
 }
 
-// Helper to encode JSON payloads into tokens
+// Helper to encode JSON payloads into legacy XOR tokens
 const encodePayload = (p) => {
   const key = "vms_pub_live_demo";
   const rawJson = JSON.stringify(p);
@@ -197,6 +220,20 @@ const encodePayload = (p) => {
     encrypted += String.fromCharCode(encodedText.charCodeAt(i) ^ key.charCodeAt(i % key.length));
   }
   return Buffer.from(encrypted, 'binary').toString('base64');
+};
+
+// Helper to encode JSON payloads into AES-256-GCM tokens
+const encodePayloadAES256 = (p) => {
+  const keySeed = "vms_pub_live_demo";
+  const rawJson = JSON.stringify(p);
+  const iv = crypto.randomBytes(12);
+  const key = crypto.createHash('sha256').update(keySeed).digest();
+  const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+  let encrypted = cipher.update(rawJson, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  const authTag = cipher.getAuthTag().toString('hex');
+  const ivHex = iv.toString('hex');
+  return 'aes:' + Buffer.from(ivHex + ':' + authTag + ':' + encrypted).toString('base64');
 };
 
 // ==========================================
@@ -217,7 +254,7 @@ for (let i = 0; i < 20; i++) {
 // Typing delays with variance (stdDev > 25ms)
 const humanKeyTimings = [120, 240, 85, 310, 160, 180, 290];
 
-const humanPayload = encodePayload({
+const humanPayload = encodePayloadAES256({
   fingerprint: {
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/126.0.0.0',
     screenWidth: 1920,

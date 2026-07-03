@@ -1,5 +1,25 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import crypto from 'crypto';
 import { evaluateTelemetry } from '../src/lib/riskEngine';
+
+function decryptAES256GCM(ciphertextBase64: string, keySeed: string): string {
+  const parts = ciphertextBase64.split(':');
+  if (parts.length !== 3) {
+    throw new Error('Invalid AES token format');
+  }
+  const iv = Buffer.from(parts[0], 'hex');
+  const authTag = Buffer.from(parts[1], 'hex');
+  const encrypted = Buffer.from(parts[2], 'hex');
+
+  const key = crypto.createHash('sha256').update(keySeed).digest();
+
+  const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+  decipher.setAuthTag(authTag);
+
+  let decrypted = decipher.update(encrypted, undefined, 'utf8');
+  decrypted += decipher.final('utf8');
+  return decrypted;
+}
 
 // Fallback Supabase settings if environment variables are not set on Vercel yet
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://qgoelcorfcqxberbayul.supabase.co';
@@ -67,16 +87,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const siteKey = secret ? secret.replace('vms_sec_', 'vms_pub_') : 'default_site_key';
 
-    // 1. Decode token payload (XOR encrypted by client-side)
+    // 1. Decode token payload (AES-256-GCM or legacy XOR decrypted by client-side)
     let telemetry: any = {};
     try {
-      const encryptedText = Buffer.from(token, 'base64').toString('binary');
-      let decrypted = '';
-      for (let i = 0; i < encryptedText.length; i++) {
-        decrypted += String.fromCharCode(encryptedText.charCodeAt(i) ^ siteKey.charCodeAt(i % siteKey.length));
+      if (token.startsWith('aes:')) {
+        const rawCiphertext = Buffer.from(token.slice(4), 'base64').toString('utf8');
+        const decryptedJson = decryptAES256GCM(rawCiphertext, siteKey);
+        telemetry = JSON.parse(decryptedJson);
+      } else {
+        const encryptedText = Buffer.from(token, 'base64').toString('binary');
+        let decrypted = '';
+        for (let i = 0; i < encryptedText.length; i++) {
+          decrypted += String.fromCharCode(encryptedText.charCodeAt(i) ^ siteKey.charCodeAt(i % siteKey.length));
+        }
+        const rawJson = decodeURIComponent(decrypted);
+        telemetry = JSON.parse(rawJson);
       }
-      const rawJson = decodeURIComponent(decrypted);
-      telemetry = JSON.parse(rawJson);
     } catch (e) {
       return res.status(400).json({ success: false, error: 'Invalid or malformed verification token.' });
     }
