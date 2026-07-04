@@ -108,51 +108,6 @@ No active botnets, scrapers, or automation frameworks have been flagged for this
     setQuery(term);
   };
 
-  const getCompanyInfo = (log: VerificationLog) => {
-    const userAgent = log.browser.toLowerCase();
-    const location = log.location.toLowerCase();
-    
-    let name = 'SleepSomno Technologies';
-    let industry = 'Healthcare & AI Systems';
-    let size = '11-50 employees';
-    let status = 'verified'; 
-    let description = 'Developing next-generation AI sleep monitoring systems and secure identity verifications.';
-
-    if (location.includes('germany')) {
-      name = 'Hetzner Online GmbH';
-      industry = 'Cloud Hosting & Data Centers';
-      size = '501-1,000 employees';
-      status = 'hosting';
-      description = 'German web hosting provider and data center operator hosting various automated services.';
-    } else if (log.ipAddress.startsWith('104.') || log.ipAddress.startsWith('172.')) {
-      name = 'Cloudflare Inc.';
-      industry = 'Network Security & Performance';
-      size = '1,001-5,000 employees';
-      status = 'verified';
-      description = 'Provides global content delivery networks, cybersecurity services, and edge computing solutions.';
-    } else if (userAgent.includes('headless') || log.riskScore > 60) {
-      name = 'Botnet Scraper Network Inc.';
-      industry = 'Automated Web Services';
-      size = 'Unknown';
-      status = 'unverified';
-      description = 'Associated with mass automated headless execution clusters scraping public data.';
-    } else if (location.includes('china')) {
-      name = 'Tencent Technology';
-      industry = 'Internet & Cloud Infrastructure';
-      size = '10,000+ employees';
-      status = 'verified';
-      description = 'Multinational technology conglomerate specializing in social networks and cloud computing.';
-    } else if (location.includes('united states') || location.includes('us')) {
-      name = 'Amazon Web Services';
-      industry = 'Cloud Platforms';
-      size = '10,000+ employees';
-      status = 'hosting';
-      description = 'On-demand cloud computing platforms hosting modern application backends and scrapers.';
-    }
-
-    return { name, industry, size, status, description };
-  };
-
   return (
     <div style={styles.container}>
       <div style={styles.header}>
@@ -376,82 +331,6 @@ No active botnets, scrapers, or automation frameworks have been flagged for this
                   </div>
                 </div>
               )}
-
-              {/* LinkedIn Company Security Profiler Card */}
-              {selectedLog && (() => {
-                const comp = getCompanyInfo(selectedLog);
-                return (
-                  <div className="glass-panel" style={{ padding: '1.5rem', background: 'rgba(10, 25, 47, 0.45)', border: '1px solid rgba(10, 102, 194, 0.2)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <h4 style={{ margin: 0, color: '#fff', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#0a66c2" style={{ borderRadius: '2px' }}>
-                          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                        </svg>
-                        LinkedIn Company Security Profiler
-                      </h4>
-                      <span style={{
-                        fontSize: '0.75rem',
-                        padding: '2px 8px',
-                        borderRadius: '12px',
-                        fontWeight: 600,
-                        backgroundColor: comp.status === 'verified' ? 'rgba(52, 211, 153, 0.12)' : comp.status === 'hosting' ? 'rgba(251, 191, 36, 0.12)' : 'rgba(239, 68, 68, 0.12)',
-                        color: comp.status === 'verified' ? '#34d399' : comp.status === 'hosting' ? '#fbbf24' : '#f87171',
-                        border: `1px solid ${comp.status === 'verified' ? 'rgba(52, 211, 153, 0.2)' : comp.status === 'hosting' ? 'rgba(251, 191, 36, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`
-                      }}>
-                        {comp.status.toUpperCase()}
-                      </span>
-                    </div>
-
-                    <div style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
-                      <div style={{ fontWeight: 700, fontSize: '1.05rem', color: '#00f2fe', marginBottom: '2px' }}>{comp.name}</div>
-                      <div style={{ color: '#94a3b8', fontSize: '0.8', marginBottom: '8px' }}>{comp.industry} • {comp.size}</div>
-                      <p style={{ margin: '0 0 12px 0', fontSize: '0.82rem', color: '#cbd5e1', lineHeight: '1.4' }}>{comp.description}</p>
-                      
-                      <div style={{ display: 'flex', gap: '10px' }}>
-                        <a 
-                          href={`https://www.linkedin.com/search/results/companies/?keywords=${encodeURIComponent(comp.name)}`} 
-                          target="_blank" 
-                          rel="noreferrer"
-                          style={{
-                            flex: 1,
-                            padding: '6px 12px',
-                            backgroundColor: '#0a66c2',
-                            color: '#fff',
-                            textDecoration: 'none',
-                            borderRadius: '4px',
-                            fontWeight: 600,
-                            fontSize: '0.78rem',
-                            textAlign: 'center',
-                            transition: 'opacity 0.2s ease',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '4px'
-                          }}
-                        >
-                          🔎 View on LinkedIn
-                        </a>
-                        <button
-                          onClick={() => alert(`Synchronizing Cloudflare AI Search indices with corporate profiles for ${comp.name}... Done.`)}
-                          style={{
-                            flex: 1,
-                            padding: '6px 12px',
-                            background: 'rgba(255, 255, 255, 0.05)',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            color: '#cbd5e1',
-                            borderRadius: '4px',
-                            fontWeight: 600,
-                            fontSize: '0.78rem',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          🔄 Sync Profile
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
             </div>
           </div>
         </>
