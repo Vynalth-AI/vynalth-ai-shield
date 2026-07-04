@@ -75,3 +75,25 @@ ALTER TABLE public.crawled_threat_intel ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Enable read access for all users on crawled intel" ON public.crawled_threat_intel FOR SELECT USING (true);
 CREATE POLICY "Enable insert access for all users on crawled intel" ON public.crawled_threat_intel FOR INSERT WITH CHECK (true);
+
+-- -------------------------------------------------------------
+-- 5. Create Database-Level HTTP Cron Trigger (pg_net / pg_cron)
+-- -------------------------------------------------------------
+-- Copy and run the following in your Supabase SQL Editor to enable automatic daily crawls:
+--
+-- CREATE EXTENSION IF NOT EXISTS pg_cron;
+-- CREATE EXTENSION IF NOT EXISTS pg_net;
+-- 
+-- SELECT cron.schedule(
+--     'daily_threat_crawl',
+--     '0 0 * * *',
+--     $$
+--     SELECT net.http_post(
+--         url:='https://vita-shield.vercel.app/api/cron/crawl',
+--         headers:=jsonb_build_object(
+--             'Content-Type', 'application/json',
+--             'Authorization', 'Bearer YOUR_CRON_SECRET_KEY'
+--         )
+--     );
+--     $$
+-- );
