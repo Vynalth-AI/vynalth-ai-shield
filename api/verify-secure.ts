@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import crypto from 'crypto';
-import { evaluateTelemetry } from '../src/lib/riskEngine';
+import { evaluateTelemetry } from '../src/lib/riskEngine.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 密钥管理服务（应连接到真实的密钥管理系统，如 AWS KMS、HashiCorp Vault）

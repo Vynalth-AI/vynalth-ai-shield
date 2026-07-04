@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import crypto from 'crypto';
-import { evaluateTelemetry, globalAutoencoder } from '../src/lib/riskEngine';
+import { evaluateTelemetry, globalAutoencoder } from '../src/lib/riskEngine.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 密钥管理服务 (Key Management Service)
@@ -390,7 +390,44 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       dimensionScores
     } = evaluation;
 
-    const decision: 'allow' | 'challenge' | 'block' = engineDecision;
+    let finalRiskScore = riskScore;
+    let finalIsAiAgent = isAiAgent;
+    let finalAgentType = agentType;
+    let finalBehaviorFlags = [...behaviorFlags];
+
+    // 🔍 Query Cloudflare AI Search to dynamically adjust security thresholds
+    const cloudflareSearchUrl = 'https://8e6afc0f-9bfc-4aba-8b16-5b452ed6e065.search.ai.cloudflare.com/search';
+    try {
+      const cfResponse = await fetch(cloudflareSearchUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: `${userAgent} ${clientIp}` })
+      });
+      if (cfResponse.ok) {
+        const cfData = await cfResponse.json();
+        const chunks = cfData?.result?.chunks || [];
+        if (chunks.length > 0) {
+          const combinedText = chunks.map((c: any) => c.text || '').join(' ').toLowerCase();
+          const riskKeywords = ['bot', 'scraper', 'headless', 'automation', 'crawler', 'suspicious', 'proxy', 'attack'];
+          const matchCount = riskKeywords.filter(keyword => combinedText.includes(keyword)).length;
+          
+          if (matchCount >= 2) {
+            finalRiskScore = Math.min(100, finalRiskScore + 35);
+            finalIsAiAgent = true;
+            finalAgentType = 'cloudflare_intel_flagged';
+            finalBehaviorFlags.push('cloudflare_search_threat_match');
+          }
+        }
+      }
+    } catch (cfErr) {
+      console.error('Cloudflare Search threat lookup failed:', cfErr);
+    }
+
+    const decision: 'allow' | 'challenge' | 'block' = finalRiskScore > 75 
+      ? 'block' 
+      : finalRiskScore > 35 
+        ? 'challenge' 
+        : 'allow';
 
     // 7. Log Session & Telemetry directly to Supabase
     if (SUPABASE_URL && SUPABASE_KEY) {
@@ -422,7 +459,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               },
               body: JSON.stringify({
                 session_id: sessionId,
-                risk_score: riskScore,
+                risk_score: finalRiskScore,
                 device_fingerprint: {
                   userAgent,
                   ipAddress: clientIp,
@@ -440,7 +477,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                   mouseEvents,
                   keyPresses,
                   scrolls,
-                  behaviorFlags,
+                  behaviorFlags: finalBehaviorFlags,
                   trustScore
                 }
               })
