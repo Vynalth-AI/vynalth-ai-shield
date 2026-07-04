@@ -6,6 +6,7 @@ interface SearchIntelligenceProps {
 }
 
 export const SearchIntelligence: React.FC<SearchIntelligenceProps> = ({ logs }) => {
+  const [activeSubTab, setActiveSubTab] = useState<'analyser' | 'chat'>('analyser');
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<VerificationLog[]>([]);
   const [selectedLog, setSelectedLog] = useState<VerificationLog | null>(null);
@@ -100,7 +101,6 @@ No active botnets, scrapers, or automation frameworks have been flagged for this
 
   const handleSelectLog = (log: VerificationLog) => {
     setSelectedLog(log);
-    // Auto populate query to focus on that specific IP or ID
     setQuery(log.ipAddress);
   };
 
@@ -121,192 +121,235 @@ No active botnets, scrapers, or automation frameworks have been flagged for this
         </div>
       </div>
 
-      {/* Quick Search Chips */}
-      <div style={styles.chipsContainer}>
-        <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Quick Intelligence Queries:</span>
-        <button onClick={() => quickSearch('blocked')} style={styles.chipButton}>🔴 Blocked Requests</button>
-        <button onClick={() => quickSearch('Headless')} style={styles.chipButton}>🤖 Headless Browsers</button>
-        <button onClick={() => quickSearch('Germany')} style={styles.chipButton}>🇩🇪 Germany Subnet</button>
-        <button onClick={() => quickSearch('behavioral_telemetry')} style={styles.chipButton}>🖱️ Telemetry Method</button>
+      {/* Sub-tab Navigation */}
+      <div style={styles.subTabNav}>
+        <button 
+          onClick={() => setActiveSubTab('analyser')} 
+          style={{
+            ...styles.subTabButton,
+            borderBottom: activeSubTab === 'analyser' ? '2px solid #00f2fe' : '2px solid transparent',
+            color: activeSubTab === 'analyser' ? '#00f2fe' : '#94a3b8'
+          }}
+        >
+          🕵️ Threat Telemetry Analyser
+        </button>
+        <button 
+          onClick={() => setActiveSubTab('chat')} 
+          style={{
+            ...styles.subTabButton,
+            borderBottom: activeSubTab === 'chat' ? '2px solid #00f2fe' : '2px solid transparent',
+            color: activeSubTab === 'chat' ? '#00f2fe' : '#94a3b8'
+          }}
+        >
+          💬 Cloudflare AI Search Chat
+        </button>
       </div>
 
-      {/* Main Grid Layout */}
-      <div style={styles.grid}>
-        {/* Left Side: Search & Table */}
-        <div style={{ flex: 1.5, display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <form onSubmit={handleSearchSubmit} style={styles.searchBarContainer} className="glass-panel">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00f2fe" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px' }}>
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input
-              type="text"
-              placeholder="Search by IP address, country, browser signature, anomaly flags..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              style={styles.searchInput}
-            />
-            <button type="submit" style={styles.searchButton}>
-              Generate Threat Intel
-            </button>
-          </form>
-
-          {/* Results Table */}
-          <div className="glass-panel" style={{ padding: '1.5rem', flex: 1 }}>
-            <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.1rem', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>Search Results ({results.length} found)</span>
-              <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Click log row to inspect detailed kinetics</span>
-            </h3>
-            
-            <div style={{ overflowX: 'auto' }}>
-              <table style={styles.table}>
-                <thead>
-                  <tr style={styles.tableHeaderRow}>
-                    <th style={styles.th}>Timestamp</th>
-                    <th style={styles.th}>IP Address</th>
-                    <th style={styles.th}>Location</th>
-                    <th style={styles.th}>Browser</th>
-                    <th style={styles.th}>Risk Score</th>
-                    <th style={styles.th}>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {results.length > 0 ? (
-                    results.map((log) => (
-                      <tr 
-                        key={log.id} 
-                        onClick={() => handleSelectLog(log)}
-                        style={{
-                          ...styles.tableRow,
-                          background: selectedLog?.id === log.id ? 'rgba(0, 242, 254, 0.08)' : 'transparent',
-                          borderLeft: selectedLog?.id === log.id ? '3px solid #00f2fe' : '3px solid transparent'
-                        }}
-                      >
-                        <td style={styles.td}>{new Date(log.timestamp).toLocaleTimeString()}</td>
-                        <td style={styles.td}>
-                          <span style={styles.ipText}>{log.ipAddress}</span>
-                        </td>
-                        <td style={styles.td}>{log.location}</td>
-                        <td style={styles.td}>{log.browser}</td>
-                        <td style={styles.td}>
-                          <span style={{
-                            color: log.riskScore > 70 ? '#f87171' : log.riskScore > 30 ? '#fbbf24' : '#34d399',
-                            fontWeight: 600
-                          }}>
-                            {log.riskScore}%
-                          </span>
-                        </td>
-                        <td style={styles.td}>
-                          <span style={{
-                            ...styles.statusBadge,
-                            backgroundColor: log.status === 'passed' ? 'rgba(52, 211, 153, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                            color: log.status === 'passed' ? '#34d399' : '#f87171'
-                          }}>
-                            {log.status.toUpperCase()}
-                          </span>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={6} style={styles.noResults}>
-                        No matching logs found in the security threat database.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+      {activeSubTab === 'analyser' && (
+        <>
+          {/* Quick Search Chips */}
+          <div style={styles.chipsContainer}>
+            <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Quick Intelligence Queries:</span>
+            <button onClick={() => quickSearch('blocked')} style={styles.chipButton}>🔴 Blocked Requests</button>
+            <button onClick={() => quickSearch('Headless')} style={styles.chipButton}>🤖 Headless Browsers</button>
+            <button onClick={() => quickSearch('Germany')} style={styles.chipButton}>🇩🇪 Germany Subnet</button>
+            <button onClick={() => quickSearch('behavioral_telemetry')} style={styles.chipButton}>🖱️ Telemetry Method</button>
           </div>
-        </div>
 
-        {/* Right Side: AI Intelligence Analysis */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px', minWidth: '320px' }}>
-          {/* AI Intelligence Report */}
-          <div className="glass-panel" style={{ padding: '2rem', flex: 1.5, background: 'rgba(10, 15, 30, 0.65)', border: '1px solid rgba(0, 242, 254, 0.15)' }}>
-            <h3 style={{ margin: '0 0 1.2rem 0', fontSize: '1.2rem', color: '#00f2fe', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00f2fe', boxShadow: '0 0 8px #00f2fe' }} />
-              Threat Intel Report Generator
-            </h3>
-
-            {isGenerating ? (
-              <div style={styles.loadingContainer}>
-                <div style={styles.spinner} />
-                <span style={{ fontSize: '0.9rem', color: '#94a3b8' }}>
-                  Analyzing {results.length} telemetry payloads with AI Search Engine...
-                </span>
-              </div>
-            ) : aiReport ? (
-              <div style={styles.reportContent}>
-                {aiReport.split('\n').map((line, idx) => {
-                  if (line.startsWith('###')) {
-                    return <h3 key={idx} style={{ color: '#fff', fontSize: '1.2rem', marginTop: '15px', marginBottom: '8px' }}>{line.replace('###', '')}</h3>;
-                  }
-                  if (line.startsWith('####')) {
-                    return <h4 key={idx} style={{ color: '#00f2fe', fontSize: '1rem', marginTop: '15px', marginBottom: '8px' }}>{line.replace('####', '')}</h4>;
-                  }
-                  if (line.startsWith('*')) {
-                    return <li key={idx} style={{ color: '#cbd5e1', fontSize: '0.9rem', marginLeft: '10px', marginBottom: '4px' }}>{line.replace('*', '').trim()}</li>;
-                  }
-                  if (line.startsWith('#####')) {
-                    return <h5 key={idx} style={{ color: '#f87171', fontSize: '0.95rem', marginTop: '12px', marginBottom: '6px' }}>{line.replace('#####', '')}</h5>;
-                  }
-                  if (line.startsWith('1.') || line.startsWith('2.') || line.startsWith('3.')) {
-                    return <p key={idx} style={{ color: '#e2e8f0', fontSize: '0.88rem', marginLeft: '15px', margin: '4px 0' }}>{line}</p>;
-                  }
-                  return <p key={idx} style={{ color: '#94a3b8', fontSize: '0.9rem', lineHeight: '1.5', margin: '8px 0' }}>{line}</p>;
-                })}
-              </div>
-            ) : (
-              <div style={styles.emptyReport}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '15px' }}>
-                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                  <polyline points="7.5 4.21 12 6.81 16.5 4.21" />
-                  <polyline points="7.5 19.79 7.5 14.6 3 12" />
-                  <polyline points="21 12 16.5 14.6 16.5 19.79" />
-                  <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                  <line x1="12" y1="22.08" x2="12" y2="12" />
+          {/* Main Grid Layout */}
+          <div style={styles.grid}>
+            {/* Left Side: Search & Table */}
+            <div style={{ flex: 1.5, display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <form onSubmit={handleSearchSubmit} style={styles.searchBarContainer} className="glass-panel">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00f2fe" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px' }}>
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <span style={{ fontSize: '0.9rem', color: '#64748b', textAlign: 'center', maxWidth: '250px' }}>
-                  Click "Generate Threat Intel" above to generate a custom natural language threat report.
-                </span>
-              </div>
-            )}
-          </div>
+                <input
+                  type="text"
+                  placeholder="Search by IP address, country, browser signature, anomaly flags..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  style={styles.searchInput}
+                />
+                <button type="submit" style={styles.searchButton}>
+                  Generate Threat Intel
+                </button>
+              </form>
 
-          {/* Selected Log Detailed Kinematics */}
-          {selectedLog && (
-            <div className="glass-panel" style={{ padding: '1.5rem', flex: 1, background: 'rgba(15, 23, 42, 0.45)' }}>
-              <h4 style={{ margin: '0 0 0.8rem 0', color: '#fff', fontSize: '1rem', display: 'flex', justifyContent: 'space-between' }}>
-                <span>🔍 Anomaly Signature Analysis</span>
-                <span style={{ color: '#00f2fe', fontSize: '0.8rem' }}>{selectedLog.id}</span>
-              </h4>
-              <div style={styles.detailGrid}>
-                <div>
-                  <div style={styles.detailLabel}>Detected Anomaly Flags:</div>
-                  {(selectedLog.flags || []).length > 0 ? (
-                    selectedLog.flags!.map(f => (
-                      <span key={f} style={styles.anomalyTag}>⚠️ {f}</span>
-                    ))
-                  ) : (
-                    <span style={{ color: '#34d399', fontSize: '0.85rem' }}>✓ Clean Behavioral Profile</span>
-                  )}
-                </div>
-                <div style={{ marginTop: '10px' }}>
-                  <div style={styles.detailLabel}>Environment Integrity Flags:</div>
-                  {selectedLog.deviceAnomalies && selectedLog.deviceAnomalies.length > 0 ? (
-                    selectedLog.deviceAnomalies.map(a => (
-                      <span key={a} style={styles.envTag}>🤖 {a}</span>
-                    ))
-                  ) : (
-                    <span style={{ color: '#34d399', fontSize: '0.85rem' }}>✓ Native Browser Environment</span>
-                  )}
+              {/* Results Table */}
+              <div className="glass-panel" style={{ padding: '1.5rem', flex: 1 }}>
+                <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.1rem', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>Search Results ({results.length} found)</span>
+                  <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Click log row to inspect detailed kinetics</span>
+                </h3>
+                
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={styles.table}>
+                    <thead>
+                      <tr style={styles.tableHeaderRow}>
+                        <th style={styles.th}>Timestamp</th>
+                        <th style={styles.th}>IP Address</th>
+                        <th style={styles.th}>Location</th>
+                        <th style={styles.th}>Browser</th>
+                        <th style={styles.th}>Risk Score</th>
+                        <th style={styles.th}>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {results.length > 0 ? (
+                        results.map((log) => (
+                          <tr 
+                            key={log.id} 
+                            onClick={() => handleSelectLog(log)}
+                            style={{
+                              ...styles.tableRow,
+                              background: selectedLog?.id === log.id ? 'rgba(0, 242, 254, 0.08)' : 'transparent',
+                              borderLeft: selectedLog?.id === log.id ? '3px solid #00f2fe' : '3px solid transparent'
+                            }}
+                          >
+                            <td style={styles.td}>{new Date(log.timestamp).toLocaleTimeString()}</td>
+                            <td style={styles.td}>
+                              <span style={styles.ipText}>{log.ipAddress}</span>
+                            </td>
+                            <td style={styles.td}>{log.location}</td>
+                            <td style={styles.td}>{log.browser}</td>
+                            <td style={styles.td}>
+                              <span style={{
+                                color: log.riskScore > 70 ? '#f87171' : log.riskScore > 30 ? '#fbbf24' : '#34d399',
+                                fontWeight: 600
+                              }}>
+                                {log.riskScore}%
+                              </span>
+                            </td>
+                            <td style={styles.td}>
+                              <span style={{
+                                ...styles.statusBadge,
+                                backgroundColor: log.status === 'passed' ? 'rgba(52, 211, 153, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                                color: log.status === 'passed' ? '#34d399' : '#f87171'
+                              }}>
+                                {log.status.toUpperCase()}
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={6} style={styles.noResults}>
+                            No matching logs found in the security threat database.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
-          )}
+
+            {/* Right Side: AI Intelligence Analysis */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px', minWidth: '320px' }}>
+              {/* AI Intelligence Report */}
+              <div className="glass-panel" style={{ padding: '2rem', flex: 1.5, background: 'rgba(10, 15, 30, 0.65)', border: '1px solid rgba(0, 242, 254, 0.15)' }}>
+                <h3 style={{ margin: '0 0 1.2rem 0', fontSize: '1.2rem', color: '#00f2fe', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00f2fe', boxShadow: '0 0 8px #00f2fe' }} />
+                  Threat Intel Report Generator
+                </h3>
+
+                {isGenerating ? (
+                  <div style={styles.loadingContainer}>
+                    <div style={styles.spinner} />
+                    <span style={{ fontSize: '0.9rem', color: '#94a3b8' }}>
+                      Analyzing {results.length} telemetry payloads with AI Search Engine...
+                    </span>
+                  </div>
+                ) : aiReport ? (
+                  <div style={styles.reportContent}>
+                    {aiReport.split('\n').map((line, idx) => {
+                      if (line.startsWith('###')) {
+                        return <h3 key={idx} style={{ color: '#fff', fontSize: '1.2rem', marginTop: '15px', marginBottom: '8px' }}>{line.replace('###', '')}</h3>;
+                      }
+                      if (line.startsWith('####')) {
+                        return <h4 key={idx} style={{ color: '#00f2fe', fontSize: '1rem', marginTop: '15px', marginBottom: '8px' }}>{line.replace('####', '')}</h4>;
+                      }
+                      if (line.startsWith('*')) {
+                        return <li key={idx} style={{ color: '#cbd5e1', fontSize: '0.9rem', marginLeft: '10px', marginBottom: '4px' }}>{line.replace('*', '').trim()}</li>;
+                      }
+                      if (line.startsWith('#####')) {
+                        return <h5 key={idx} style={{ color: '#f87171', fontSize: '0.95rem', marginTop: '12px', marginBottom: '6px' }}>{line.replace('#####', '')}</h5>;
+                      }
+                      if (line.startsWith('1.') || line.startsWith('2.') || line.startsWith('3.')) {
+                        return <p key={idx} style={{ color: '#e2e8f0', fontSize: '0.88rem', marginLeft: '15px', margin: '4px 0' }}>{line}</p>;
+                      }
+                      return <p key={idx} style={{ color: '#94a3b8', fontSize: '0.9rem', lineHeight: '1.5', margin: '8px 0' }}>{line}</p>;
+                    })}
+                  </div>
+                ) : (
+                  <div style={styles.emptyReport}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '15px' }}>
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                      <polyline points="7.5 4.21 12 6.81 16.5 4.21" />
+                      <polyline points="7.5 19.79 7.5 14.6 3 12" />
+                      <polyline points="21 12 16.5 14.6 16.5 19.79" />
+                      <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                      <line x1="12" y1="22.08" x2="12" y2="12" />
+                    </svg>
+                    <span style={{ fontSize: '0.9rem', color: '#64748b', textAlign: 'center', maxWidth: '250px' }}>
+                      Click "Generate Threat Intel" above to generate a custom natural language threat report.
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Selected Log Detailed Kinematics */}
+              {selectedLog && (
+                <div className="glass-panel" style={{ padding: '1.5rem', flex: 1, background: 'rgba(15, 23, 42, 0.45)' }}>
+                  <h4 style={{ margin: '0 0 0.8rem 0', color: '#fff', fontSize: '1rem', display: 'flex', justifyContent: 'space-between' }}>
+                    <span>🔍 Anomaly Signature Analysis</span>
+                    <span style={{ color: '#00f2fe', fontSize: '0.8rem' }}>{selectedLog.id}</span>
+                  </h4>
+                  <div style={styles.detailGrid}>
+                    <div>
+                      <div style={styles.detailLabel}>Detected Anomaly Flags:</div>
+                      {selectedLog.flags && selectedLog.flags.length > 0 ? (
+                        selectedLog.flags.map(f => (
+                          <span key={f} style={styles.anomalyTag}>⚠️ {f}</span>
+                        ))
+                      ) : (
+                        <span style={{ color: '#34d399', fontSize: '0.85rem' }}>✓ Clean Behavioral Profile</span>
+                      )}
+                    </div>
+                    <div style={{ marginTop: '10px' }}>
+                      <div style={styles.detailLabel}>Environment Integrity Flags:</div>
+                      {selectedLog.deviceAnomalies && selectedLog.deviceAnomalies.length > 0 ? (
+                        selectedLog.deviceAnomalies.map(a => (
+                          <span key={a} style={styles.envTag}>🤖 {a}</span>
+                        ))
+                      ) : (
+                        <span style={{ color: '#34d399', fontSize: '0.85rem' }}>✓ Native Browser Environment</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {activeSubTab === 'chat' && (
+        <div className="glass-panel" style={styles.cloudflareChatContainer}>
+          <div dangerouslySetInnerHTML={{
+            __html: `
+              <chat-page-snippet 
+                api-url="https://8e6afc0f-9bfc-4aba-8b16-5b452ed6e065.search.ai.cloudflare.com"
+                theme="dark"
+                placeholder="Ask VitaShield AI Search Intelligence anything about your system or docs..."
+                style="height: 100%; display: block;">
+              </chat-page-snippet>
+            `
+          }} style={{ height: '100%' }} />
         </div>
-      </div>
+      )}
     </div>
   );
 };
@@ -356,6 +399,31 @@ const styles = {
     borderRadius: '50%',
     backgroundColor: '#00f2fe',
     boxShadow: '0 0 8px #00f2fe'
+  },
+  subTabNav: {
+    display: 'flex',
+    gap: '20px',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+    paddingBottom: '2px',
+    marginBottom: '10px'
+  },
+  subTabButton: {
+    background: 'transparent',
+    border: 'none',
+    fontSize: '1rem',
+    fontWeight: 600,
+    padding: '8px 12px 10px 12px',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    outline: 'none'
+  },
+  cloudflareChatContainer: {
+    height: '600px',
+    padding: '1rem',
+    background: 'rgba(10, 15, 30, 0.45)',
+    border: '1px solid rgba(0, 242, 254, 0.15)',
+    borderRadius: '12px',
+    overflow: 'hidden'
   },
   chipsContainer: {
     display: 'flex',
