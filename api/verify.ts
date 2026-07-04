@@ -447,6 +447,46 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.error('Dynamic network ISP lookup failed:', ipApiErr);
     }
 
+    // 🛡️ Real-time Threat Intel DB Lookup (auto-updated by /api/cron/crawl daily)
+    // Check if this client IP matches any known C2 botnet IPs, or if any CVE/attack
+    // patterns match, applying dynamic risk penalties from our live threat database.
+    try {
+      if (clientIp && SUPABASE_URL && SUPABASE_KEY) {
+        const threatRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/threat_intel?indicator=eq.${encodeURIComponent(clientIp)}&select=category,severity,description`,
+          { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+        );
+        if (threatRes.ok) {
+          const threats = await threatRes.json();
+          if (threats && threats.length > 0) {
+            const t = threats[0];
+            const penalty = t.severity === 'critical' ? 65 : t.severity === 'high' ? 45 : 25;
+            finalRiskScore = Math.min(100, finalRiskScore + penalty);
+            finalIsAiAgent = true;
+            finalAgentType = t.category || 'threat_intel_match';
+            finalBehaviorFlags.push(`threat_intel_match:${t.category}`);
+            console.log(`[ThreatIntel] IP ${clientIp} matched ${t.category} | penalty +${penalty}`);
+          }
+        }
+
+        // Also fetch current risk multiplier from auto-updated config
+        const configRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/threat_risk_config?select=risk_multiplier&order=updated_at.desc&limit=1`,
+          { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+        );
+        if (configRes.ok) {
+          const config = await configRes.json();
+          if (config && config.length > 0 && config[0].risk_multiplier) {
+            const multiplier = Math.min(Number(config[0].risk_multiplier), 1.5);
+            finalRiskScore = Math.min(100, Math.round(finalRiskScore * multiplier));
+          }
+        }
+      }
+    } catch (threatErr) {
+      console.error('Threat Intel DB lookup failed:', threatErr);
+    }
+
+
     const decision: 'allow' | 'challenge' | 'block' = finalRiskScore > 75 
       ? 'block' 
       : finalRiskScore > 35 

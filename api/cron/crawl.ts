@@ -3,123 +3,248 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://qgoelcorfcqxberbayul.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY || '';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Protect cron endpoints against unauthorized execution
-  const authHeader = req.headers.authorization;
-  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return res.status(401).json({ success: false, error: 'Unauthorized cron trigger' });
+// =====================================================================
+// Open-Source Threat Intelligence Sources (all free, no API key needed)
+// =====================================================================
+const THREAT_FEEDS = [
+  {
+    name: 'CISA KEV',
+    description: 'CISA Known Exploited Vulnerabilities Catalog (US Government)',
+    url: 'https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json',
+    type: 'json' as const,
+  },
+  {
+    name: 'abuse.ch URLhaus',
+    description: 'Malware distribution URLs tracked by abuse.ch community',
+    url: 'https://urlhaus-api.abuse.ch/v1/urls/recent/',
+    type: 'json_post' as const,
+  },
+  {
+    name: 'Feodo Tracker C2 IPs',
+    description: 'Botnet Command-and-Control IP blocklist by abuse.ch',
+    url: 'https://feodotracker.abuse.ch/downloads/ipblocklist.json',
+    type: 'json' as const,
+  },
+];
+
+// =====================================================================
+// Type definitions
+// =====================================================================
+interface ThreatRecord {
+  source: string;
+  category: string;
+  indicator: string;
+  description: string;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  raw_data: Record<string, unknown>;
+}
+
+// =====================================================================
+// Supabase helpers
+// =====================================================================
+async function upsertThreat(record: ThreatRecord): Promise<void> {
+  if (!SUPABASE_URL || !SUPABASE_KEY) return;
+
+  // Check if indicator already exists
+  const checkRes = await fetch(
+    `${SUPABASE_URL}/rest/v1/threat_intel?indicator=eq.${encodeURIComponent(record.indicator)}&source=eq.${encodeURIComponent(record.source)}`,
+    { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+  );
+  if (checkRes.ok) {
+    const existing = await checkRes.json();
+    if (existing && existing.length > 0) return; // Skip duplicate
   }
 
-  // Predefined crawl targets
-  const seedUrl = 'https://www.cve.org/';
-  const maxPages = 3;
-  
-  const visitedUrls = new Set<string>();
-  const queue = [{ url: seedUrl, depth: 0 }];
-  let pagesCrawled = 0;
-  const crawledResults: Array<{ title: string; source_url: string; content_text: string }> = [];
+  await fetch(`${SUPABASE_URL}/rest/v1/threat_intel`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify(record),
+  });
+}
+
+async function updateThreatStats(stats: { cves: number; malicious_urls: number; c2_ips: number }): Promise<void> {
+  if (!SUPABASE_URL || !SUPABASE_KEY) return;
+
+  await fetch(`${SUPABASE_URL}/rest/v1/threat_feed_stats`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify({ ...stats, last_updated: new Date().toISOString() }),
+  });
+}
+
+// =====================================================================
+// Feed parsers
+// =====================================================================
+async function fetchCISAKEV(): Promise<ThreatRecord[]> {
+  const results: ThreatRecord[] = [];
+  try {
+    const res = await fetch(THREAT_FEEDS[0].url, { signal: AbortSignal.timeout(10000) });
+    if (!res.ok) return results;
+    const data = await res.json() as { vulnerabilities?: Array<Record<string, unknown>> };
+
+    const vulns = (data.vulnerabilities || []).slice(0, 50); // Latest 50 KEVs
+    for (const v of vulns) {
+      results.push({
+        source: 'CISA KEV',
+        category: 'cve_exploited',
+        indicator: String(v.cveID || ''),
+        description: `[${v.vendorProject}] ${v.product}: ${v.shortDescription}`,
+        severity: 'critical',
+        raw_data: v,
+      });
+    }
+  } catch (err) {
+    console.error('CISA KEV fetch error:', err);
+  }
+  return results;
+}
+
+async function fetchURLhaus(): Promise<ThreatRecord[]> {
+  const results: ThreatRecord[] = [];
+  try {
+    const res = await fetch(THREAT_FEEDS[1].url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'limit=50',
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) return results;
+    const data = await res.json() as { urls?: Array<Record<string, unknown>> };
+
+    for (const entry of (data.urls || []).slice(0, 30)) {
+      const url = String(entry.url || '');
+      if (!url) continue;
+      results.push({
+        source: 'abuse.ch URLhaus',
+        category: 'malware_url',
+        indicator: url,
+        description: `Malware: ${entry.tags || 'unknown'} | Reporter: ${entry.reporter || 'community'}`,
+        severity: 'high',
+        raw_data: entry,
+      });
+    }
+  } catch (err) {
+    console.error('URLhaus fetch error:', err);
+  }
+  return results;
+}
+
+async function fetchFeodoC2(): Promise<ThreatRecord[]> {
+  const results: ThreatRecord[] = [];
+  try {
+    const res = await fetch(THREAT_FEEDS[2].url, { signal: AbortSignal.timeout(10000) });
+    if (!res.ok) return results;
+    const data = await res.json() as Array<Record<string, unknown>>;
+
+    for (const entry of (data || []).slice(0, 50)) {
+      const ip = String(entry.ip_address || '');
+      if (!ip) continue;
+      results.push({
+        source: 'Feodo Tracker',
+        category: 'c2_botnet_ip',
+        indicator: ip,
+        description: `C2 Botnet IP | Malware: ${entry.malware || 'unknown'} | Port: ${entry.port || 'unknown'}`,
+        severity: 'critical',
+        raw_data: entry,
+      });
+    }
+  } catch (err) {
+    console.error('Feodo C2 fetch error:', err);
+  }
+  return results;
+}
+
+// =====================================================================
+// Auto-update risk engine: raise baseline risk for C2/KEV indicators
+// =====================================================================
+async function autoUpdateRiskThresholds(c2Count: number, kevCount: number): Promise<void> {
+  if (!SUPABASE_URL || !SUPABASE_KEY) return;
+  if (c2Count === 0 && kevCount === 0) return;
+
+  // Dynamically increase global risk sensitivity when new threats are detected
+  const riskMultiplier = Math.min(1.0 + (c2Count + kevCount) * 0.002, 1.5);
+
+  await fetch(`${SUPABASE_URL}/rest/v1/threat_risk_config`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify({
+      risk_multiplier: riskMultiplier,
+      new_kev_count: kevCount,
+      new_c2_count: c2Count,
+      updated_at: new Date().toISOString(),
+    }),
+  });
+}
+
+// =====================================================================
+// Main cron handler
+// =====================================================================
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Protect against unauthorized triggers
+  const authHeader = req.headers.authorization;
+  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return res.status(401).json({ success: false, error: 'Unauthorized' });
+  }
+
+  console.log('[ThreatCrawler] Starting threat intelligence collection...');
 
   try {
-    while (queue.length > 0 && pagesCrawled < maxPages) {
-      const { url, depth } = queue.shift()!;
-      if (visitedUrls.has(url)) continue;
-      visitedUrls.add(url);
+    // Parallel fetch from all open-source feeds
+    const [cisaRecords, urlhausRecords, feodoRecords] = await Promise.all([
+      fetchCISAKEV(),
+      fetchURLhaus(),
+      fetchFeodoC2(),
+    ]);
 
-      // Fetch
-      const fetchRes = await fetch(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; VitaShieldThreatCrawler/1.0; +https://vitashield.sleepsomno.com)'
-        }
-      });
-      if (!fetchRes.ok) continue;
+    const allRecords = [...cisaRecords, ...urlhausRecords, ...feodoRecords];
+    let saved = 0;
 
-      const html = await fetchRes.text();
-      
-      // Clean HTML
-      let cleaned = html
-        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-        .replace(/<!--[\s\S]*?-->/g, '');
-
-      const titleMatch = html.match(/<title>([\s\S]*?)<\/title>/i);
-      const title = titleMatch ? titleMatch[1].trim() : 'Crawled Security Document';
-
-      const bodyMatch = cleaned.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-      let bodyContent = bodyMatch ? bodyMatch[1] : cleaned;
-
-      bodyContent = bodyContent
-        .replace(/<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/gi, '\n# $1\n')
-        .replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, '\n$1\n')
-        .replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, '\n* $1\n')
-        .replace(/<[^>]+>/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-
-      crawledResults.push({
-        title,
-        source_url: url,
-        content_text: bodyContent
-      });
-
-      pagesCrawled++;
-
-      // Extract links if depth < 1
-      if (depth < 1) {
-        const linkRegex = /href="([^"#]+)"/ig;
-        let match;
-        while ((match = linkRegex.exec(html)) !== null) {
-          try {
-            const absoluteUrl = new URL(match[1], url).toString();
-            if (absoluteUrl.startsWith('https://www.cve.org/') && !visitedUrls.has(absoluteUrl)) {
-              queue.push({ url: absoluteUrl, depth: depth + 1 });
-            }
-          } catch (e) {}
-        }
-      }
+    // Persist all records concurrently in batches
+    const batchSize = 5;
+    for (let i = 0; i < allRecords.length; i += batchSize) {
+      const batch = allRecords.slice(i, i + batchSize);
+      await Promise.all(batch.map((r) => upsertThreat(r).then(() => saved++).catch(() => {})));
     }
 
-    // Persist crawled pages to Supabase crawled_threat_intel table
-    if (crawledResults.length > 0 && SUPABASE_URL && SUPABASE_KEY) {
-      for (const item of crawledResults) {
-        try {
-          // Check if already exists in Supabase
-          const checkRes = await fetch(`${SUPABASE_URL}/rest/v1/crawled_threat_intel?source_url=eq.${encodeURIComponent(item.source_url)}`, {
-            headers: {
-              'apikey': SUPABASE_KEY,
-              'Authorization': `Bearer ${SUPABASE_KEY}`
-            }
-          });
-          if (checkRes.ok) {
-            const existing = await checkRes.json();
-            if (existing && existing.length > 0) {
-              // Already indexed, skip
-              continue;
-            }
-          }
+    // Update feed statistics
+    await updateThreatStats({
+      cves: cisaRecords.length,
+      malicious_urls: urlhausRecords.length,
+      c2_ips: feodoRecords.length,
+    });
 
-          // Insert
-          await fetch(`${SUPABASE_URL}/rest/v1/crawled_threat_intel`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'apikey': SUPABASE_KEY,
-              'Authorization': `Bearer ${SUPABASE_KEY}`
-            },
-            body: JSON.stringify(item)
-          });
-        } catch (dbErr) {
-          console.error(`Supabase persistence failed for ${item.source_url}:`, dbErr);
-        }
-      }
-    }
+    // Auto-adjust risk engine sensitivity based on newly discovered threats
+    await autoUpdateRiskThresholds(feodoRecords.length, cisaRecords.length);
+
+    console.log(`[ThreatCrawler] Done. Saved ${saved}/${allRecords.length} indicators.`);
 
     return res.status(200).json({
       success: true,
-      pages_crawled: pagesCrawled,
-      saved_results_count: crawledResults.length
+      summary: {
+        cisa_kev: cisaRecords.length,
+        malware_urls: urlhausRecords.length,
+        botnet_c2_ips: feodoRecords.length,
+        total_saved: saved,
+      },
     });
-
-  } catch (err: any) {
-    return res.status(500).json({ success: false, error: err.message });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    console.error('[ThreatCrawler] Fatal error:', message);
+    return res.status(500).json({ success: false, error: message });
   }
 }
