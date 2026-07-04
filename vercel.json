@@ -9,8 +9,22 @@
       "destination": "/widget.js"
     },
     {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/intel/:id",
+      "destination": "/api/intel?id=:id"
+    },
+    {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/crawl",
+      "schedule": "0 0 * * *"
     }
   ],
   "headers": [
