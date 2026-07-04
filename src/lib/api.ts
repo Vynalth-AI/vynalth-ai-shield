@@ -7,7 +7,9 @@
 export const getApiBaseUrl = (): string => {
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;
-    if (host && !host.includes('vitashield') && !host.includes('localhost') && !host.includes('127.0.0.1')) {
+    // If embedding on client domains (e.g. sleepsomno.com), route to collector domain.
+    // Otherwise (localhost, vitashield.sleepsomno.com, or vercel.app preview URL), use relative path.
+    if (host && (host.includes('sleepsomno.com') || host.includes('powiismunc.com')) && !host.includes('vitashield')) {
       return 'https://vitashield.sleepsomno.com';
     }
   }
