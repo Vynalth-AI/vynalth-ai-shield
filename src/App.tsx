@@ -14,6 +14,7 @@ import { MarketingPortal } from './components/MarketingPortal';
 import { AuthPortal } from './components/AuthPortal';
 import { ChecklistPage } from './components/ChecklistPage';
 import { NegativeTraining } from './components/NegativeTraining';
+import { SearchIntelligence } from './components/SearchIntelligence';
 import { getApiBaseUrl } from './lib/api';
 import type { ShieldConfig, VerificationLog } from './types';
 
@@ -296,8 +297,10 @@ function App() {
         return <AlertsManager />;
       case 'checklist':
         return <ChecklistPage />;
+      case 'search_intelligence':
+        return <SearchIntelligence logs={logs} />;
       default:
-        return <Dashboard config={config} logs={logs} />;
+        return <Dashboard config={config} logs={logs} onAddLog={handleAddLog} />;
     }
   };
 
