@@ -1,0 +1,53 @@
+# Cloudflare Threat Events & Cloudy Integration Strategy
+This document outlines the architectural blueprint for combining Cloudflare's Threat Events, Cloudy AI, and VitaShield's AI Search instance to establish a Real-Time B2B Threat Intelligence pipeline.
+
+---
+
+## 1. Core Components
+
+### 1.1 Cloudflare Threat Events
+A real-time threat intelligence data feed powered by **Cloudforce One**, tracking active global attack campaigns and actor metrics:
+*   **Advanced Persistent Threats (APTs)**: Tracking targeted hacker groups.
+*   **DDoS attacks**: Real-time traffic amplification vectors.
+*   **Cybercrime & Compromised devices**: Malware-infected hosting nodes.
+*   **Residential proxies**: Subnets routing automated traffic.
+*   **WAF attacks**: Direct web application firewall violation signatures (highly useful for training the autoencoder).
+
+### 1.2 Cloudy AI Agent
+An inline conversational AI assistant deployed directly in the Cloudflare Dashboard to query, aggregate, and analyze high-volume Threat Events.
+*   **Common Analytics Queries**:
+    *   *“Give me a summary of the top threats targeting healthcare and AI platforms this week”*
+    *   *“Summarize recent WAF attacks and common bypass techniques”*
+    *   *“Give me analysis of threats related to compromised devices or residential proxies”*
+
+---
+
+## 2. Integrated Pipeline (The Dual-Engine Setup)
+
+| Engine / Component | Core Purpose | Combined Integration |
+| :--- | :--- | :--- |
+| **Threat Events + Cloudy** | Global Real-Time Threat Feeds | Extract weekly tactical intelligence (TTPs, IP lists, signature trends). |
+| **VitaShield AI Search** | Private Semantic Knowledge Base | Index the aggregated notes, enabling dynamic RAG-based verify endpoints to consult locally. |
+
+### 2.1 Operational Lifecycle
+```
+[Cloudflare Threat Events]
+           │
+           ▼ (Real-time Global Threat Data)
+    [Cloudy AI Agent] ───> (Weekly Summaries & Threat Profiles)
+           │
+           ▼ (Convert to Markdown/JSON Notes)
+ [VitaShield AI Search] ───> (Indexed in Vector Database)
+           │
+           ▼ (Consulted during telemetry evaluation)
+  [VitaShield Verify API] ───> (Dynamic Risk Threshold Tuning)
+```
+
+1.  **Weekly Curation**: Query Cloudy for the latest WAF bypass and compromised device proxy trends targeting health/AI platforms.
+2.  **Vector Ingestion**: Save aggregated summaries to a markdown folder and trigger a Sync to the Cloudflare AI Search instance.
+3.  **Active Defence Gating**: The `/api/verify` serverless endpoint queries the indexed vector space with client metadata. If matched, the baseline risk score is adjusted instantly.
+
+---
+
+## 3. Worker Agent Expansion (Phase 2 Roadmap)
+In future updates, a Cloudflare Workers Agent can be deployed to automatically query both the Cloudflare Search instance (containing private data) and the Cloudforce One `cf.intel` API variables directly inside WAF execution headers to enforce Zero-Trust edge gating.
