@@ -20,6 +20,10 @@ An inline conversational AI assistant deployed directly in the Cloudflare Dashbo
     *   *“Summarize recent WAF attacks and common bypass techniques”*
     *   *“Give me analysis of threats related to compromised devices or residential proxies”*
 
+### 1.3 Cloudflare AI Search (Open Beta, formerly AutoRAG)
+A managed RAG (Retrieval-Augmented Generation) search service designed specifically for applications and AI agents.
+*   **Role & Scope**: It is *not* a search engine for searching the global web for threats (cannot query external CVEs or global trends directly). Instead, it acts as a private semantic vector database, converting local security records, threat summaries, and internal files into a searchable knowledge base.
+
 ---
 
 ## 2. Integrated Pipeline (The Dual-Engine Setup)
