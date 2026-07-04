@@ -423,6 +423,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.error('Cloudflare Search threat lookup failed:', cfErr);
     }
 
+    // 🌐 Dynamic Network Lookup (ip-api) to identify server/datacenter hosting origins
+    try {
+      const ipApiRes = await fetch(`http://ip-api.com/json/${clientIp}?fields=status,org,isp,hosting`);
+      if (ipApiRes.ok) {
+        const ipInfo = await ipApiRes.json();
+        if (ipInfo.status === 'success') {
+          const org = (ipInfo.org || '').toLowerCase();
+          const isp = (ipInfo.isp || '').toLowerCase();
+          const isHosting = ipInfo.hosting === true || 
+            org.includes('amazon') || org.includes('digitalocean') || org.includes('hetzner') || 
+            org.includes('ovh') || org.includes('linode') || org.includes('google cloud') || 
+            isp.includes('amazon') || isp.includes('digitalocean') || isp.includes('hetzner') || 
+            isp.includes('ovh') || isp.includes('linode') || isp.includes('google cloud');
+          
+          if (isHosting) {
+            finalRiskScore = Math.min(100, finalRiskScore + 40);
+            finalBehaviorFlags.push('datacenter_hosting_detected');
+          }
+        }
+      }
+    } catch (ipApiErr) {
+      console.error('Dynamic network ISP lookup failed:', ipApiErr);
+    }
+
     const decision: 'allow' | 'challenge' | 'block' = finalRiskScore > 75 
       ? 'block' 
       : finalRiskScore > 35 
