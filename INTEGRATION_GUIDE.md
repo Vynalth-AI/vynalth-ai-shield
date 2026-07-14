@@ -87,3 +87,113 @@ When integrating the VitaShield script (`widget.js`), developers may see the fol
 *   **What it is**: The SDK logs diagnostic wrappers to test if client DevTools are active or if headless scripts are attempting to hijack the DOM elements.
 *   **Mitigation**: This is standard anti-debugging scanning and is fully expected.
 *   **Prevention**: Inform your security ops team that these console logs are benign indicators of active human-kinetics protection.
+
+---
+
+## 🌐 4. CORS Preflight Credentials Wildcard Block (`credentials: 'include' vs '*'`)
+
+### Symptom
+Browser blocks outgoing requests to VitaShield endpoints (`/api/model/train` or `/api/verify`) with CORS error:
+```text
+Access to resource at 'https://vitashield.sleepsomno.com/api/model/train' from origin 'https://sleepsomno.com' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: The value of the 'Access-Control-Allow-Origin' header in the response must not be the wildcard '*' when the request's credentials mode is 'include'.
+```
+
+### Cause
+When client scripts perform fetch requests with `credentials: 'include'` (sending authentication headers, session cookies, etc.), modern browser security requirements mandate that the receiving server's `Access-Control-Allow-Origin` header **must match the exact requesting Origin domain**. If the server returns a wildcard `*`, the preflight pre-check is blocked by the browser.
+
+### Fix
+Our API endpoints have been upgraded to dynamically inspect incoming CORS request headers. Instead of returning `*`, they echo back the requesting `Origin` (e.g. `https://sleepsomno.com`) and attach `Access-Control-Allow-Credentials: true`.
+Ensure your serverless config or router mirrors this pattern:
+```javascript
+const origin = req.headers.origin;
+if (origin) {
+  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+} else {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+}
+```
+
+### Prevention
+*   **Avoid Wildcards for Private/Authed Endpoints**: Never use `Access-Control-Allow-Origin: *` on endpoints that require authentication tokens, session states, or custom credentials.
+*   **Explicit Origin Whitelisting**: Map client subdomains dynamically on the backend to restrict traffic to validated hostnames.
+
+---
+
+## ⚙️ 5. Service Worker MIME-type Stylesheet Block (`text/plain` stylesheet ReferenceError)
+
+### Symptom
+Styles fail to load, and console reports:
+```text
+Refused to apply style from 'https://sleepsomno.com/assets/index-BYlZwKHS.css' because its MIME type ('text/plain') is not a supported stylesheet MIME type, and strict MIME checking is enabled.
+Uncaught (in promise) TypeError: Failed to fetch (sw.js:45)
+```
+
+### Cause
+The Service Worker (`sw.js`) intercepts requests for `.css` static assets. If there is a network error or a cache-miss, the Service Worker fallback catches the request and mistakenly serves a default single-page app layout (like `index.html`) or a custom plain text 404 block with a `Content-Type: text/plain` or `text/html` header. The browser detects the MIME mismatch and blocks it.
+
+### Fix
+Adjust the fallback interception routing in your Service Worker (`sw.js`) to ignore stylesheets and scripts:
+```javascript
+// Inside sw.js Fetch Event Listener
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  
+  // Skip routing fallback index.html for static CSS/JS/Image file requests
+  const isStaticAsset = url.pathname.match(/\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2)$/);
+  
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request).catch(() => {
+        if (!isStaticAsset) {
+          return caches.match('/index.html'); // Only serve index.html for document routes
+        }
+        // Return a proper 404 response for assets
+        return new Response('Asset not found', { 
+          status: 404, 
+          headers: { 'Content-Type': 'text/plain' } 
+        });
+      });
+    })
+  );
+});
+```
+
+### Prevention
+*   **MIME-type Safeguards**: Keep asset file requests isolated from single-page routing fallbacks.
+*   **Cache Invalidation**: Configure Vite to append unique hashes to filenames (e.g. `index-[hash].css`) and update the service worker cache manifest on each build.
+
+---
+
+## 🛡️ 6. Cloudflare Turnstile Embed Location & AdBlocker Warnings
+
+### Symptoms
+1. **Turnstile Location Error**:
+   ```text
+   [Cloudflare Turnstile] Cannot determine Turnstile's embedded location, aborting clearance redemption, are you running Turnstile on a Cloudflare Zone?
+   ```
+2. **Google AdSense Block**:
+   ```text
+   Access to script at 'https://pagead2.googlesyndication.com/pagead/.../adsbygoogle.js' from origin 'https://sleepsomno.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+   ```
+
+### Cause
+*   **Turnstile**: Cloudflare Turnstile expects to run inside a valid browser document or a correctly configured iframe. If it is loaded inside a sandboxed iframe without `allow-same-origin` or on a domain not whitelisted in the Cloudflare Turnstile Dashboard, it aborts.
+*   **Google AdSense**: Google AdSense scripts are blocked by local browser AdBlockers, causing a script preflight load check failure (`ERR_FAILED`). Alternatively, including the `crossorigin` attribute in the AdSense `<script>` tag forces a CORS verification, which Google's CDNs do not support.
+
+### Fix
+*   **For Turnstile**:
+    - Ensure Turnstile widgets are loaded inside standard browser frames or iframes configured with: `sandbox="allow-same-origin allow-scripts allow-forms"`.
+    - Register the target domains (`sleepsomno.com`) in the Turnstile settings dashboard.
+*   **For Google AdSense**:
+    - Remove `crossorigin` or `crossorigin="anonymous"` from your AdSense script tag:
+      ```html
+      <!-- CORRECT (No crossorigin attribute) -->
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-xxx"></script>
+      ```
+    - Check if local AdBlockers are active during testing.
+
+### Prevention
+*   **Audit Script Attributes**: Keep `crossorigin` attributes exclusive to CORS-enabled CDNs.
+*   **Sandboxing Best Practices**: Ensure all third-party iframe overlays carry adequate permissions to prevent host resolution errors.
+
