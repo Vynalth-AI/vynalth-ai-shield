@@ -155,7 +155,7 @@ export const MATRIX_CATEGORIES = [
   },
   {
     id: 'vitashield',
-    title: '🛡️ 🛡️ VitaShield Proprietary Heuristics',
+    title: '🛡️ VitaShield Proprietary Heuristics',
     description: 'Our proprietary algorithms designed specifically to counter advanced human-mimicking AI Agents and bot automation scripts.',
     methods: [
       { name: 'Sub-pixel Jitter Bio-noise Mapping', desc: 'Analyze cursor streams for sub-pixel physiological tremors. Script paths lack these micro-vibrations.', power: 'Maximum', difficulty: 'Medium' },
@@ -173,7 +173,9 @@ export const MATRIX_CATEGORIES = [
       { name: 'Hybrid Probabilistic-Behavioral Fusion Engine', desc: 'Fuse classic rule decisions with machine learning confidence scores to yield dynamic risk verdicts.', power: 'Maximum', difficulty: 'High' }
     ]
   }
-];export const SystemSpecs: React.FC = () => {
+];
+
+export const SystemSpecs: React.FC = () => {
   const [activeSpecTab, setActiveSpecTab] = useState<'blueprint' | 'supabase' | 'api' | 'matrix'>('matrix');
   const [activeMatrixCategory, setActiveMatrixCategory] = useState<string>('behavioral');
 

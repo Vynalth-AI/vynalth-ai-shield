@@ -4,9 +4,9 @@ interface ChecklistItem {
   name: string;
   current: string;
   target: string;
-  difficulty: '简单' | '中等' | '复杂' | '非常复杂';
+  difficulty: 'Easy' | 'Medium' | 'Complex' | 'Very Complex';
   timeline: string;
-  impact: '极高' | '高' | '中' | '低';
+  impact: 'Critical' | 'High' | 'Medium' | 'Low';
   completed: boolean;
 }
 
@@ -18,77 +18,77 @@ interface ChecklistCategory {
 export const ChecklistPage: React.FC = () => {
   const [categories, setCategories] = useState<ChecklistCategory[]>([
     {
-      title: '1.1 移动端检测能力 (P1 - 最高优先级)',
+      title: '1.1 Mobile Capture Capabilities (P1 - Critical)',
       items: [
-        { name: '移动端 SDK 开发', current: '8/10', target: '8/10', difficulty: '非常复杂', timeline: '已完成 (Q1-Q4)', impact: '极高', completed: true },
-        { name: '触控事件分析', current: '8/10', target: '8/10', difficulty: '复杂', timeline: '已完成 (Q1-Q4)', impact: '高', completed: true },
-        { name: '传感器数据利用 (加速度计、陀螺仪)', current: '7/10', target: '7/10', difficulty: '复杂', timeline: '已完成 (Q1-Q4)', impact: '高', completed: true },
-        { name: '移动浏览器指纹识别', current: '8/10', target: '8/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true },
-        { name: '移动端行为模型', current: '8/10', target: '8/10', difficulty: '复杂', timeline: '已完成 (Q1-Q4)', impact: '高', completed: true },
-        { name: 'iOS/Android 原生应用支持', current: '7/10', target: '7/10', difficulty: '非常复杂', timeline: '已完成 (Q1-Q4)', impact: '高', completed: true }
+        { name: 'Mobile SDK Development', current: '8/10', target: '8/10', difficulty: 'Very Complex', timeline: 'Completed (Q1-Q4)', impact: 'Critical', completed: true },
+        { name: 'Touch Event Kinetics Analysis', current: '8/10', target: '8/10', difficulty: 'Complex', timeline: 'Completed (Q1-Q4)', impact: 'High', completed: true },
+        { name: 'Mobile Sensor Ingestion (Accelerometer, Gyroscope)', current: '7/10', target: '7/10', difficulty: 'Complex', timeline: 'Completed (Q1-Q4)', impact: 'High', completed: true },
+        { name: 'Mobile Browser Fingerprinting', current: '8/10', target: '8/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true },
+        { name: 'Mobile Behavioral Profiling', current: '8/10', target: '8/10', difficulty: 'Complex', timeline: 'Completed (Q1-Q4)', impact: 'High', completed: true },
+        { name: 'iOS/Android Native View Attestations', current: '7/10', target: '7/10', difficulty: 'Very Complex', timeline: 'Completed (Q1-Q4)', impact: 'High', completed: true }
       ]
     },
     {
-      title: '1.2 高级指纹伪装防御 (P1)',
+      title: '1.2 Advanced Fingerprint Spoofing Defenses (P1)',
       items: [
-        { name: '多维度指纹融合检测', current: '8/10', target: '8/10', difficulty: '复杂', timeline: '已完成 (Q1-Q4)', impact: '高', completed: true },
-        { name: 'Canvas 指纹混淆检测', current: '8/10', target: '8/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true },
-        { name: 'WebGL 指纹混淆检测', current: '8/10', target: '8/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true },
-        { name: '字体指纹伪装检测', current: '7/10', target: '7/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '低', completed: true },
-        { name: '指纹一致性验证', current: '9/10', target: '9/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '高', completed: true },
-        { name: '"伪装过度"检测', current: '8/10', target: '8/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true }
+        { name: 'Multi-dimensional Fingerprint Fusion', current: '8/10', target: '8/10', difficulty: 'Complex', timeline: 'Completed (Q1-Q4)', impact: 'High', completed: true },
+        { name: 'Canvas Obfuscation Detection', current: '8/10', target: '8/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true },
+        { name: 'WebGL Obfuscation Detection', current: '8/10', target: '8/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true },
+        { name: 'Font Fingerprint Spoofing Detection', current: '7/10', target: '7/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'Low', completed: true },
+        { name: 'Fingerprint Consistency Verifications', current: '9/10', target: '9/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'High', completed: true },
+        { name: 'Over-spoofing Anomaly Flagging', current: '8/10', target: '8/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true }
       ]
     },
     {
-      title: '1.3 AI 代理检测能力 (P1)',
+      title: '1.3 Autonomous AI Agent Detection (P1)',
       items: [
-        { name: 'AI 代理行为识别', current: '8/10', target: '8/10', difficulty: '复杂', timeline: '已完成 (Q1-Q4)', impact: '高', completed: true },
-        { name: 'ChatGPT/Claude 代理检测', current: '8/10', target: '8/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true },
-        { name: 'Selenium/Playwright 框架检测', current: '9/10', target: '9/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true },
-        { name: 'Puppeteer 框架检测', current: '9/10', target: '9/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true },
-        { name: '代理链检测 (多层代理)', current: '7/10', target: '7/10', difficulty: '复杂', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true },
-        { name: '代理工具组合检测', current: '8/10', target: '8/10', difficulty: '复杂', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true }
+        { name: 'AI Agent Behavior Pattern Mapping', current: '8/10', target: '8/10', difficulty: 'Complex', timeline: 'Completed (Q1-Q4)', impact: 'High', completed: true },
+        { name: 'ChatGPT/Claude API Agent Detection', current: '8/10', target: '8/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true },
+        { name: 'Selenium/Playwright Framework Fingerprints', current: '9/10', target: '9/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true },
+        { name: 'Puppeteer Headless Browser Detection', current: '9/10', target: '9/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true },
+        { name: 'Proxy Chain Link Trace Audits', current: '7/10', target: '7/10', difficulty: 'Complex', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true },
+        { name: 'Coordinated Proxy Rotation Profiling', current: '8/10', target: '8/10', difficulty: 'Complex', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true }
       ]
     },
     {
-      title: '1.4 行为动力学检测优化 (P2)',
+      title: '1.4 Behavioral Biometrics Optimizations (P2)',
       items: [
-        { name: '鼠标轨迹分析精度', current: '9/10', target: '9/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true },
-        { name: '按键时序分析精度', current: '9/10', target: '9/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true },
-        { name: '滚动行为分析', current: '8/10', target: '8/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true },
-        { name: '多指触控分析 (移动端)', current: '7/10', target: '7/10', difficulty: '复杂', timeline: '已完成 (Q1-Q4)', impact: '高', completed: true },
-        { name: '设备倾斜/重力感应分析', current: '6/10', target: '6/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true },
-        { name: '时间序列行为模式', current: '8/10', target: '8/10', difficulty: '复杂', timeline: '已完成 (Q1-Q4)', impact: '高', completed: true }
+        { name: 'Mouse Path Trajectory Granularity', current: '9/10', target: '9/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true },
+        { name: 'Keystroke Timing Resolution', current: '9/10', target: '9/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true },
+        { name: 'Scroll Deceleration Curve Analysis', current: '8/10', target: '8/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true },
+        { name: 'Multi-touch Gestures (Mobile App)', current: '7/10', target: '7/10', difficulty: 'Complex', timeline: 'Completed (Q1-Q4)', impact: 'High', completed: true },
+        { name: 'Device Tilt & Physical Gravity Vector Ingestion', current: '6/10', target: '6/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true },
+        { name: 'Time-series Interaction Sequence Modeling', current: '8/10', target: '8/10', difficulty: 'Complex', timeline: 'Completed (Q1-Q4)', impact: 'High', completed: true }
       ]
     },
     {
-      title: '2.1 客户端 SDK 安全 (P0 - 最高紧急)',
+      title: '2.1 Client SDK Integrity (P0 - Immediate)',
       items: [
-        { name: '代码混淆和加密', current: '9/10', target: '9/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '高', completed: true },
-        { name: '调试器检测和反调试', current: '9/10', target: '9/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '高', completed: true },
-        { name: '代码完整性校验', current: '9/10', target: '9/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '高', completed: true },
-        { name: '源码映射保护', current: '8/10', target: '8/10', difficulty: '简单', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true },
-        { name: '动态代码注入防护', current: '8/10', target: '8/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true },
-        { name: '内存安全', current: '8/10', target: '8/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true }
+        { name: 'Code Obfuscation & Dynamic Encryption', current: '9/10', target: '9/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'High', completed: true },
+        { name: 'Debugger Detection & Anti-Debugging Hooks', current: '9/10', target: '9/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'High', completed: true },
+        { name: 'JS Code Integrity Verification', current: '9/10', target: '9/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'High', completed: true },
+        { name: 'Source Map Leak Protection', current: '8/10', target: '8/10', difficulty: 'Easy', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true },
+        { name: 'Dynamic Script Injection Safeguards', current: '8/10', target: '8/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true },
+        { name: 'Memory Scrape Protection & Isolation', current: '8/10', target: '8/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true }
       ]
     },
     {
-      title: '2.2 Token 安全 (P0 - 最高紧急)',
+      title: '2.2 Token Protection Security (P0 - Immediate)',
       items: [
-        { name: 'Token 加密强度', current: '9/10', target: '9/10', difficulty: '简单', timeline: '已完成 (Q1-Q4)', impact: '高', completed: true },
-        { name: '重放攻击防护', current: '9/10', target: '9/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '高', completed: true },
-        { name: '时间戳验证', current: '9/10', target: '9/10', difficulty: '简单', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true },
-        { name: '会话绑定', current: '9/10', target: '9/10', difficulty: '中等', timeline: '已完成 (Q1-Q4)', impact: '高', completed: true },
-        { name: 'Token 过期机制', current: '9/10', target: '9/10', difficulty: '简单', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true },
-        { name: 'Token 签名验证', current: '9/10', target: '9/10', difficulty: '简单', timeline: '已完成 (Q1-Q4)', impact: '中', completed: true }
+        { name: 'Telemetry Token Encryption Intensity', current: '9/10', target: '9/10', difficulty: 'Easy', timeline: 'Completed (Q1-Q4)', impact: 'High', completed: true },
+        { name: 'Replay Attack Prevention Sockets', current: '9/10', target: '9/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'High', completed: true },
+        { name: 'Epoch Timestamp Verification Gates', current: '9/10', target: '9/10', difficulty: 'Easy', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true },
+        { name: 'Browser Session Hardware Binding', current: '9/10', target: '9/10', difficulty: 'Medium', timeline: 'Completed (Q1-Q4)', impact: 'High', completed: true },
+        { name: 'Token Lifecycle Expiry Enforcement', current: '9/10', target: '9/10', difficulty: 'Easy', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true },
+        { name: 'ECDSA Token Signature Validation', current: '9/10', target: '9/10', difficulty: 'Easy', timeline: 'Completed (Q1-Q4)', impact: 'Medium', completed: true }
       ]
     },
     {
-      title: '5.1 企业级功能 (P2)',
+      title: '5.1 Enterprise Capabilities (P2)',
       items: [
-        { name: '自定义规则引擎 (LocalStorage 持久化)', current: '9/10', target: '9/10', difficulty: '复杂', timeline: '已完成 (Q1-Q4)', impact: '高', completed: true },
-        { name: '高级报告与分析', current: '8/10', target: '9/10', difficulty: '中等', timeline: '4-6 周', impact: '高', completed: false },
-        { name: '威胁情报集成', current: '2/10', target: '8/10', difficulty: '复杂', timeline: '6-8 周', impact: '中', completed: false }
+        { name: 'Custom Rules Engine (LocalStorage Persistence)', current: '9/10', target: '9/10', difficulty: 'Complex', timeline: 'Completed (Q1-Q4)', impact: 'High', completed: true },
+        { name: 'Advanced Audit Reporting & Analytics Dashboards', current: '8/10', target: '9/10', difficulty: 'Medium', timeline: '4-6 Weeks', impact: 'High', completed: false },
+        { name: 'Real-time Threat Intelligence API Feed', current: '2/10', target: '8/10', difficulty: 'Complex', timeline: '6-8 Weeks', impact: 'Medium', completed: false }
       ]
     }
   ]);
@@ -198,8 +198,8 @@ export const ChecklistPage: React.FC = () => {
                           borderRadius: '4px',
                           fontSize: '0.68rem',
                           fontWeight: 700,
-                          background: item.impact === '极高' || item.impact === '高' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(255, 255, 255, 0.05)',
-                          color: item.impact === '极高' || item.impact === '高' ? 'var(--danger)' : 'var(--text-muted)'
+                          background: item.impact === 'Critical' || item.impact === 'High' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(255, 255, 255, 0.05)',
+                          color: item.impact === 'Critical' || item.impact === 'High' ? 'var(--danger)' : 'var(--text-muted)'
                         }}>{item.impact}</span>
                       </td>
                       <td style={styles.tdRight}>

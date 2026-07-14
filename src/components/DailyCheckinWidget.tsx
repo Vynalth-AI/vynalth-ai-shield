@@ -830,7 +830,7 @@ export const DailyCheckinWidget: React.FC = () => {
               }}>LIVE</span>
             </div>
             <h3 style={{ color: '#fff', fontSize: '16px', fontWeight: 700, margin: 0 }}>
-              每日人类验证签到
+              Daily Verification Check-in
             </h3>
             <p style={{ color: '#475569', fontSize: '11px', margin: '3px 0 0' }}>
               Help train the future of human verification
@@ -846,7 +846,7 @@ export const DailyCheckinWidget: React.FC = () => {
             <div style={{ fontSize: '20px', fontWeight: 800, color: '#a855f7', lineHeight: 1 }}>
               {state.streak}/4
             </div>
-            <div style={{ fontSize: '10px', color: '#64748b', marginTop: '2px' }}>连续天数</div>
+            <div style={{ fontSize: '10px', color: '#64748b', marginTop: '2px' }}>Streak Days</div>
           </div>
         </div>
 
@@ -892,8 +892,8 @@ export const DailyCheckinWidget: React.FC = () => {
         }}>
           <span style={{ fontSize: '18px' }}>🎁</span>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '12px', color: '#a855f7', fontWeight: 700 }}>4天奖励</div>
-            <div style={{ fontSize: '11px', color: '#64748b' }}>Neuro Plan 3 个月 · 免费解锁</div>
+            <div style={{ fontSize: '12px', color: '#a855f7', fontWeight: 700 }}>4-Day Streak Reward</div>
+            <div style={{ fontSize: '11px', color: '#64748b' }}>Neuro Plan 3 Months · Free Unlock</div>
           </div>
           {/* Progress bar */}
           <div style={{ width: '60px', height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
@@ -910,7 +910,7 @@ export const DailyCheckinWidget: React.FC = () => {
           <div style={{
             fontSize: '11px', color: '#334155', textAlign: 'center', marginBottom: '12px',
           }}>
-            🧠 你已贡献 <strong style={{ color: '#00f2fe' }}>{state.totalDataPoints}</strong> 个行为数据点
+            🧠 You have contributed <strong style={{ color: '#00f2fe' }}>{state.totalDataPoints}</strong> behavior data points
           </div>
         )}
 
@@ -933,14 +933,14 @@ export const DailyCheckinWidget: React.FC = () => {
           }}
         >
           {allDone && state.rewarded
-            ? '🎉 已完成全部挑战！感谢你的贡献'
+            ? '🎉 All Streaks Completed! Thank you'
             : allDone
-            ? '🎁 领取 Neuro Plan 3 个月奖励'
+            ? '🎁 Claim 3 Months Neuro Plan'
             : isCompletedToday
-            ? `✓ 今日已签到 · 明天继续 (${state.streak}/4)`
+            ? `✓ Checked-in Today · Come back tomorrow (${state.streak}/4)`
             : state.streak === 0
-            ? '🛡️ 开始 Day 1 验证 (~10秒)'
-            : `🛡️ 继续 Day ${state.streak + 1} 验证 (~10秒)`}
+            ? '🛡️ Start Day 1 Verify (~10s)'
+            : `🛡️ Continue Day ${state.streak + 1} Verify (~10s)`}
         </button>
 
         {/* Just completed flash */}
