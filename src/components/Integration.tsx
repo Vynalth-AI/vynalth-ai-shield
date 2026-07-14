@@ -4,10 +4,23 @@ export const Integration: React.FC = () => {
   const [activeCodeTab, setActiveCodeTab] = useState<'javascript' | 'react' | 'vue' | 'svelte' | 'ios_swift' | 'android_kotlin' | 'nodejs' | 'python' | 'go' | 'java' | 'php' | 'curl' | 'supabase'>('javascript');
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   
-  const [keys, setKeys] = useState({
-    publicKey: 'vms_pub_live_79a2b8e3df9102ca',
-    secretKey: 'vms_sec_live_9c0f73b18274d8a21f7c'
+  const [selectedProject, setSelectedProject] = useState<'default' | 'personal' | 'sleepsomno'>('default');
+  const [projectsData, setProjectsData] = useState({
+    default: {
+      publicKey: 'vms_pub_live_79a2b8e3df9102ca',
+      secretKey: 'vms_sec_live_9c0f73b18274d8a21f7c'
+    },
+    personal: {
+      publicKey: 'vms_pub_live_38bf8c6e2d9a10bc',
+      secretKey: 'vms_sec_live_8f0a2d3e1b7c4d5e9f8a'
+    },
+    sleepsomno: {
+      publicKey: 'vms_pub_live_14ac89df20eb73fa',
+      secretKey: 'vms_sec_live_5d6e7f8a9b0c1d2e3f4a'
+    }
   });
+
+  const keys = projectsData[selectedProject];
 
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -17,10 +30,13 @@ export const Integration: React.FC = () => {
 
   const regenerateKeys = () => {
     const randomHex = (len: number) => Array.from({length: len}, () => Math.floor(Math.random()*16).toString(16)).join('');
-    setKeys({
-      publicKey: `vms_pub_live_${randomHex(16)}`,
-      secretKey: `vms_sec_live_${randomHex(20)}`
-    });
+    setProjectsData(prev => ({
+      ...prev,
+      [selectedProject]: {
+        publicKey: `vms_pub_live_${randomHex(16)}`,
+        secretKey: `vms_sec_live_${randomHex(20)}`
+      }
+    }));
   };
 
   // Code snippets generator based on current keys state
@@ -492,6 +508,29 @@ async function signInWithVitaShield() {
           </div>
 
           <div style={styles.keyContainer}>
+            {/* Active Project Dropdown */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '0.75rem' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-muted)' }}>Select Target Site / Domain Profile</span>
+              <select 
+                value={selectedProject} 
+                onChange={(e) => setSelectedProject(e.target.value as any)}
+                style={{
+                  background: 'rgba(0, 0, 0, 0.3)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '8px',
+                  padding: '0.65rem 1rem',
+                  fontSize: '0.88rem',
+                  color: '#fff',
+                  outline: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="default">VitaShield Default (vitashield.sleepsomno.com)</option>
+                <option value="personal">Vyncus Lim Personal Website (vyncuslim.sleepsomno.com)</option>
+                <option value="sleepsomno">SleepSomno Main App (sleepsomno.com)</option>
+              </select>
+            </div>
+
             <div style={styles.keyRow}>
               <div style={styles.keyInfo}>
                 <span style={styles.keyLabel}>Site Key (Public)</span>
