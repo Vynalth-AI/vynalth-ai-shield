@@ -15,6 +15,7 @@ import { AuthPortal } from './components/AuthPortal';
 import { ChecklistPage } from './components/ChecklistPage';
 import { NegativeTraining } from './components/NegativeTraining';
 import { SearchIntelligence } from './components/SearchIntelligence';
+import { TrustCenter } from './components/TrustCenter';
 import { getApiBaseUrl } from './lib/api';
 import type { ShieldConfig, VerificationLog } from './types';
 
@@ -275,6 +276,8 @@ function App() {
     switch (activeTab) {
       case 'dashboard':
         return <Dashboard config={config} logs={logs} onAddLog={handleAddLog} />;
+      case 'trust_center':
+        return <TrustCenter logs={logs} />;
       case 'playground':
         return <WidgetPlayground config={config} onAddLog={handleAddLog} />;
       case 'logs':
