@@ -75,16 +75,19 @@ export const PlaybookPages: React.FC<PlaybookPagesProps> = ({ currentPath, onBac
     try {
       localStorage.setItem('vms-widget-muted', String(nextMute));
     } catch {}
+    if (!nextMute) {
+      synthesizeTone('success', true);
+    }
   };
 
 
   // Web Audio Synthesis Engine (Sine/Triangle oscillators mapped to ENVELOPE filters)
-  const synthesizeTone = (type: 'success' | 'error' | 'click') => {
+  const synthesizeTone = (type: 'success' | 'error' | 'click', force = false) => {
     if (!allowedRegion) {
       setAudioFeedback('Audio synthesis is locked for your region until August 2026 (Malaysia Time GMT+8).');
       return;
     }
-    if (isMuted) {
+    if (!force && isMuted) {
       setAudioFeedback('Audio output is currently muted. Please unmute using the control switch in the top header bar.');
       return;
     }

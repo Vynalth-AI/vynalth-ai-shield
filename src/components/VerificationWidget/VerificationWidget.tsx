@@ -87,8 +87,10 @@ export const VerificationWidget: React.FC<VerificationWidgetProps> = ({
   const lastPlayedX = useRef(3);
 
   // Web Audio Synthesis (Sine & Triangle tone generators)
-  const playSound = (type: 'success' | 'error' | 'click') => {
-    if (!allowedRegion || isMuted) return; // Only trigger audio for MYSG if unmuted
+  const playSound = (type: 'success' | 'error' | 'click', force = false) => {
+    if (!allowedRegion) return;
+    if (!force && isMuted) return; // Only trigger audio if unmuted or forced
+
 
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
@@ -158,6 +160,9 @@ export const VerificationWidget: React.FC<VerificationWidgetProps> = ({
     try {
       localStorage.setItem('vms-widget-muted', String(nextMute));
     } catch {}
+    if (!nextMute) {
+      playSound('success', true);
+    }
   };
 
   // Automatically intercept parent form submissions without requiring clicks
