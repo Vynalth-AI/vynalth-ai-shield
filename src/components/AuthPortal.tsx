@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useBehaviorTracker } from './VerificationWidget/useBehaviorTracker';
 import { getApiBaseUrl } from '../lib/api';
+import { DotMatrixLoader } from './ui/DotMatrixLoader';
 
 interface AuthPortalProps {
   onAuthSuccess: (session: any) => void;
@@ -286,7 +287,12 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({ onAuthSuccess, onBackToH
               ...(isLoading || challengeActive ? styles.submitBtnDisabled : {}) 
             }}
           >
-            {isLoading ? 'Processing...' : isSignUp ? 'Create Account' : 'Sign In'}
+            {isLoading ? (
+              <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <DotMatrixLoader preset="spiral" size={16} dotSize={2} color="#fff" />
+                Processing...
+              </span>
+            ) : isSignUp ? 'Create Account' : 'Sign In'}
           </button>
         </form>
 

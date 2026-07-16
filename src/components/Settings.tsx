@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { ShieldConfig } from '../types';
+import { DotMatrixLoader } from './ui/DotMatrixLoader';
 
 interface SettingsProps {
   config: ShieldConfig;
@@ -375,7 +376,10 @@ export const Settings: React.FC<SettingsProps> = ({ config, setConfig }) => {
               }}
             >
               {saveLoading ? (
-                <span>Syncing rules...</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <DotMatrixLoader preset="wave" size={16} dotSize={2} color="#fff" />
+                  Syncing rules...
+                </span>
               ) : saveSuccess ? (
                 <span>Rules Synced Successfully!</span>
               ) : (

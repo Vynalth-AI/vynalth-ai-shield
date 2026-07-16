@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { VerificationLog } from '../types';
+import { DotMatrixLoader } from './ui/DotMatrixLoader';
 
 interface SearchIntelligenceProps {
   logs: VerificationLog[];
@@ -255,14 +256,14 @@ No active botnets, scrapers, or automation frameworks have been flagged for this
                   Threat Intel Report Generator
                 </h3>
 
-                {isGenerating ? (
-                  <div style={styles.loadingContainer}>
-                    <div style={styles.spinner} />
-                    <span style={{ fontSize: '0.9rem', color: '#94a3b8' }}>
-                      Analyzing {results.length} telemetry payloads with AI Search Engine...
-                    </span>
-                  </div>
-                ) : aiReport ? (
+                 {isGenerating ? (
+                   <div style={{ ...styles.loadingContainer, display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
+                     <DotMatrixLoader preset="radar" size={36} dotSize={4.5} color="#00f2fe" />
+                     <span style={{ fontSize: '0.9rem', color: '#94a3b8' }}>
+                       Analyzing {results.length} telemetry payloads with AI Search Engine...
+                     </span>
+                   </div>
+                 ) : aiReport ? (
                   <div style={styles.reportContent}>
                     {aiReport.split('\n').map((line, idx) => {
                       if (line.startsWith('###')) {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getApiBaseUrl } from '../lib/api';
+import { DotMatrixLoader } from './ui/DotMatrixLoader';
 
 interface ComponentStatus {
   key: string;
@@ -274,9 +275,9 @@ export const StatusPage: React.FC<{ isStandalone?: boolean }> = ({ isStandalone 
 
       {/* Loading Overlay */}
       {loading && (
-        <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-          <div className="glowing" style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'var(--secondary)', display: 'inline-block', animation: 'dot-pulse 1.5s infinite', marginRight: '10px' }} />
-          <span>Synchronizing live audit configurations from sleepsomno.com REST gateway...</span>
+        <div style={{ padding: '3rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', color: 'var(--text-muted)' }}>
+          <DotMatrixLoader preset="spiral" size={32} dotSize={4} color="#06b6d4" />
+          <span style={{ fontSize: '0.82rem' }}>Synchronizing live audit configurations from sleepsomno.com REST gateway...</span>
         </div>
       )}
 

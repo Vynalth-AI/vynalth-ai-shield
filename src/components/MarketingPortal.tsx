@@ -4,6 +4,7 @@ import { useBehaviorTracker } from './VerificationWidget/useBehaviorTracker';
 import { MATRIX_CATEGORIES } from './SystemSpecs';
 import { evaluateTelemetry } from '../lib/riskEngine';
 import { DailyCheckinWidget } from './DailyCheckinWidget';
+import { DotMatrixLoader } from './ui/DotMatrixLoader';
 
 interface MarketingPortalProps {
   onEnterConsole: () => void;
@@ -619,8 +620,9 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
             </h3>
 
             {demoLoading ? (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '180px', color: 'var(--text-muted)', fontSize: '0.78rem', fontFamily: 'var(--font-mono)' }}>
-                Analyzing client-side bio-kinetics logs...
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem', height: '180px', color: 'var(--text-muted)' }}>
+                <DotMatrixLoader preset="pulse" size={36} dotSize={4.5} color="#2997ff" />
+                <span style={{ fontSize: '0.78rem', fontFamily: 'var(--font-mono)' }}>Analyzing client-side bio-kinetics logs...</span>
               </div>
             ) : demoResults ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
