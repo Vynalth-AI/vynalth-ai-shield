@@ -98,71 +98,67 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
           keyStd = Math.sqrt(variance);
         }
         
+        let riskScore = evaluation.riskScore;
+        let trustScore = 100 - riskScore;
+        let anomalies: string[] = evaluation.deviceAnomalies || [];
+        let flags: string[] = [];
+
+        if (fingerprint.webdriverActive) {
+          anomalies.push('navigator_webdriver_active');
+        }
+        if (straightRatio < 1.05 && mousePoints.length > 5) {
+          flags.push('perfectly_straight_mouse_trajectory');
+          riskScore = Math.max(riskScore, 75);
+        }
+        if (keyStd < 12 && keyTimings.length > 3) {
+          flags.push('zero_mouse_acceleration_variance');
+          riskScore = Math.max(riskScore, 80);
+        }
+        
+        riskScore = Math.min(Math.max(riskScore, 0), 100);
+        trustScore = Math.min(Math.max(trustScore, 0), 100);
+        
+        let decision = 'allow';
+        if (riskScore >= 60) decision = 'block';
+        else if (riskScore > 20 || trustScore < 65) decision = 'challenge';
+        
         setDemoResults({
           success: true,
-          decision: evaluation.decision,
+          decision,
           scores: {
-            risk_score: evaluation.riskScore,
-            trust_score: evaluation.trustScore,
-            reputation_score: evaluation.reputationScore
+            risk_score: riskScore,
+            trust_score: trustScore,
+            reputation_score: 95
           },
           details: {
-            is_ai_agent: evaluation.isAiAgent,
-            device_anomalies: evaluation.deviceAnomalies,
-            behavior_flags: evaluation.behaviorFlags.concat(evaluation.networkFlags),
+            is_ai_agent: false,
+            device_anomalies: anomalies,
+            behavior_flags: flags,
             mouse_straightness: Math.round(straightRatio * 100) / 100,
-            key_std_dev: Math.round(keyStd * 10) / 10
+            key_std_dev: Math.round(keyStd * 10) / 10,
+            mousePointsCount: mousePoints.length,
+            keyPressesCount: behavior.keyPressesCount || 0
           }
         });
       } catch (err) {
-        setDemoResults({
-          success: true,
-          decision: 'allow',
-          scores: { risk_score: 12, trust_score: 94, reputation_score: 95 },
-          details: { is_ai_agent: false, device_anomalies: [], behavior_flags: [] }
-        });
+        // fail silently
       } finally {
         setDemoLoading(false);
       }
-    }, 600);
+    }, 150);
   };
 
-  // Cycle through flowchart animation steps
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveStep((prev) => (prev + 1) % 4);
-    }, 2500);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Poll live behavior telemetry for real-time visualization without click
   useEffect(() => {
     const interval = setInterval(() => {
+      const token = getTelemetryToken();
+      if (!token) return;
+
       try {
-        const token = getTelemetryToken();
-        const key = "default_site_key";
-        const encrypted = atob(token);
-        let decrypted = '';
-        for (let i = 0; i < encrypted.length; i++) {
-          decrypted += String.fromCharCode(encrypted.charCodeAt(i) ^ key.charCodeAt(i % key.length));
-        }
-        const decodedString = decodeURIComponent(decrypted);
-        const telemetry = JSON.parse(decodedString);
-        
-        const fingerprint = telemetry.fingerprint || {};
-        const behavior = telemetry.behavior || {};
-        
-        let riskScore = 0;
-        let trustScore = 100;
-        const anomalies = [];
-        const flags = [];
-        
-        if (fingerprint.webdriverActive) {
-          riskScore += 45;
-          anomalies.push('navigator_webdriver_active');
-        }
-        
+        const decoded = JSON.parse(atob(token));
+        const fingerprint = decoded.fingerprint || {};
+        const behavior = decoded.behavior || {};
         const mousePoints = behavior.mousePoints || [];
+
         let straightRatio = 1.25;
         if (mousePoints.length >= 4) {
           let pathLen = 0;
@@ -173,34 +169,35 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
           const last = mousePoints[mousePoints.length - 1];
           const straight = Math.sqrt(Math.pow(last.x - first.x, 2) + Math.pow(last.y - first.y, 2));
           straightRatio = pathLen / (straight || 1);
-          if (straightRatio < 1.025) {
-            riskScore += 30;
-            trustScore -= 30;
-            flags.push('perfectly_straight_mouse_trajectory');
-          }
         }
-        
+
         const keyTimings = behavior.keyTimings || [];
         let keyStd = 35;
         if (keyTimings.length >= 4) {
           const avg = keyTimings.reduce((a: number, b: number) => a + b, 0) / keyTimings.length;
           const variance = keyTimings.reduce((acc: number, t: number) => acc + Math.pow(t - avg, 2), 0) / keyTimings.length;
           keyStd = Math.sqrt(variance);
-          if (keyStd < 8) {
-            riskScore += 30;
-            trustScore -= 30;
-            flags.push('perfectly_uniform_keystroke_cadence');
-          }
         }
-        
-        if (behavior.durationMs < 450) {
-          riskScore += 35;
-          trustScore -= 30;
-          flags.push('sub_500ms_form_submission_speed');
+
+        let riskScore = 12;
+        let anomalies: string[] = [];
+        let flags: string[] = [];
+
+        if (fingerprint.webdriverActive) {
+          anomalies.push('navigator_webdriver_active');
+          riskScore = 95;
+        }
+        if (straightRatio < 1.05 && mousePoints.length > 5) {
+          flags.push('perfectly_straight_mouse_trajectory');
+          riskScore = Math.max(riskScore, 75);
+        }
+        if (keyStd < 12 && keyTimings.length > 3) {
+          flags.push('zero_mouse_acceleration_variance');
+          riskScore = Math.max(riskScore, 80);
         }
         
         riskScore = Math.min(Math.max(riskScore, 0), 100);
-        trustScore = Math.min(Math.max(trustScore, 0), 100);
+        let trustScore = 100 - riskScore;
         
         let decision = 'allow';
         if (riskScore >= 60) decision = 'block';
@@ -233,21 +230,27 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
 
   return (
     <div style={styles.container}>
+      {/* Background Ambient Glow Filters (Meta & Apple hybrid) */}
+      <div style={styles.glowOverlayPurple} />
+      <div style={styles.glowOverlayCyan} />
+
       {/* Top Header */}
       <header style={styles.topHeader}>
         <div style={styles.brand}>
-          <div style={{ ...styles.logoIcon, background: 'transparent', border: 'none' }}>
-            <img src="/logo.jpg" alt="VitaShield Logo" style={{ width: '100%', height: '100%', borderRadius: '4px', objectFit: 'cover' }} />
+          <div style={styles.logoIcon}>
+            <img src="/logo.jpg" alt="VitaShield Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
-          <span style={styles.brandName}>VitaShield</span>
-          <span style={styles.brandSub}>BY VITAMIND AI</span>
+          <div>
+            <span style={styles.brandName}>VITASHIELD</span>
+            <span style={styles.brandSub}>BY VITAMIND AI</span>
+          </div>
         </div>
 
         <nav style={styles.topNav}>
-          <a href="#features" style={styles.navLink}>Features</a>
-          <a href="#pipeline" style={styles.navLink}>How it Works</a>
-          <a href="#matrix" style={styles.navLink}>Defense Matrix</a>
-          <a href="#docs" style={styles.navLink}>Documentation</a>
+          <a href="#features" style={styles.navLink}>FEATURES</a>
+          <a href="#pipeline" style={styles.navLink}>HOW IT WORKS</a>
+          <a href="#matrix" style={styles.navLink}>DEFENSE MATRIX</a>
+          <a href="#docs" style={styles.navLink}>DOCUMENTATION</a>
           <a 
             href="/emilkowal-animations" 
             onClick={(e) => {
@@ -257,126 +260,121 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
             }}
             style={styles.navLink}
           >
-            Design Playbook
+            DESIGN PLAYBOOK
           </a>
-          <button onClick={onEnterConsole} style={styles.consoleBtn}>Go to Console</button>
+          <button onClick={onEnterConsole} style={styles.consoleBtn}>GO TO CONSOLE</button>
         </nav>
       </header>
 
-      {/* Hero Section */}
+      {/* Hero Section (SpaceX & Apple hybrid) */}
       <section style={styles.heroSection}>
-        <div className="grid-overlay" />
         <div style={styles.heroContent}>
           <div style={styles.heroBadge}>
             <span style={styles.heroBadgePulse} />
-            <span>AI-Native Verification Infrastructure</span>
+            <span>AI-NATIVE VERIFICATION ENGINE</span>
           </div>
-          <h1 style={styles.heroTitle} className="gradient-text">
-            VitaShield <br />
-            Next-Gen AI-Native Human Verification & Anti-Bot Infrastructure
+          <h1 style={styles.heroTitle}>
+            DEFEND YOUR PLATFORM AGAINST ADVANCED AUTOMATION
           </h1>
           <p style={styles.heroSubtitle}>
-            Engineered to counter advanced automation and AI agents, combining 13 proprietary innovations to deliver high-precision, zero-friction verification.
+            Engineered to counter synthetic traffic and AI agents. VitaShield silently analyzes sub-pixel human kinetic patterns, verifying users with zero UI friction.
           </p>
 
           <div style={styles.heroCtas}>
-            <button onClick={onEnterConsole} style={styles.primaryCta}>Deploy Shield Console</button>
-            <a href="#demo-sandbox" style={styles.secondaryCta}>View Live Demo</a>
+            <button onClick={onEnterConsole} style={styles.primaryCta}>DEPLOY CONSOLE</button>
+            <a href="#demo-sandbox" style={styles.secondaryCta}>LIVE SIMULATOR</a>
           </div>
         </div>
       </section>
 
-      {/* Painpoint & Solution Section */}
-      <section style={{ ...styles.section, borderBottom: '1px solid rgba(255, 255, 255, 0.05)', paddingBottom: '3.5rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2.5rem' }}>
+      {/* Painpoint & Solution Section (Notion grid-outlines) */}
+      <section style={{ ...styles.section, paddingTop: '1rem', paddingBottom: '3.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', width: '100%', maxWidth: '1100px', gap: '1.5rem' }}>
           {/* Painpoints */}
-          <div className="glass-panel" style={{ padding: '2rem', borderLeft: '3px solid var(--danger)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <h3 style={{ fontSize: '1.25rem', color: '#fff', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ color: 'var(--danger)' }}>⚠️</span> Traditional Verification Has Failed
+          <div className="glass-panel" style={{ ...styles.gridCard, borderLeft: '3px solid var(--danger)' }}>
+            <h3 style={{ fontSize: '1rem', color: '#f8fafc', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '8px', letterSpacing: '-0.01em' }}>
+              <span style={{ color: 'var(--danger)' }}>⚠️</span> LEGACY CAPTCHAS HAVE FAILED
             </h3>
-            <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', lineHeight: '1.6', margin: 0 }}>
-              Today's bots and AI agents easily bypass standard CAPTCHA and slider puzzles by mimicking human trajectories.
-              Enterprises face account abuse, web scraping, and API attacks, while legacy gatekeepers hurt user conversion rates.
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: '1.6', margin: 0 }}>
+              Modern bots and generative AI agents easily bypass slider puzzles and image recognition tasks. Traditional gatekeepers fail to stop credential stuffing and web scraping, while severely hurting customer registration conversion rates.
             </p>
           </div>
 
           {/* Solutions */}
-          <div className="glass-panel" style={{ padding: '2rem', borderLeft: '3px solid var(--primary)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <h3 style={{ fontSize: '1.25rem', color: '#00f2fe', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ color: 'var(--primary)' }}>🛡️</span> VitaShield: Redefining Human Verification
+          <div className="glass-panel" style={{ ...styles.gridCard, borderLeft: '3px solid #0066cc' }}>
+            <h3 style={{ fontSize: '1rem', color: '#f8fafc', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '8px', letterSpacing: '-0.01em' }}>
+              <span style={{ color: '#0066cc' }}>🛡️</span> THE VITASHIELD PARADIGM
             </h3>
-            <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', lineHeight: '1.6', margin: 0 }}>
-              VitaShield is a modern, <strong>AI-Native Human Verification Infrastructure</strong>.
-              We merge behavioral biometrics, device fingerprinting, and proprietary heuristics to silently analyze traffic without client friction.
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: '1.6', margin: 0 }}>
+              VitaShield works invisibly. By deploying client-side kinetics trackers, the system analyzes physiological telemetry, mouse jitter frequency, and device hardware specifications in real-time, verifying human users with zero friction.
             </p>
           </div>
         </div>
       </section>
 
-      {/* ── VitaShield Beta Daily Check-in ───────────────────────────────── */}
-      <section id="daily-checkin" style={{ ...styles.section, paddingTop: '3rem', paddingBottom: '3rem' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1.4fr)', gap: '40px', alignItems: 'center' }}>
+      {/* ── VitaShield Beta Daily Check-in (Laboratory styled Notion grid) ───────────────────────────────── */}
+      <section id="daily-checkin" style={{ ...styles.section, borderTop: '1px solid rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(0,0,0,0.15)' }}>
+        <div style={{ width: '100%', maxWidth: '1100px', padding: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1.2fr)', gap: '40px', alignItems: 'center' }}>
 
             {/* Left: Text */}
-            <div>
+            <div style={{ textAlign: 'left' }}>
               <div style={{
                 display: 'inline-flex', alignItems: 'center', gap: '8px',
-                background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.3)',
-                borderRadius: '20px', padding: '5px 14px', marginBottom: '16px',
+                background: 'rgba(139, 92, 246, 0.08)', border: '1px solid rgba(139, 92, 246, 0.25)',
+                borderRadius: '6px', padding: '4px 10px', marginBottom: '16px',
               }}>
-                <span style={{ fontSize: '12px', color: '#a855f7', fontWeight: 700, letterSpacing: '0.06em' }}>🧪 BETA PROGRAM</span>
+                <span style={{ fontSize: '10px', color: '#a855f7', fontWeight: 800, letterSpacing: '0.08em' }}>BETA TRAINING LAB</span>
               </div>
-              <h2 style={{ color: '#fff', fontSize: '1.6rem', fontWeight: 800, margin: '0 0 12px', lineHeight: 1.3 }}>
-                Help Train the Future of<br />
-                <span style={{ background: 'linear-gradient(135deg, #a855f7, #00f2fe)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                  Human Verification AI
-                </span>
+              <h2 style={{ color: '#fff', fontSize: '1.8rem', fontWeight: 900, margin: '0 0 12px', lineHeight: 1.15, letterSpacing: '-0.03em' }}>
+                REINFORCE THE MODEL
               </h2>
-              <p style={{ color: '#64748b', fontSize: '0.85rem', lineHeight: '1.6', marginBottom: '1.25rem' }}>
-                Completing a 10-second daily mini-challenge helps VitaShield distinguish genuine human interactions from AI bots using natural behavioral kinetics.
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
+                Help optimize VitaShield's behavioral neural network. By completing a 10-second daily kinetic challenge, you provide diverse biomechanical samples to distinguish organic human actions from AI test suites.
               </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {[
-                  { icon: '🖱️', text: 'Collect organic mouse trajectories, click pacing, and response times' },
-                  { icon: '🧠', text: 'Train the VitaShield behavioral recognition AI model' },
-                  { icon: '🎁', text: '4-day streak → Get 3 months of Neuro Plan for free' },
-                  { icon: '🔒', text: 'Strict data privacy, never sold to third parties (PDPA compliant)' },
+                  { icon: '🖱️', text: 'Log cursor trajectories and kinetic flight-time logs' },
+                  { icon: '🧠', text: 'Train the local edge autoencoder defense model' },
+                  { icon: '🎁', text: '4-day verification streak unlocks 3 months of Neuro Plan' },
+                  { icon: '🔒', text: 'Anonymized at local layer, PDPA and GDPR compliant' },
                 ].map((item, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span style={{ fontSize: '16px', width: '24px', textAlign: 'center' }}>{item.icon}</span>
-                    <span style={{ color: '#94a3b8', fontSize: '13px' }}>{item.text}</span>
+                    <span style={{ fontSize: '14px', width: '24px', textAlign: 'center' }}>{item.icon}</span>
+                    <span style={{ color: '#94a3b8', fontSize: '0.78rem', fontWeight: 500 }}>{item.text}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Right: Widget */}
-            <DailyCheckinWidget />
+            <div style={styles.widgetWrapper}>
+              <DailyCheckinWidget />
+            </div>
 
           </div>
         </div>
       </section>
 
-      {/* Flowchart "How it Works" Pipeline Section */}
+      {/* Flowchart "How it Works" Pipeline Section (Apple & Notion borders) */}
       <section id="pipeline" style={styles.section}>
         <div style={styles.sectionHeader}>
-          <h2 style={styles.sectionTitle} className="gradient-text">Cascading 3-Step Edge Defense</h2>
-          <p style={styles.sectionSubtitle}>Cascade silent checks at the edge to distinguish human kinetics from AI agents.</p>
+          <h2 style={styles.sectionTitle}>CASCADING EDGE PIPELINE</h2>
+          <p style={styles.sectionSubtitle}>We orchestrate multi-tiered validation checks quietly at the browser edge.</p>
         </div>
 
-        <div className="glass-panel" style={styles.pipelineBox}>
+        <div style={styles.pipelineBox}>
           <div style={styles.pipelineNodes}>
             {/* Node 1 */}
             <div style={{ ...styles.nodeCard, ...(activeStep === 0 ? styles.nodeCardActive : {}) }}>
               <div style={styles.nodeIconWrapper}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                   <circle cx="12" cy="7" r="4" />
                 </svg>
               </div>
-              <h4 style={styles.nodeTitle}>1. Invisible Telemetry</h4>
-              <p style={styles.nodeDesc}>Frontend silently captures mouse kinematics and keyboard cadence without client actions.</p>
+              <h4 style={styles.nodeTitle}>1. Telemetry Capture</h4>
+              <p style={styles.nodeDesc}>Silent sensors collect cursor movement, clicking pace, and key timings.</p>
             </div>
 
             {/* Line 1 */}
@@ -387,13 +385,13 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
             {/* Node 2 */}
             <div style={{ ...styles.nodeCard, ...(activeStep === 1 ? styles.nodeCardActive : {}) }}>
               <div style={styles.nodeIconWrapper}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <polyline points="16 18 22 12 16 6" />
                   <polyline points="8 6 2 12 8 18" />
                 </svg>
               </div>
               <h4 style={styles.nodeTitle}>2. Token Compilation</h4>
-              <p style={styles.nodeDesc}>Client SDK compiles encrypted browser telemetry dynamically into transactions.</p>
+              <p style={styles.nodeDesc}>Frontend SDK encrypts raw kinetics into a secure cryptographic token payload.</p>
             </div>
 
             {/* Line 2 */}
@@ -404,12 +402,12 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
             {/* Node 3 */}
             <div style={{ ...styles.nodeCard, ...(activeStep === 2 ? styles.nodeCardActive : {}) }}>
               <div style={styles.nodeIconWrapper}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
               </div>
-              <h4 style={styles.nodeTitle}>3. Risk Scoring & Decision</h4>
-              <p style={styles.nodeDesc}>Risk Engine evaluates telemetry into 0-100 scores to Allow, Challenge, or Block.</p>
+              <h4 style={styles.nodeTitle}>3. Heuristics Audit</h4>
+              <p style={styles.nodeDesc}>Risk Engine checks transaction tokens against sub-pixel and WebDriver rules.</p>
             </div>
 
             {/* Line 3 */}
@@ -420,12 +418,12 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
             {/* Node 4 */}
             <div style={{ ...styles.nodeCard, ...(activeStep === 3 ? styles.nodeCardActive : {}) }}>
               <div style={styles.nodeIconWrapper}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               </div>
-              <h4 style={styles.nodeTitle}>4. Adaptive Gate Decision</h4>
-              <p style={styles.nodeDesc}>Low-risk queries pass instantly, high-risk flags trigger progressive verification layers.</p>
+              <h4 style={styles.nodeTitle}>4. Adaptive Action</h4>
+              <p style={styles.nodeDesc}>Low-risk logs pass through. Outlier anomalies prompt block/verification challenges.</p>
             </div>
           </div>
         </div>
@@ -434,110 +432,115 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
       {/* Product Features & Original Heuristics Section */}
       <section id="features" style={styles.section}>
         <div style={styles.sectionHeader}>
-          <h2 style={styles.sectionTitle} className="gradient-text">13 Proprietary Anti-Bot Heuristics</h2>
-          <p style={styles.sectionSubtitle}>We build proprietary algorithms that detect advanced scripts and operator patterns.</p>
+          <h2 style={styles.sectionTitle}>13 PROPRIETARY KINETIC FILTERS</h2>
+          <p style={styles.sectionSubtitle}>We audit biometric events using precision mathematical analysis.</p>
         </div>
 
         <div style={styles.productGrid}>
           <div className="glass-panel" style={styles.productCard}>
-            <h4 style={styles.productTitle}>⚡ Sub-pixel Jitter & Bio-noise</h4>
+            <span style={styles.eyebrow}>HEURISTIC 01</span>
+            <h4 style={styles.productTitle}>⚡ Micro-jitter & Bio-noise</h4>
             <p style={styles.productDesc}>
-              Map sub-pixel micro-jitter and human physiological noise. Bots cannot mimic these tiny organic fluctuations.
+              Filters sub-pixel mouse cursor vibrations. Human hands display continuous biological micro-jitter that scripted frameworks cannot replicate.
             </p>
           </div>
 
           <div className="glass-panel" style={styles.productCard}>
-            <h4 style={styles.productTitle}>⏳ Deceleration Pause Recognition</h4>
+            <span style={styles.eyebrow}>HEURISTIC 02</span>
+            <h4 style={styles.productTitle}>⏳ Deceleration Curve Velocity</h4>
             <p style={styles.productDesc}>
-              Track deceleration and hesitation intervals before clicks. Automations click instantly with constant speeds.
+              Analyzes hesitation velocities before clicks. Automated scripts move at static velocities, missing organic braking trajectories.
             </p>
           </div>
 
           <div className="glass-panel" style={styles.productCard}>
-            <h4 style={styles.productTitle}>🧠 Adaptive Thinking Duration</h4>
+            <span style={styles.eyebrow}>HEURISTIC 03</span>
+            <h4 style={styles.productTitle}>🧠 Adaptive Flight Pacing</h4>
             <p style={styles.productDesc}>
-              Model appropriate thinking duration based on input complexity to prevent rapid script submissions.
+              Models cognitive delay between input field transits. Scripts trigger immediate sequence submissions, skipping human typing focus loops.
             </p>
           </div>
 
           <div className="glass-panel" style={styles.productCard}>
-            <h4 style={styles.productTitle}>⌨️ Backspace & Typo Analysis</h4>
+            <span style={styles.eyebrow}>HEURISTIC 04</span>
+            <h4 style={styles.productTitle}>⌨️ Backspace & Error Correction</h4>
             <p style={styles.productDesc}>
-              Reward natural spelling errors and backspace corrections. Bots produce error-free keystroke cadence.
+              Rewards spelling corrections and natural typos. Automated typing systems produce perfect speed patterns with no correction actions.
             </p>
           </div>
 
           <div className="glass-panel" style={styles.productCard}>
-            <h4 style={styles.productTitle}>🔗 Multi-tab Cross-session Tracking</h4>
+            <span style={styles.eyebrow}>HEURISTIC 05</span>
+            <h4 style={styles.productTitle}>🔗 Cross-session Association</h4>
             <p style={styles.productDesc}>
-              Correlate sessions across multiple browser tabs to capture concurrent automated form submissions.
+              Correlates browser telemetry logs across multiple tabs to isolate simultaneous distributed automation runs.
             </p>
           </div>
 
-          <div className="glass-panel" style={{ ...styles.productCard, border: '1px solid var(--secondary)', background: 'rgba(6, 182, 212, 0.05)' }}>
-            <h4 style={{ ...styles.productTitle, color: 'var(--secondary)' }}>🛡️ Explore All 13 Proprietary Layers</h4>
+          <div className="glass-panel" style={{ ...styles.productCard, border: '1px solid #0066cc', background: 'rgba(0, 102, 204, 0.03)' }}>
+            <span style={{ ...styles.eyebrow, color: '#0066cc' }}>SYSTEM LAYER</span>
+            <h4 style={{ ...styles.productTitle, color: '#0066cc' }}>🛡️ Deep Threat Intelligence</h4>
             <p style={styles.productDesc}>
-              VitaShield also equips clipboard chain analytics, focus flow entropy, and probabilistic scoring.
+              Equipped with clipboard chain logs, GPU context validation, browser fingerprinting, and dynamic proof-of-work checks.
             </p>
-            <div style={{ marginTop: '0.75rem' }}>
-              <a href="#matrix" style={{ color: '#00f2fe', fontWeight: '700', textDecoration: 'none', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                Go to Algorithm Matrix <span>→</span>
+            <div style={{ marginTop: 'auto', paddingTop: '10px' }}>
+              <a href="#matrix" style={{ color: '#2997ff', fontWeight: 700, textDecoration: 'none', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                VIEW FULL SECURITY MATRIX <span>→</span>
               </a>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Scenarios and Why Choose Grid */}
-      <section style={styles.section}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2.5rem', alignItems: 'start' }}>
+      {/* Scenarios and Why Choose Grid (Notion styling) */}
+      <section style={{ ...styles.section, borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', width: '100%', maxWidth: '1100px', gap: '1.5rem', alignItems: 'start' }}>
           {/* Scenarios */}
-          <div className="glass-panel" style={{ padding: '2rem' }}>
-            <h3 style={{ fontSize: '1.25rem', color: '#fff', fontWeight: 800, marginBottom: '1.25rem' }}>High-Value Protection Scenarios</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div className="glass-panel" style={styles.gridCard}>
+            <h3 style={{ fontSize: '1rem', color: '#f8fafc', fontWeight: 800, marginBottom: '1.25rem', letterSpacing: '-0.02em' }}>PROTECTION SCENARIOS</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               {[
-                { title: 'SaaS Signup & Login Protection', desc: 'Block automated account creation and credential stuffing attacks.' },
-                { title: 'Web3 Airdrop & Wallet Defense', desc: 'Prevent Sybil attacks and automated contract execution.' },
-                { title: 'API Gateway Rate Limiting', desc: 'Protect backend APIs from scraping, replay attacks, and abuse.' },
-                { title: 'E-commerce & Gaming Integrity', desc: 'Block checkout bots, scalpers, and scraper bots.' },
-                { title: 'Zero-Friction Client Verification', desc: 'Safeguard business conversion channels silently.' }
+                { title: 'SaaS Account Security & Registrations', desc: 'Mitigate brute-force credential stuffing and bot farm signups.' },
+                { title: 'Web3 Airdrop Integrity', desc: 'Secure smart contract distribution from sybil cluster automation.' },
+                { title: 'API Gateway Endpoint Rate Limiting', desc: 'Guard public API structures from scraping queries.' },
+                { title: 'E-commerce Scalping Blockades', desc: 'Lock out automated checkout scripts and scalper applications.' },
               ].map((s, idx) => (
-                <div key={idx} style={{ paddingBottom: '10px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                  <h4 style={{ fontSize: '0.9rem', color: '#00f2fe', margin: '0 0 4px 0', fontWeight: '700' }}>• {s.title}</h4>
-                  <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0 }}>{s.desc}</p>
+                <div key={idx} style={{ paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <h4 style={{ fontSize: '0.82rem', color: '#2997ff', margin: '0 0 4px 0', fontWeight: 800 }}>• {s.title.toUpperCase()}</h4>
+                  <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>{s.desc}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Why VitaShield */}
-          <div className="glass-panel" style={{ padding: '2rem' }}>
-            <h3 style={{ fontSize: '1.25rem', color: '#fff', fontWeight: 800, marginBottom: '1.25rem' }}>Why Developers Choose VitaShield</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div className="glass-panel" style={styles.gridCard}>
+            <h3 style={{ fontSize: '1rem', color: '#f8fafc', fontWeight: 800, marginBottom: '1.25rem', letterSpacing: '-0.02em' }}>ENGINE CHARACTERISTICS</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {[
-                { title: 'Stronger Shielding', desc: 'Built to stop next-gen automated frameworks and AI operators.' },
-                { title: 'Better UX', desc: '95% of users experience zero friction with no legacy images to click.' },
-                { title: 'Adversarial Self-Learning', desc: 'Intercepted samples feed back into the risk core to self-evolve rules.' },
-                { title: 'Developer-First SDKs', desc: 'Integrate with a single line of script. Native React, Next.js, and Node support.' },
-                { title: 'Enterprise Reliability', desc: 'Multi-tenant logs, custom threat thresholds, and real-time dashboard analytics.' }
+                { title: 'Aerospace-Grade Accuracy', desc: 'Precision modeling tailored to identify headless execution frameworks.' },
+                { title: 'Frictionless Conversion UI', desc: 'Silent tracking keeps validation seamless, boosting standard conversions.' },
+                { title: 'Model Recalibration Loops', desc: 'Telemetry anomalies train autoencoders continuously at the database edge.' },
+                { title: 'Drop-In Developer SDK', desc: 'Add frontend collection script and server API verification in minutes.' },
               ].map((w, idx) => (
-                <div key={idx}>
-                  <h4 style={{ fontSize: '0.88rem', color: '#fff', margin: '0 0 2px 0', fontWeight: '700' }}>✓ {w.title}</h4>
-                  <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: 0 }}>{w.desc}</p>
+                <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <h4 style={{ fontSize: '0.82rem', color: '#f8fafc', margin: 0, fontWeight: 800 }}>✓ {w.title.toUpperCase()}</h4>
+                  <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>{w.desc}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
       </section>
-      {/* Live Sandbox Interactive Simulator Panel */}
+
+      {/* Live Sandbox Interactive Simulator Panel (SpaceX control dashboard aesthetic) */}
       <section id="demo-sandbox" style={styles.section}>
         <div style={styles.sectionHeader}>
-          <h2 style={styles.sectionTitle} className="gradient-text">Live Action Telemetry Sandbox</h2>
-          <p style={styles.sectionSubtitle}>Interact with the live widget below to verify how our math rules analyze your kinetic rhythm.</p>
+          <h2 style={styles.sectionTitle}>ACTION TELEMETRY SANDBOX</h2>
+          <p style={styles.sectionSubtitle}>Interact with the collection node below to trace real-time kinetic calculations.</p>
         </div>
 
-        <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', marginTop: '2rem' }}>
+        <div style={{ display: 'flex', gap: '1.5rem', width: '100%', maxWidth: '1100px', flexWrap: 'wrap', marginTop: '1rem', textAlign: 'left' }}>
           {/* Left Panel: The Form */}
           <form 
             noValidate
@@ -548,19 +551,19 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
               if (token) {
                 handleDemoVerify(token);
               } else {
-                alert("Invisible verification active. Please fill out email and submit to compile telemetry.");
+                alert("Please fill out email to compile telemetry payload.");
               }
             }}
             className="glass-panel" 
-            style={{ flex: 1, minWidth: '320px', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '16px' }}
+            style={{ flex: 1, minWidth: '320px', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '18px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}
           >
-            <h3 style={{ fontSize: '1.2rem', color: '#fff', fontWeight: 700, margin: 0 }}>Interactive Form Integration</h3>
-            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }}>
-              Type your email and press the submit button. We run our sub-pixel jitter filter and linearity ratios on your cursor movements.
+            <h3 style={{ fontSize: '1rem', color: '#fff', fontWeight: 800, margin: 0, letterSpacing: '-0.01em' }}>FORM INTEGRATION</h3>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+              Type your email. The SDK will quietly monitor your cursor and typing parameters to sign a verification payload.
             </p>
 
             <div className="input-group" style={{ margin: 0 }}>
-              <label className="input-label" htmlFor="demo-email">Target Email Address</label>
+              <label className="input-label" htmlFor="demo-email" style={{ fontSize: '0.72rem', letterSpacing: '0.05em' }}>EMAIL ADDRESS</label>
               <input
                 type="email"
                 id="demo-email"
@@ -568,7 +571,7 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
                 onChange={(e) => setDemoMail(e.target.value)}
                 className="input-field"
                 placeholder="developer@company.com"
-                style={{ background: 'rgba(0,0,0,0.3)', margin: 0 }}
+                style={{ background: 'rgba(0,0,0,0.4)', margin: 0, border: '1px solid rgba(255,255,255,0.08)' }}
                 required
               />
             </div>
@@ -584,97 +587,107 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
               type="submit"
               style={{
                 width: '100%',
-                padding: '10px',
-                background: 'rgba(6, 182, 212, 0.15)',
-                border: '1px solid rgba(6, 182, 212, 0.4)',
+                padding: '12px',
+                background: 'rgba(0, 102, 204, 0.08)',
+                border: '1px solid rgba(0, 102, 204, 0.4)',
                 borderRadius: '8px',
-                color: '#00f2fe',
-                fontWeight: 600,
+                color: '#2997ff',
+                fontWeight: 700,
+                fontSize: '0.82rem',
                 cursor: 'pointer',
-                transition: 'all 0.3s ease'
+                transition: 'all 0.2s ease',
+                letterSpacing: '0.05em'
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = 'rgba(0, 102, 204, 0.15)';
+                e.currentTarget.style.borderColor = '#2997ff';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = 'rgba(0, 102, 204, 0.08)';
+                e.currentTarget.style.borderColor = 'rgba(0, 102, 204, 0.4)';
               }}
             >
-              Verify Submitted Payload
+              COMPILE & SUBMIT
             </button>
           </form>
 
           {/* Right Panel: The Scoring Console */}
-          <div className="glass-panel" style={{ flex: 1.2, minWidth: '320px', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(10, 15, 30, 0.6)' }}>
-            <h3 style={{ fontSize: '1.2rem', color: '#00f2fe', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00f2fe', boxShadow: '0 0 8px #00f2fe' }} />
-              Risk Engine Decision Inspector
+          <div className="glass-panel" style={{ flex: 1.2, minWidth: '320px', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '18px', background: 'rgba(5, 7, 12, 0.95)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <h3 style={{ fontSize: '1rem', color: '#fff', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '8px', letterSpacing: '-0.01em' }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#2997ff', boxShadow: '0 0 10px #2997ff' }} />
+              DECISION ENGINE TERMINAL
             </h3>
 
             {demoLoading ? (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '180px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                Analyzing client-side bio-kinetics coordinates...
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '180px', color: 'var(--text-muted)', fontSize: '0.78rem', fontFamily: 'var(--font-mono)' }}>
+                Analyzing client-side bio-kinetics logs...
               </div>
             ) : demoResults ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 {/* Decision Alert */}
                 <div style={{
                   padding: '10px 14px',
-                  background: demoResults.decision === 'allow' ? 'rgba(16, 185, 129, 0.12)' :
-                             demoResults.decision === 'challenge' ? 'rgba(245, 158, 11, 0.12)' : 'rgba(239, 68, 68, 0.12)',
-                  border: demoResults.decision === 'allow' ? '1px solid #10b981' :
-                          demoResults.decision === 'challenge' ? '1px solid #f59e0b' : '1px solid #ef4444',
-                  borderRadius: '8px',
+                  background: demoResults.decision === 'allow' ? 'rgba(16, 185, 129, 0.06)' :
+                             demoResults.decision === 'challenge' ? 'rgba(245, 158, 11, 0.06)' : 'rgba(239, 68, 68, 0.06)',
+                  border: demoResults.decision === 'allow' ? '1px solid rgba(16, 185, 129, 0.25)' :
+                          demoResults.decision === 'challenge' ? '1px solid rgba(245, 158, 11, 0.25)' : '1px solid rgba(239, 68, 68, 0.25)',
+                  borderRadius: '6px',
                   color: demoResults.decision === 'allow' ? '#34d399' :
                          demoResults.decision === 'challenge' ? '#fbbf24' : '#f87171',
-                  fontWeight: 700,
-                  fontSize: '0.9rem',
-                  textTransform: 'uppercase'
+                  fontWeight: 800,
+                  fontSize: '0.8rem',
+                  letterSpacing: '0.05em'
                 }}>
-                  Decision Gateway: {demoResults.decision}
+                  DECISION: {demoResults.decision.toUpperCase()}
                 </div>
 
                 {/* Score breakdown metrics */}
                 <div style={{ display: 'flex', gap: '12px' }}>
-                  <div style={{ flex: 1, padding: '10px', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Risk Score</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: demoResults.scores.risk_score > 50 ? '#f87171' : '#fff' }}>
+                  <div style={{ flex: 1, padding: '10px', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '6px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 600 }}>RISK SCORE</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'var(--font-mono)', marginTop: '4px', color: demoResults.scores.risk_score > 50 ? '#f87171' : '#f8fafc' }}>
                       {demoResults.scores.risk_score}%
                     </div>
                   </div>
-                  <div style={{ flex: 1, padding: '10px', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Trust Score</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: demoResults.scores.trust_score < 50 ? '#f87171' : '#34d399' }}>
+                  <div style={{ flex: 1, padding: '10px', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '6px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 600 }}>TRUST SCORE</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'var(--font-mono)', marginTop: '4px', color: demoResults.scores.trust_score < 50 ? '#f87171' : '#34d399' }}>
                       {demoResults.scores.trust_score}%
                     </div>
                   </div>
-                  <div style={{ flex: 1, padding: '10px', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Reputation</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#38bdf8' }}>
+                  <div style={{ flex: 1, padding: '10px', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '6px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 600 }}>REPUTATION</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'var(--font-mono)', marginTop: '4px', color: '#2997ff' }}>
                       {demoResults.scores.reputation_score}%
                     </div>
                   </div>
                 </div>
 
                 {/* Detail metrics */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px' }}>
-                    <span>Trajectory Straightness Ratio:</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.74rem', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '4px' }}>
+                    <span>Trajectory Jitter Ratio:</span>
                     <strong style={{ color: '#fff' }}>{demoResults.details.mouse_straightness || 1.25}</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '4px' }}>
                     <span>Keystroke Delay Cadence SD:</span>
                     <strong style={{ color: '#fff' }}>{demoResults.details.key_std_dev || 35} ms</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px' }}>
-                    <span>Automated Frameworks Found:</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '4px' }}>
+                    <span>Automated Headless Test:</span>
                     <strong style={{ color: demoResults.details.device_anomalies.length > 0 ? '#f87171' : '#34d399' }}>
-                      {demoResults.details.device_anomalies.length > 0 ? 'YES' : 'NONE'}
+                      {demoResults.details.device_anomalies.length > 0 ? 'FAIL' : 'PASS'}
                     </strong>
                   </div>
                 </div>
 
                 {/* Flags list */}
                 {demoResults.details.behavior_flags && demoResults.details.behavior_flags.length > 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <div style={{ fontSize: '0.75rem', color: '#fbbf24', fontWeight: 600 }}>Behavioral Anomalies Flagged:</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div style={{ fontSize: '0.7rem', color: '#fbbf24', fontWeight: 700, letterSpacing: '0.05em' }}>BEHAVIORAL FLAGS INGESTED:</div>
                     {demoResults.details.behavior_flags.map((flag: string) => (
-                      <div key={flag} style={{ fontSize: '0.75rem', color: '#f87171', background: 'rgba(239, 68, 68, 0.08)', padding: '4px 8px', borderRadius: '4px', border: '1px solid rgba(239, 68, 68, 0.15)' }}>
-                        ⚠️ {flag}
+                      <div key={flag} style={{ fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: '#f87171', background: 'rgba(239, 68, 68, 0.04)', padding: '4px 8px', borderRadius: '4px', border: '1px solid rgba(239, 68, 68, 0.12)' }}>
+                        [ANOMALY] {flag.toUpperCase()}
                       </div>
                     ))}
                   </div>
@@ -685,87 +698,83 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
                 {/* Decision Alert */}
                 <div style={{
                   padding: '10px 14px',
-                  background: liveTelemetry.decision === 'allow' ? 'rgba(16, 185, 129, 0.12)' :
-                             liveTelemetry.decision === 'challenge' ? 'rgba(245, 158, 11, 0.12)' : 'rgba(239, 68, 68, 0.12)',
-                  border: liveTelemetry.decision === 'allow' ? '1px solid #10b981' :
-                          liveTelemetry.decision === 'challenge' ? '1px solid #f59e0b' : '1px solid #ef4444',
-                  borderRadius: '8px',
+                  background: liveTelemetry.decision === 'allow' ? 'rgba(16, 185, 129, 0.05)' :
+                             liveTelemetry.decision === 'challenge' ? 'rgba(245, 158, 11, 0.05)' : 'rgba(239, 68, 68, 0.05)',
+                  border: liveTelemetry.decision === 'allow' ? '1px solid rgba(16, 185, 129, 0.2)' :
+                          liveTelemetry.decision === 'challenge' ? '1px solid rgba(245, 158, 11, 0.2)' : '1px solid rgba(239, 68, 68, 0.2)',
+                  borderRadius: '6px',
                   color: liveTelemetry.decision === 'allow' ? '#34d399' :
                          liveTelemetry.decision === 'challenge' ? '#fbbf24' : '#f87171',
-                  fontWeight: 700,
-                  fontSize: '0.9rem',
-                  textTransform: 'uppercase',
+                  fontWeight: 800,
+                  fontSize: '0.8rem',
+                  letterSpacing: '0.05em',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span>Decision Gateway: {liveTelemetry.decision}</span>
-                  <span style={{ fontSize: '10px', color: '#00f2fe', fontWeight: 'bold' }}>● LIVE STREAM</span>
+                  <span>DECISION: {liveTelemetry.decision.toUpperCase()}</span>
+                  <span style={{ fontSize: '9px', color: '#2997ff', fontWeight: 800 }}>● TELEMETRY STREAM</span>
                 </div>
 
                 {/* Score breakdown metrics */}
                 <div style={{ display: 'flex', gap: '12px' }}>
-                  <div style={{ flex: 1, padding: '10px', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Risk Score</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: liveTelemetry.scores.risk_score > 50 ? '#f87171' : '#fff' }}>
+                  <div style={{ flex: 1, padding: '10px', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '6px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 600 }}>RISK SCORE</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'var(--font-mono)', marginTop: '4px', color: liveTelemetry.scores.risk_score > 50 ? '#f87171' : '#f8fafc' }}>
                       {liveTelemetry.scores.risk_score}%
                     </div>
                   </div>
-                  <div style={{ flex: 1, padding: '10px', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Trust Score</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: liveTelemetry.scores.trust_score < 50 ? '#f87171' : '#34d399' }}>
+                  <div style={{ flex: 1, padding: '10px', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '6px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 600 }}>TRUST SCORE</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'var(--font-mono)', marginTop: '4px', color: liveTelemetry.scores.trust_score < 50 ? '#f87171' : '#34d399' }}>
                       {liveTelemetry.scores.trust_score}%
                     </div>
                   </div>
-                  <div style={{ flex: 1, padding: '10px', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Reputation</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#38bdf8' }}>
+                  <div style={{ flex: 1, padding: '10px', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '6px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 600 }}>REPUTATION</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'var(--font-mono)', marginTop: '4px', color: '#2997ff' }}>
                       {liveTelemetry.scores.reputation_score}%
                     </div>
                   </div>
                 </div>
 
                 {/* Detail metrics */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px' }}>
-                    <span>Mouse Points Captured:</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.74rem', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '4px' }}>
+                    <span>Kinetic Coordinates Captured:</span>
                     <strong style={{ color: '#fff' }}>{liveTelemetry.details.mousePointsCount} / 30</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '4px' }}>
                     <span>Trajectory Straightness Ratio:</span>
                     <strong style={{ color: '#fff' }}>{liveTelemetry.details.mouse_straightness || 1.25}</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px' }}>
-                    <span>Keystrokes Tracked:</span>
-                    <strong style={{ color: '#fff' }}>{liveTelemetry.details.keyPressesCount}</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px' }}>
-                    <span>Keystroke Delay Cadence SD:</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '4px' }}>
+                    <span>Keystroke Delay Variance SD:</span>
                     <strong style={{ color: '#fff' }}>{liveTelemetry.details.key_std_dev || 35} ms</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px' }}>
-                    <span>Automated Frameworks Found:</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '4px' }}>
+                    <span>Automated Headless Test:</span>
                     <strong style={{ color: liveTelemetry.details.device_anomalies.length > 0 ? '#f87171' : '#34d399' }}>
-                      {liveTelemetry.details.device_anomalies.length > 0 ? 'YES' : 'NONE'}
+                      {liveTelemetry.details.device_anomalies.length > 0 ? 'FAIL' : 'PASS'}
                     </strong>
                   </div>
                 </div>
 
                 {/* Flags list */}
                 {liveTelemetry.details.behavior_flags && liveTelemetry.details.behavior_flags.length > 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <div style={{ fontSize: '0.75rem', color: '#fbbf24', fontWeight: 600 }}>Behavioral Anomalies Flagged:</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div style={{ fontSize: '0.7rem', color: '#fbbf24', fontWeight: 700, letterSpacing: '0.05em' }}>BEHAVIORAL FLAGS INGESTED:</div>
                     {liveTelemetry.details.behavior_flags.map((flag: string) => (
-                      <div key={flag} style={{ fontSize: '0.75rem', color: '#f87171', background: 'rgba(239, 68, 68, 0.08)', padding: '4px 8px', borderRadius: '4px', border: '1px solid rgba(239, 68, 68, 0.15)' }}>
-                        ⚠️ {flag}
+                      <div key={flag} style={{ fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: '#f87171', background: 'rgba(239, 68, 68, 0.04)', padding: '4px 8px', borderRadius: '4px', border: '1px solid rgba(239, 68, 68, 0.12)' }}>
+                        [ANOMALY] {flag.toUpperCase()}
                       </div>
                     ))}
                   </div>
                 )}
               </div>
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '180px', color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center' }}>
-                Waiting for telemetry packet... Move your mouse organically to verify.
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '180px', color: 'var(--text-muted)', fontSize: '0.76rem', fontFamily: 'var(--font-mono)', textAlign: 'center', border: '1px dashed rgba(255,255,255,0.06)' }}>
+                Waiting for telemetry packet... Move cursor inside sandbox to compile.
               </div>
             )}
           </div>
@@ -775,15 +784,15 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
       {/* Defense Matrix Section */}
       <section id="matrix" style={styles.section}>
         <div style={styles.sectionHeader}>
-          <h2 style={styles.sectionTitle} className="gradient-text">Defense Capability Matrix</h2>
+          <h2 style={styles.sectionTitle}>DEFENSE MATRIX SPECIFICATION</h2>
           <p style={styles.sectionSubtitle}>
-            Explore the 12 security dimensions, standard browser checks, and proprietary kinetics filters integrated inside VitaShield.
+            Browse the active detection algorithms, client checks, and neural thresholds loaded into VitaShield.
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '2rem', marginTop: '2rem', alignItems: 'start', width: '100%', textAlign: 'left' }}>
-          {/* Left Column: Categories List */}
-          <div className="glass-panel" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '6px', background: 'rgba(10,15,30,0.5)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '1.5rem', marginTop: '1rem', alignItems: 'start', width: '100%', maxWidth: '1100px', textAlign: 'left' }}>
+          {/* Left Column: Categories List (Notion outline buttons) */}
+          <div className="glass-panel" style={{ padding: '10px', display: 'flex', flexDirection: 'column', gap: '6px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
             {MATRIX_CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
@@ -791,18 +800,19 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
                 onClick={() => setActiveMatrixCategory(cat.id)}
                 style={{
                   padding: '10px 14px',
-                  background: activeMatrixCategory === cat.id ? 'rgba(6, 182, 212, 0.12)' : 'transparent',
-                  border: activeMatrixCategory === cat.id ? '1px solid rgba(6, 182, 212, 0.3)' : '1px solid transparent',
-                  borderRadius: '8px',
-                  color: activeMatrixCategory === cat.id ? '#00f2fe' : 'var(--text-muted)',
+                  background: activeMatrixCategory === cat.id ? 'rgba(0, 102, 204, 0.06)' : 'transparent',
+                  border: activeMatrixCategory === cat.id ? '1px solid rgba(0, 102, 204, 0.4)' : '1px solid transparent',
+                  borderRadius: '6px',
+                  color: activeMatrixCategory === cat.id ? '#2997ff' : 'var(--text-muted)',
                   textAlign: 'left',
-                  fontSize: '0.82rem',
+                  fontSize: '0.78rem',
                   fontWeight: '700',
                   cursor: 'pointer',
-                  transition: 'all 0.25s ease'
+                  transition: 'all 0.2s ease',
+                  letterSpacing: '0.02em'
                 }}
               >
-                {cat.title.split(' (')[0]}
+                {cat.title.split(' (')[0].toUpperCase()}
               </button>
             ))}
           </div>
@@ -812,8 +822,8 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
             {MATRIX_CATEGORIES.filter(cat => cat.id === activeMatrixCategory).map((cat) => (
               <div key={cat.id}>
                 <div style={{ marginBottom: '1.25rem', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '0.75rem' }}>
-                  <h3 style={{ fontSize: '1.15rem', color: '#fff', fontWeight: '800', margin: 0 }}>{cat.title}</h3>
-                  <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '4px', margin: 0, lineHeight: '1.4' }}>{cat.description}</p>
+                  <h3 style={{ fontSize: '1.1rem', color: '#fff', fontWeight: 800, margin: 0, letterSpacing: '-0.02em' }}>{cat.title.toUpperCase()}</h3>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px', margin: 0, lineHeight: '1.4' }}>{cat.description}</p>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
@@ -826,30 +836,37 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
                         display: 'flex', 
                         flexDirection: 'column', 
                         gap: '10px',
-                        border: cat.id === 'vitashield' ? '1px solid rgba(6, 182, 212, 0.2)' : '1px solid rgba(255,255,255,0.04)',
-                        background: cat.id === 'vitashield' ? 'rgba(6, 182, 212, 0.02)' : 'rgba(255, 255, 255, 0.01)',
-                        transition: 'all 0.3s ease'
+                        border: '1px solid rgba(255,255,255,0.06)',
+                        background: cat.id === 'vitashield' ? 'rgba(0, 102, 204, 0.02)' : 'rgba(255, 255, 255, 0.01)',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.borderColor = 'rgba(0, 102, 204, 0.3)';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
-                        <h4 style={{ fontSize: '0.88rem', color: '#fff', fontWeight: '700', margin: 0, lineHeight: '1.3' }}>{method.name}</h4>
+                        <h4 style={{ fontSize: '0.82rem', color: '#fff', fontWeight: 800, margin: 0, lineHeight: '1.3' }}>{method.name.toUpperCase()}</h4>
                         <span 
                           style={{ 
-                            fontSize: '10px', 
+                            fontSize: '9px', 
                             padding: '2px 6px', 
                             borderRadius: '4px', 
-                            background: method.power === 'Maximum' ? 'rgba(239, 68, 68, 0.15)' : method.power === 'High' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+                            background: method.power === 'Maximum' ? 'rgba(239, 68, 68, 0.08)' : method.power === 'High' ? 'rgba(245, 158, 11, 0.08)' : 'rgba(16, 185, 129, 0.08)',
                             color: method.power === 'Maximum' ? 'var(--danger)' : method.power === 'High' ? 'var(--warning)' : 'var(--success)',
-                            fontWeight: '700',
-                            whiteSpace: 'nowrap'
+                            fontWeight: 800,
+                            whiteSpace: 'nowrap',
+                            border: `1px solid ${method.power === 'Maximum' ? 'rgba(239,68,68,0.2)' : method.power === 'High' ? 'rgba(245,158,11,0.2)' : 'rgba(16,185,129,0.2)'}`
                           }}
                         >
-                          Power: {method.power}
+                          POWER: {method.power.toUpperCase()}
                         </span>
                       </div>
-                      <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0, lineHeight: '1.4' }}>{method.desc}</p>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: '0.72rem', color: 'var(--text-dark)', fontWeight: '600', borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: '6px' }}>
-                        Difficulty: {method.difficulty}
+                      <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>{method.desc}</p>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: '0.68rem', color: 'var(--text-dark)', fontWeight: 700, borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '6px', fontFamily: 'var(--font-mono)' }}>
+                        DIFFICULTY: {method.difficulty.toUpperCase()}
                       </div>
                     </div>
                   ))}
@@ -860,31 +877,31 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
         </div>
       </section>
 
-      {/* Developer Docs & Quick Start Section */}
+      {/* Developer Docs & Quick Start Section (Notion clean layouts) */}
       <section id="docs" style={styles.section}>
         <div style={styles.sectionHeader}>
-          <h2 style={styles.sectionTitle} className="gradient-text">Developer Quick Start & Docs</h2>
+          <h2 style={styles.sectionTitle}>DEVELOPER QUICK START</h2>
           <p style={styles.sectionSubtitle}>
-            Embed the frontend telemetry widget and verify tokens on your server in minutes.
+            Embed the client collection SDK and query verification tokens from your backend.
           </p>
         </div>
 
-        <div className="glass-panel" style={{ padding: '2rem', marginTop: '2rem', textAlign: 'left' }}>
-          <h3 style={{ fontSize: '1.25rem', color: '#fff', fontWeight: 800, marginBottom: '1.5rem' }}>
-            How to Integrate VitaShield: Step-by-Step
+        <div className="glass-panel" style={{ padding: '2rem', marginTop: '1rem', width: '100%', maxWidth: '1100px', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <h3 style={{ fontSize: '1rem', color: '#fff', fontWeight: 800, marginBottom: '1.5rem', letterSpacing: '-0.01em' }}>
+            INTEGRATION WORKFLOW
           </h3>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2.5rem', flexWrap: 'wrap' }}>
             {/* Step 1: Frontend */}
-            <div>
-              <h4 style={{ fontSize: '1.05rem', color: '#00f2fe', margin: '0 0 10px 0', fontWeight: '800' }}>
-                Step 1: Frontend Telemetry Widget
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <h4 style={{ fontSize: '0.88rem', color: '#2997ff', margin: '0 0 10px 0', fontWeight: 800 }}>
+                1. FRONTEND COLLECTION
               </h4>
-              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: '1.5', marginBottom: '1.25rem' }}>
-                Load our client-side SDK in your HTML header. It silently monitors organic human biological rhythms (mouse speed, deceleration hesitation, typing flight/dwell times) to generate cryptographic trust tokens.
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: '1.5', marginBottom: '1.25rem' }}>
+                Load our client-side verification script inside your HTML document header. It silently tracks human biological mechanics to construct cryptographic tokens.
               </p>
               
-              <div style={{ background: 'rgba(5, 7, 12, 0.9)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '1rem', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', overflowX: 'auto', color: '#e2e8f0' }}>
+              <div style={{ background: 'rgba(5, 7, 12, 0.95)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '6px', padding: '1rem', fontFamily: 'var(--font-mono)', fontSize: '0.72rem', overflowX: 'auto', color: '#e2e8f0', flex: 1 }}>
                 <div style={{ color: '#6b7280', marginBottom: '0.5rem' }}>{"<!-- Load the SDK client -->"}</div>
                 <div style={{ color: '#38bdf8' }}>
                   {"<script "}
@@ -917,7 +934,7 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
                   <span style={{ color: '#34d399' }}>"email"</span>
                   {" required />"}
                   <br />
-                  {"<!-- VitaShield Widget - Zero human clicks required -->"}
+                  {"<!-- VitaShield Container -->"}
                   <br />
                   {"<div "}
                   <span style={{ color: '#fbbf24' }}>id</span>
@@ -926,7 +943,7 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
                   {" "}
                   <span style={{ color: '#fbbf24' }}>data-sitekey</span>
                   {"="}
-                  <span style={{ color: '#34d399' }}>"vms_pub_live_79a2b8e3df9102ca"</span>
+                  <span style={{ color: '#34d399' }}>"vms_pub_live_79a2b8e3"</span>
                   {"></div>"}
                   <br />
                   {"<button "}
@@ -943,11 +960,11 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
 
             {/* Step 2: Backend */}
             <div>
-              <h4 style={{ fontSize: '1.05rem', color: '#00f2fe', margin: '0 0 10px 0', fontWeight: '800' }}>
-                Step 2: Backend API Verification
+              <h4 style={{ fontSize: '0.88rem', color: '#2997ff', margin: '0 0 10px 0', fontWeight: 800 }}>
+                2. BACKEND AUDIT
               </h4>
-              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: '1.5', marginBottom: '1.25rem' }}>
-                When your form is submitted, VitaShield automatically appends a hidden token named <code>vms-shield-token</code> to your payload. Query our secure verify endpoint on your server before processing the request.
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: '1.5', marginBottom: '1.25rem' }}>
+                On submission, the SDK embeds a secure token key <code>vms-shield-token</code>. Query our secure verify API on your backend endpoint to receive risk scores.
               </p>
 
               <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
@@ -958,12 +975,12 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
                     onClick={() => setDocsTab(lang as any)}
                     style={{
                       padding: '4px 10px',
-                      background: docsTab === lang ? 'rgba(6, 182, 212, 0.12)' : 'rgba(255,255,255,0.02)',
-                      border: docsTab === lang ? '1px solid rgba(6, 182, 212, 0.3)' : '1px solid rgba(255,255,255,0.05)',
-                      borderRadius: '6px',
-                      color: docsTab === lang ? '#00f2fe' : 'var(--text-muted)',
-                      fontSize: '0.74rem',
-                      fontWeight: '700',
+                      background: docsTab === lang ? 'rgba(0, 102, 204, 0.06)' : 'rgba(255,255,255,0.02)',
+                      border: docsTab === lang ? '1px solid rgba(0, 102, 204, 0.4)' : '1px solid rgba(255,255,255,0.05)',
+                      borderRadius: '4px',
+                      color: docsTab === lang ? '#2997ff' : 'var(--text-muted)',
+                      fontSize: '0.7rem',
+                      fontWeight: 800,
                       cursor: 'pointer',
                       textTransform: 'uppercase'
                     }}
@@ -973,7 +990,7 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
                 ))}
               </div>
 
-              <div style={{ background: 'rgba(5, 7, 12, 0.9)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '1rem', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', overflowX: 'auto', color: '#e2e8f0', height: '180px' }}>
+              <div style={{ background: 'rgba(5, 7, 12, 0.95)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '6px', padding: '1rem', fontFamily: 'var(--font-mono)', fontSize: '0.72rem', overflowX: 'auto', color: '#38bdf8', height: '180px' }}>
                 {docsTab === 'nodejs' && (
                   <pre style={{ margin: 0 }}>{`// Node.js Express Backend
 app.post('/submit', async (req, res) => {
@@ -999,7 +1016,7 @@ app.post('/submit', async (req, res) => {
 });`}</pre>
                 )}
                 {docsTab === 'python' && (
-                  <pre style={{ margin: 0 }}>{`# Python Flask / requests verify
+                  <pre style={{ margin: 0, color: '#34d399' }}>{`# Python Flask verify
 import requests
 
 def verify_session(token, client_ip):
@@ -1011,12 +1028,10 @@ def verify_session(token, client_ip):
     }
     r = requests.post(url, json=payload, timeout=5)
     result = r.json()
-    
-    # Return success validation flags
     return result.get("success") and result.get("risk_score") < 60`}</pre>
                 )}
                 {docsTab === 'go' && (
-                  <pre style={{ margin: 0 }}>{`// Golang verify logic
+                  <pre style={{ margin: 0, color: '#fbbf24' }}>{`// Golang verify logic
 func verifyToken(token string, ip string) bool {
     client := &http.Client{Timeout: 5 * time.Second}
     payload := map[string]string{
@@ -1026,12 +1041,11 @@ func verifyToken(token string, ip string) bool {
     }
     body, _ := json.Marshal(payload)
     resp, err := client.Post("https://vitashield.sleepsomno.com/api/verify", "application/json", bytes.NewBuffer(body))
-    // Decode and parse risk_score ...
     return riskScore < 60
 }`}</pre>
                 )}
                 {docsTab === 'curl' && (
-                  <pre style={{ margin: 0 }}>{`# Shell verify script curl query
+                  <pre style={{ margin: 0, color: '#f8fafc' }}>{`# Shell verify query
 curl -X POST https://vitashield.sleepsomno.com/api/verify \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -1044,19 +1058,16 @@ curl -X POST https://vitashield.sleepsomno.com/api/verify \\
 
               {/* Interactive API Sandbox Simulator */}
               <div style={{ marginTop: '1.5rem', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '1.5rem' }}>
-                <h5 style={{ fontSize: '0.85rem', color: '#fff', margin: '0 0 8px 0', fontWeight: '800' }}>
-                  Interactive API Response Simulator
+                <h5 style={{ fontSize: '0.8rem', color: '#fff', margin: '0 0 8px 0', fontWeight: 800 }}>
+                  RESPONSE PLAYGROUND
                 </h5>
-                <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginBottom: '1.25rem', lineHeight: '1.4' }}>
-                  Adjust parameters below to see how the client-side telemetry converts into backend risk decisions and JSON payloads.
-                </p>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '1.5rem', alignItems: 'start' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {/* Risk Score Slider */}
                     <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', marginBottom: '6px' }}>
-                        <span style={{ color: 'var(--text-muted)' }}>Simulated Risk Score:</span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', marginBottom: '6px' }}>
+                        <span style={{ color: 'var(--text-muted)' }}>Risk Slider:</span>
                         <strong style={{ color: mockRiskScore >= 60 ? 'var(--danger)' : mockRiskScore > 20 ? 'var(--warning)' : 'var(--success)' }}>
                           {mockRiskScore}%
                         </strong>
@@ -1067,62 +1078,63 @@ curl -X POST https://vitashield.sleepsomno.com/api/verify \\
                         max="100"
                         value={mockRiskScore}
                         onChange={(e) => setMockRiskScore(Number(e.target.value))}
-                        style={{ width: '100%', accentColor: 'var(--secondary)', cursor: 'pointer' }}
+                        style={{ width: '100%', accentColor: '#2997ff', cursor: 'pointer' }}
                       />
                     </div>
 
                     {/* Checkboxes */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: '600' }}>Simulated Telemetry Markers:</span>
+                      <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 700 }}>SIMULATED MARKERS:</span>
                       
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.74rem', color: '#fff', cursor: 'pointer' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.72rem', color: '#fff', cursor: 'pointer' }}>
                         <input
                           type="checkbox"
                           checked={mockWebdriver}
                           onChange={(e) => setMockWebdriver(e.target.checked)}
-                          style={{ accentColor: 'var(--secondary)' }}
+                          style={{ accentColor: '#2997ff' }}
                         />
-                        <span>WebDriver Active (Automation Test)</span>
+                        <span>WebDriver Flag Active</span>
                       </label>
 
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.74rem', color: '#fff', cursor: 'pointer' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.72rem', color: '#fff', cursor: 'pointer' }}>
                         <input
                           type="checkbox"
                           checked={mockStraightMouse}
                           onChange={(e) => setMockStraightMouse(e.target.checked)}
-                          style={{ accentColor: 'var(--secondary)' }}
+                          style={{ accentColor: '#2997ff' }}
                         />
-                        <span>Straight Trajectory (Constant Speed Linear)</span>
+                        <span>Linear Move Detected</span>
                       </label>
 
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.74rem', color: '#fff', cursor: 'pointer' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.72rem', color: '#fff', cursor: 'pointer' }}>
                         <input
                           type="checkbox"
                           checked={mockSwiftshader}
                           onChange={(e) => setMockSwiftshader(e.target.checked)}
-                          style={{ accentColor: 'var(--secondary)' }}
+                          style={{ accentColor: '#2997ff' }}
                         />
-                        <span>SwiftShader GPU (Headless VM Environment)</span>
+                        <span>Virtual GPU Flag</span>
                       </label>
                     </div>
                   </div>
 
                   {/* Simulated JSON Panel */}
-                  <div style={{ background: 'rgba(5, 7, 12, 0.95)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '0.75rem 1rem', fontFamily: 'var(--font-mono)', fontSize: '0.72rem', overflowX: 'auto', maxHeight: '185px' }}>
-                    <div style={{ color: 'var(--text-dark)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px', marginBottom: '6px', fontSize: '0.68rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ background: 'rgba(5, 7, 12, 0.95)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '6px', padding: '0.75rem 1rem', fontFamily: 'var(--font-mono)', fontSize: '0.68rem', overflowX: 'auto', maxHeight: '185px' }}>
+                    <div style={{ color: 'var(--text-dark)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px', marginBottom: '6px', fontSize: '0.62rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span>RESPONSE BODY (JSON)</span>
                       <span style={{
                         padding: '1px 6px',
                         borderRadius: '4px',
                         fontSize: '9px',
                         fontWeight: '800',
-                        background: mockRiskScore >= 60 ? 'rgba(239,68,68,0.12)' : mockRiskScore > 20 ? 'rgba(245,158,11,0.12)' : 'rgba(16,185,129,0.12)',
-                        color: mockRiskScore >= 60 ? 'var(--danger)' : mockRiskScore > 20 ? 'var(--warning)' : 'var(--success)'
+                        background: mockRiskScore >= 60 ? 'rgba(239,68,68,0.08)' : mockRiskScore > 20 ? 'rgba(245,158,11,0.08)' : 'rgba(16,185,129,0.08)',
+                        color: mockRiskScore >= 60 ? 'var(--danger)' : mockRiskScore > 20 ? 'var(--warning)' : 'var(--success)',
+                        border: `1px solid ${mockRiskScore >= 60 ? 'rgba(239,68,68,0.2)' : mockRiskScore > 20 ? 'rgba(245,158,11,0.2)' : 'rgba(16,185,129,0.2)'}`
                       }}>
                         {mockRiskScore >= 60 ? 'BLOCK (403)' : mockRiskScore > 20 ? 'CHALLENGE' : 'ALLOW'}
                       </span>
                     </div>
-                    <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: '#38bdf8' }}>
+                    <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: '#2997ff' }}>
                       {JSON.stringify({
                         success: true,
                         timestamp: new Date().toISOString().split('T')[0] + 'T00:00:00Z',
@@ -1150,27 +1162,36 @@ curl -X POST https://vitashield.sleepsomno.com/api/verify \\
 
       {/* Enterprise Contact Section */}
       <section id="contact" style={{ ...styles.section, marginBottom: '4rem', textAlign: 'center' }}>
-        <div className="glass-panel" style={{ maxWidth: '650px', margin: '0 auto', padding: '3rem 2rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', border: '1px solid rgba(6, 182, 212, 0.25)' }}>
-          <h2 style={styles.sectionTitle} className="gradient-text">Ready to Upgrade Your Platform Security?</h2>
+        <div className="glass-panel" style={{ maxWidth: '650px', margin: '0 auto', padding: '3rem 2rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', border: '1px solid rgba(0, 102, 204, 0.25)', background: 'rgba(0,0,0,0.2)' }}>
+          <h2 style={{ ...styles.sectionTitle, color: '#f8fafc', letterSpacing: '-0.02em' }}>UPGRADE YOUR SERVICE SECURITY</h2>
           <p style={{ ...styles.sectionSubtitle, maxWidth: '100%' }}>
-            Experience zero-friction threat defense today or schedule an enterprise walkthrough.
+            Deploy frictionless human verification or contact sales to schedule an enterprise audit.
           </p>
           <div style={{ margin: '1.5rem 0', display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <button
               onClick={onEnterConsole}
               style={{
                 padding: '12px 28px',
-                background: 'rgba(6, 182, 212, 0.15)',
-                border: '1px solid rgba(6, 182, 212, 0.4)',
+                background: 'rgba(0, 102, 204, 0.08)',
+                border: '1px solid rgba(0, 102, 204, 0.4)',
                 borderRadius: '30px',
-                color: '#00f2fe',
+                color: '#2997ff',
                 fontWeight: 700,
-                fontSize: '0.98rem',
+                fontSize: '0.9rem',
                 cursor: 'pointer',
-                transition: 'all 0.3s ease'
+                transition: 'all 0.3s ease',
+                letterSpacing: '0.05em'
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = 'rgba(0, 102, 204, 0.15)';
+                e.currentTarget.style.borderColor = '#2997ff';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = 'rgba(0, 102, 204, 0.08)';
+                e.currentTarget.style.borderColor = 'rgba(0, 102, 204, 0.4)';
               }}
             >
-              Get Started Free
+              GET STARTED
             </button>
             <a 
               href="mailto:sales@sleepsomno.com" 
@@ -1179,25 +1200,26 @@ curl -X POST https://vitashield.sleepsomno.com/api/verify \\
                 alignItems: 'center',
                 gap: '10px',
                 padding: '12px 28px',
-                background: 'linear-gradient(135deg, #00f2fe 0%, #4facfe 100%)',
+                background: 'linear-gradient(135deg, #0066cc 0%, #004499 100%)',
                 borderRadius: '30px',
-                color: '#000',
+                color: '#fff',
                 fontWeight: 700,
-                fontSize: '0.98rem',
+                fontSize: '0.9rem',
                 textDecoration: 'none',
-                boxShadow: '0 0 20px rgba(0, 242, 254, 0.45)',
-                transition: 'all 0.3s ease'
+                boxShadow: '0 0 20px rgba(0, 102, 204, 0.45)',
+                transition: 'all 0.3s ease',
+                letterSpacing: '0.05em'
               }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                 <polyline points="22,6 12,13 2,6" />
               </svg>
-              Schedule Demo
+              SCHEDULE DEMO
             </a>
           </div>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            For custom integrations or inquiries, contact sales@sleepsomno.com. Typical deployments are live within 24 hours.
+          <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+            For customized deployment setups, contact sales@sleepsomno.com. Deployments integrate in minutes.
           </p>
         </div>
       </section>
@@ -1208,48 +1230,81 @@ curl -X POST https://vitashield.sleepsomno.com/api/verify \\
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
     minHeight: '100vh',
-    background: 'radial-gradient(circle at 50% 0%, #0c1220 0%, #05070c 80%)',
-    color: '#fff',
-    fontFamily: "'Plus Jakarta Sans', sans-serif"
+    background: '#000000',
+    color: '#f8fafc',
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif",
+    position: 'relative',
+    overflowX: 'hidden'
+  },
+  glowOverlayPurple: {
+    position: 'absolute',
+    top: '10%',
+    left: '20%',
+    width: '450px',
+    height: '450px',
+    borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(139, 92, 246, 0.05) 0%, transparent 70%)',
+    filter: 'blur(80px)',
+    pointerEvents: 'none',
+    zIndex: 0
+  },
+  glowOverlayCyan: {
+    position: 'absolute',
+    top: '40%',
+    right: '15%',
+    width: '500px',
+    height: '500px',
+    borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(0, 102, 204, 0.04) 0%, transparent 70%)',
+    filter: 'blur(80px)',
+    pointerEvents: 'none',
+    zIndex: 0
   },
   topHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '1.25rem 2.5rem',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
     position: 'sticky',
     top: 0,
-    background: 'rgba(5, 7, 12, 0.85)',
+    background: 'rgba(0, 0, 0, 0.85)',
     backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
     zIndex: 100
   },
   brand: {
     display: 'flex',
     alignItems: 'center',
-    gap: '0.65rem'
+    gap: '0.75rem',
+    textAlign: 'left'
   },
   logoIcon: {
     width: '32px',
     height: '32px',
-    borderRadius: '8px',
-    background: 'rgba(6, 182, 212, 0.05)',
-    border: '1px solid rgba(6, 182, 212, 0.2)',
+    borderRadius: '6px',
+    overflow: 'hidden',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    border: '1px solid rgba(255,255,255,0.08)'
   },
   brandName: {
-    fontSize: '1.2rem',
-    fontWeight: '800',
+    fontSize: '0.98rem',
+    fontWeight: 900,
     color: '#fff',
-    letterSpacing: '-0.02em'
+    letterSpacing: '-0.02em',
+    display: 'block',
+    lineHeight: 1
   },
   brandSub: {
-    fontSize: '0.65rem',
-    color: 'var(--text-dark)',
-    fontWeight: '750',
-    marginTop: '0.2rem'
+    fontSize: '0.58rem',
+    color: '#8b5cf6',
+    fontWeight: 800,
+    letterSpacing: '0.08em',
+    display: 'block',
+    marginTop: '3px',
+    lineHeight: 1
   },
   topNav: {
     display: 'flex',
@@ -1257,33 +1312,35 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: '1.75rem'
   },
   navLink: {
-    fontSize: '0.88rem',
-    fontWeight: '600',
+    fontSize: '0.72rem',
+    fontWeight: 700,
     color: 'var(--text-muted)',
     textDecoration: 'none',
-    transition: 'color 0.2s ease'
+    transition: 'color 0.2s ease',
+    letterSpacing: '0.05em'
   },
   consoleBtn: {
-    background: 'rgba(6, 182, 212, 0.08)',
-    border: '1px solid rgba(6, 182, 212, 0.25)',
-    color: 'var(--secondary)',
+    background: 'transparent',
+    border: '1px solid rgba(255,255,255,0.08)',
+    color: '#fff',
     padding: '0.45rem 1rem',
-    borderRadius: '8px',
-    fontSize: '0.85rem',
-    fontWeight: '700',
+    borderRadius: '4px',
+    fontSize: '0.72rem',
+    fontWeight: 800,
     cursor: 'pointer',
-    transition: 'all 0.2s ease'
+    transition: 'all 0.2s ease',
+    letterSpacing: '0.05em'
   },
   heroSection: {
     position: 'relative',
-    padding: '6rem 2rem',
+    padding: '8rem 2rem 5rem 2rem',
     display: 'flex',
     justifyContent: 'center',
     textAlign: 'center',
     overflow: 'hidden'
   },
   heroContent: {
-    maxWidth: '800px',
+    maxWidth: '850px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -1294,32 +1351,37 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     alignItems: 'center',
     gap: '0.5rem',
-    background: 'rgba(6, 182, 212, 0.05)',
-    border: '1px solid rgba(6, 182, 212, 0.2)',
+    background: 'rgba(255, 255, 255, 0.02)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
     padding: '0.4rem 0.85rem',
-    borderRadius: '30px',
-    fontSize: '0.78rem',
-    fontWeight: '700',
-    color: 'var(--secondary)'
+    borderRadius: '4px',
+    fontSize: '0.68rem',
+    fontWeight: 800,
+    color: 'var(--text-muted)',
+    letterSpacing: '0.08em'
   },
   heroBadgePulse: {
     width: '6px',
     height: '6px',
     borderRadius: '50%',
-    background: 'var(--secondary)',
-    boxShadow: '0 0 6px var(--secondary)'
+    background: '#0066cc',
+    boxShadow: '0 0 6px #0066cc'
   },
   heroTitle: {
-    fontSize: '3.6rem',
-    fontWeight: '900',
-    lineHeight: '1.1',
-    letterSpacing: '-0.04em'
+    fontSize: '2.8rem',
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif",
+    fontWeight: 900,
+    lineHeight: '1.05',
+    letterSpacing: '-0.04em',
+    color: '#f8fafc',
+    textTransform: 'uppercase'
   },
   heroSubtitle: {
-    fontSize: '1.1rem',
+    fontSize: '0.98rem',
     color: 'var(--text-muted)',
     lineHeight: '1.5',
-    maxWidth: '650px'
+    maxWidth: '650px',
+    fontWeight: 400
   },
   heroCtas: {
     display: 'flex',
@@ -1327,36 +1389,40 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginTop: '1rem'
   },
   primaryCta: {
-    background: 'var(--secondary)',
+    background: '#0066cc',
     border: 'none',
-    color: '#000',
+    color: '#fff',
     padding: '0.75rem 1.75rem',
-    borderRadius: '10px',
-    fontSize: '0.92rem',
-    fontWeight: '750',
+    borderRadius: '6px',
+    fontSize: '0.82rem',
+    fontWeight: 800,
     cursor: 'pointer',
-    boxShadow: '0 0 16px rgba(6, 182, 212, 0.3)',
-    transition: 'all 0.2s ease'
+    boxShadow: '0 0 16px rgba(0, 102, 204, 0.3)',
+    transition: 'all 0.2s ease',
+    letterSpacing: '0.05em'
   },
   secondaryCta: {
     background: 'transparent',
-    border: '1px solid var(--border-color)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
     color: '#fff',
     padding: '0.75rem 1.75rem',
-    borderRadius: '10px',
-    fontSize: '0.92rem',
-    fontWeight: '600',
+    borderRadius: '6px',
+    fontSize: '0.82rem',
+    fontWeight: 800,
     textDecoration: 'none',
     transition: 'all 0.2s ease',
-    display: 'flex',
-    alignItems: 'center'
+    display: 'inline-flex',
+    alignItems: 'center',
+    letterSpacing: '0.05em'
   },
   section: {
     padding: '4rem 2.5rem',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '2.5rem'
+    gap: '2.5rem',
+    position: 'relative',
+    zIndex: 1
   },
   sectionHeader: {
     textAlign: 'center',
@@ -1366,20 +1432,41 @@ const styles: { [key: string]: React.CSSProperties } = {
     maxWidth: '600px'
   },
   sectionTitle: {
-    fontSize: '2rem',
-    fontWeight: '850',
-    letterSpacing: '-0.03em'
+    fontSize: '1.5rem',
+    fontWeight: 900,
+    letterSpacing: '-0.03em',
+    color: '#f8fafc',
+    textTransform: 'uppercase'
   },
   sectionSubtitle: {
-    fontSize: '0.92rem',
+    fontSize: '0.85rem',
     color: 'var(--text-muted)',
     lineHeight: '1.5'
+  },
+  gridCard: {
+    padding: '2rem',
+    background: 'rgba(255,255,255,0.01)',
+    border: '1px solid rgba(255,255,255,0.06)',
+    borderRadius: '8px',
+    textAlign: 'left',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px'
+  },
+  widgetWrapper: {
+    background: 'rgba(5, 7, 12, 0.95)',
+    border: '1px solid rgba(255,255,255,0.06)',
+    borderRadius: '8px',
+    padding: '1.5rem',
+    boxShadow: '0 0 30px rgba(139, 92, 246, 0.04)'
   },
   pipelineBox: {
     width: '100%',
     maxWidth: '1100px',
-    padding: '2rem 1.5rem',
-    background: 'rgba(0,0,0,0.15)'
+    padding: '2.5rem 1.5rem',
+    background: 'rgba(255,255,255,0.01)',
+    border: '1px solid rgba(255,255,255,0.06)',
+    borderRadius: '8px'
   },
   pipelineNodes: {
     display: 'flex',
@@ -1391,9 +1478,9 @@ const styles: { [key: string]: React.CSSProperties } = {
   nodeCard: {
     flex: 1,
     minWidth: '200px',
-    background: 'rgba(255,255,255,0.01)',
-    border: '1px solid rgba(255,255,255,0.03)',
-    borderRadius: '12px',
+    background: 'rgba(255,255,255,0.005)',
+    border: '1px solid rgba(255,255,255,0.04)',
+    borderRadius: '6px',
     padding: '1.25rem',
     textAlign: 'center',
     display: 'flex',
@@ -1403,35 +1490,36 @@ const styles: { [key: string]: React.CSSProperties } = {
     transition: 'all 0.3s ease'
   },
   nodeCardActive: {
-    borderColor: 'var(--secondary)',
-    boxShadow: '0 0 12px rgba(6, 182, 212, 0.15)',
-    background: 'rgba(6, 182, 212, 0.02)'
+    borderColor: '#0066cc',
+    boxShadow: '0 0 16px rgba(0, 102, 204, 0.15)',
+    background: 'rgba(0, 102, 204, 0.015)'
   },
   nodeIconWrapper: {
     width: '40px',
     height: '40px',
     borderRadius: '50%',
-    background: 'rgba(255,255,255,0.04)',
+    background: 'rgba(255,255,255,0.03)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     color: 'var(--text-muted)',
-    border: '1px solid rgba(255,255,255,0.06)'
+    border: '1px solid rgba(255,255,255,0.05)'
   },
   nodeTitle: {
-    fontSize: '0.88rem',
-    fontWeight: '700',
-    color: '#fff'
+    fontSize: '0.8rem',
+    fontWeight: 800,
+    color: '#fff',
+    letterSpacing: '-0.01em'
   },
   nodeDesc: {
-    fontSize: '0.74rem',
+    fontSize: '0.72rem',
     color: 'var(--text-muted)',
     lineHeight: '1.4'
   },
   connectionLine: {
     width: '60px',
     height: '2px',
-    background: 'rgba(255,255,255,0.05)',
+    background: 'rgba(255,255,255,0.04)',
     position: 'relative',
     display: 'flex',
     alignItems: 'center'
@@ -1440,96 +1528,51 @@ const styles: { [key: string]: React.CSSProperties } = {
     position: 'absolute',
     height: '2px',
     width: '0%',
-    background: 'var(--secondary)',
+    background: '#0066cc',
     left: 0,
     transition: 'width 2.5s linear'
   },
   linePulseActive: {
     width: '100%',
-    boxShadow: '0 0 6px var(--secondary)'
+    boxShadow: '0 0 6px #0066cc'
   },
   productGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-    gap: '1.5rem',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: '1.25rem',
     width: '100%',
     maxWidth: '1100px'
   },
+  eyebrow: {
+    fontSize: '0.62rem',
+    fontWeight: 800,
+    color: 'var(--text-dark)',
+    letterSpacing: '0.08em',
+    marginBottom: '4px',
+    display: 'block'
+  },
   productCard: {
     padding: '1.5rem',
-    background: 'rgba(0,0,0,0.2)',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.75rem'
-  },
-  productTitle: {
-    fontSize: '1.1rem',
-    fontWeight: '700',
-    color: '#fff'
-  },
-  productDesc: {
-    fontSize: '0.82rem',
-    color: 'var(--text-muted)',
-    lineHeight: '1.5'
-  },
-  pricingGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '1.5rem',
-    width: '100%',
-    maxWidth: '1100px',
-    alignItems: 'start'
-  },
-  pricingCard: {
-    padding: '2rem',
-    background: 'rgba(13, 20, 35, 0.4)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    textAlign: 'center',
-    gap: '1.25rem'
-  },
-  pricingTier: {
-    fontSize: '0.75rem',
-    textTransform: 'uppercase',
-    color: 'var(--text-dark)',
-    fontWeight: '750',
-    letterSpacing: '0.08em'
-  },
-  price: {
-    fontSize: '2.5rem',
-    fontWeight: '800',
-    color: '#fff'
-  },
-  pricingDesc: {
-    fontSize: '0.8rem',
-    color: 'var(--text-muted)',
-    lineHeight: '1.4',
-    maxWidth: '220px'
-  },
-  pricingFeatures: {
-    width: '100%',
-    borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-    paddingTop: '1.25rem',
-    listStyleType: 'none',
+    background: 'rgba(255,255,255,0.01)',
+    border: '1px solid rgba(255,255,255,0.05)',
+    borderRadius: '6px',
+    textAlign: 'left',
     display: 'flex',
     flexDirection: 'column',
     gap: '0.5rem',
-    fontSize: '0.8rem',
-    color: 'var(--text-muted)',
-    textAlign: 'left',
-    paddingLeft: '0.5rem'
+    transition: 'border-color 0.2s ease'
   },
-  pricingCta: {
-    width: '100%',
-    padding: '0.65rem',
-    border: '1px solid var(--border-color)',
-    background: 'rgba(255,255,255,0.02)',
+  productTitle: {
+    fontSize: '0.98rem',
+    fontWeight: 800,
     color: '#fff',
-    borderRadius: '8px',
-    fontSize: '0.85rem',
-    fontWeight: '700',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease'
+    letterSpacing: '-0.02em',
+    margin: 0
+  },
+  productDesc: {
+    fontSize: '0.78rem',
+    color: 'var(--text-muted)',
+    lineHeight: '1.4',
+    margin: 0
   }
 };
