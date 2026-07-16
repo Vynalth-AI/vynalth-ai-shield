@@ -430,8 +430,9 @@ export const StatusPage: React.FC<{ isStandalone?: boolean }> = ({ isStandalone 
                   <div style={styles.timelineIndicator}>
                     <div style={{
                       ...styles.timelineNodeDot,
-                      background: incident.status === 'RESOLVED' ? '#10b981' : 'rgba(255,255,255,0.2)',
-                      boxShadow: incident.status === 'RESOLVED' ? '0 0 6px rgba(16,185,129,0.5)' : 'none'
+                      background: incident.status === 'MITIGATING' ? '#ef4444' : incident.status === 'RESOLVED' ? '#10b981' : 'rgba(255,255,255,0.2)',
+                      boxShadow: incident.status === 'MITIGATING' ? '0 0 10px #ef4444' : incident.status === 'RESOLVED' ? '0 0 6px rgba(16,185,129,0.5)' : 'none',
+                      animation: incident.status === 'MITIGATING' ? 'pulse-glow 1.5s infinite' : 'none'
                     }} />
                     {!isLast && <div style={styles.timelineLineTrack} />}
                   </div>
@@ -439,9 +440,9 @@ export const StatusPage: React.FC<{ isStandalone?: boolean }> = ({ isStandalone 
                     <div style={styles.incidentHeader}>
                       <span style={{
                         ...styles.incidentStatusBadge,
-                        color: incident.status === 'RESOLVED' ? '#10b981' : 'var(--text-muted)',
-                        borderColor: incident.status === 'RESOLVED' ? 'rgba(16,185,129,0.25)' : 'rgba(255,255,255,0.1)',
-                        background: incident.status === 'RESOLVED' ? 'rgba(16,185,129,0.05)' : 'transparent'
+                        color: incident.status === 'MITIGATING' ? '#ef4444' : incident.status === 'RESOLVED' ? '#10b981' : 'var(--text-muted)',
+                        borderColor: incident.status === 'MITIGATING' ? 'rgba(239,68,68,0.25)' : incident.status === 'RESOLVED' ? 'rgba(16,185,129,0.25)' : 'rgba(255,255,255,0.1)',
+                        background: incident.status === 'MITIGATING' ? 'rgba(239,68,68,0.05)' : incident.status === 'RESOLVED' ? 'rgba(16,185,129,0.05)' : 'transparent'
                       }}>{incident.status}</span>
                       <span style={styles.incidentTitle}>{incident.title}</span>
                     </div>
