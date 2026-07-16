@@ -13,10 +13,76 @@ export const PlaybookPages: React.FC<PlaybookPagesProps> = ({ currentPath, onBac
   const [bounceTrigger, setBounceTrigger] = useState(false);
   const [audioFeedback, setAudioFeedback] = useState<string>('Select an audio cue below to synthesize...');
 
+  // Check if visitor is eligible (Singapore/Malaysia locale now, fully open to the world in August 2026 MYT)
+  const isEligibleMYSG = () => {
+    try {
+      // Dynamic time gating in Malaysia Time (GMT+8)
+      const d = new Date();
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Asia/Kuala_Lumpur',
+        year: 'numeric',
+        month: 'numeric'
+      });
+      const parts = formatter.formatToParts(d);
+      const year = parseInt(parts.find(p => p.type === 'year')?.value || '2026', 10);
+      const month = parseInt(parts.find(p => p.type === 'month')?.value || '7', 10); // 1-indexed (1-12)
+
+      if (year > 2026 || (year === 2026 && month >= 8)) {
+        return true; // Auto-open globally starting August 2026 MYT
+      }
+
+      // Restrict to Malaysia (MY) or Singapore (SG) in July 2026
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const lang = navigator.language.toLowerCase();
+      return (
+        tz.includes('Singapore') || 
+        tz.includes('Kuala_Lumpur') || 
+        lang.includes('-sg') || 
+        lang.includes('-my') || 
+        lang.includes('singapore') || 
+        lang.includes('malaysia') || 
+        lang.startsWith('ms')
+      );
+    } catch {
+      return false;
+    }
+  };
+
+  const allowedRegion = isEligibleMYSG();
+
+  // localStorage-persisted sound mute toggle state
+  const [isMuted, setIsMuted] = useState(() => {
+    if (!allowedRegion) return true; // Force muted/disabled for other countries
+    try {
+      const cached = localStorage.getItem('vms-widget-muted');
+      return cached !== null ? cached === 'true' : true; // Default to true (muted by default)
+    } catch {
+      return true;
+    }
+  });
+
+  const toggleMute = () => {
+    const nextMute = !isMuted;
+    setIsMuted(nextMute);
+    try {
+      localStorage.setItem('vms-widget-muted', String(nextMute));
+    } catch {}
+  };
+
+
   // Web Audio Synthesis Engine (Sine/Triangle oscillators mapped to ENVELOPE filters)
   const synthesizeTone = (type: 'success' | 'error' | 'click') => {
+    if (!allowedRegion) {
+      setAudioFeedback('Audio synthesis is locked for your region until August 2026 (Malaysia Time GMT+8).');
+      return;
+    }
+    if (isMuted) {
+      setAudioFeedback('Audio output is currently muted. Please unmute using the control switch in the top header bar.');
+      return;
+    }
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+
       if (!AudioCtx) {
         setAudioFeedback('Web Audio API not supported in this browser.');
         return;
@@ -364,9 +430,44 @@ export const PlaybookPages: React.FC<PlaybookPagesProps> = ({ currentPath, onBac
             <p style={styles.brandSubtitle}>UI Design & Animation Playbook</p>
           </div>
         </div>
-        <button onClick={onBack} style={styles.backBtn}>
-          ← Back to Gateway
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          {allowedRegion && (
+            <button
+              onClick={toggleMute}
+              style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                color: isMuted ? '#64748b' : '#00ffff',
+                borderRadius: '6px',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                outline: 'none'
+              }}
+              title={isMuted ? "Unmute playbook sounds" : "Mute playbook sounds"}
+            >
+              {isMuted ? (
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <line x1="1" y1="1" x2="23" y2="23" />
+                  <path d="M9 9v6a3 3 0 0 0 3 3h1.586l4.707 4.707A1 1 0 0 0 20 22V4a1 1 0 0 0-1.707-.707L13.586 8H12a3 3 0 0 0-3 3z" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M11 5L6 9H2v6h4l5 4V5z" />
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                </svg>
+              )}
+            </button>
+          )}
+          <button onClick={onBack} style={styles.backBtn}>
+            ← Back to Gateway
+          </button>
+        </div>
+
       </div>
 
       {/* Main layout grid */}
