@@ -55,13 +55,34 @@ export const WidgetPlayground: React.FC<WidgetPlaygroundProps> = ({ config, onAd
         })
       });
 
-      if (!response.ok) {
+      let result: any;
+      if (response.status === 403) {
+        result = await response.json();
+      } else if (!response.ok) {
         throw new Error(`Server returned HTTP ${response.status}: ${response.statusText}`);
+      } else {
+        result = await response.json();
       }
 
-      const result = await response.json();
       setRealResponseJson(result);
       
+      if (response.status === 403) {
+        addTerminalLog('SECURE GATEWAY: [ALERT] HTTP 403 Forbidden - Anomaly Block Gate triggered!');
+        addTerminalLog(`RISK ENGINE: Classification -> BLOCK. Risk Score: ${result.scores?.risk_score || 95}/100, Trust Score: ${result.scores?.trust_score || 5}/100, Reputation Score: ${result.scores?.reputation_score || 50}/100.`);
+        
+        if (result.detection_details?.device_anomalies?.length > 0) {
+          addTerminalLog(`ANOMALIES DETECTED: ${JSON.stringify(result.detection_details.device_anomalies)}`);
+        }
+        if (result.detection_details?.behavior_flags?.length > 0) {
+          addTerminalLog(`BEHAVIOR FLAGS DETECTED: ${JSON.stringify(result.detection_details.behavior_flags)}`);
+        }
+        
+        addTerminalLog('SECURE GATEWAY: Decision -> BLOCK. Connection dropped by gateway firewall.');
+        setWidgetState('failed');
+        onAddLog('behavioral_telemetry', 'blocked', result.scores?.risk_score || 95);
+        return;
+      }
+
       addTerminalLog('SECURE GATEWAY: Connection successful. Analyzing response payload...');
       addTerminalLog(`RISK ENGINE: Classification -> ${result.decision.toUpperCase()}. Risk Score: ${result.scores?.risk_score || 0}/100, Trust Score: ${result.scores?.trust_score || 0}/100, Reputation Score: ${result.scores?.reputation_score || 0}/100.`);
       

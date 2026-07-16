@@ -365,7 +365,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         automationLikelihood: 0.95,
       }, requestId);
 
-      return res.status(200).json(response);
+      return res.status(403).json(response);
     }
 
     // 4. 获取解密密钥
@@ -428,7 +428,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       timestamp: new Date(),
     });
 
-    return res.status(200).json(response);
+    const statusCode = scores.decision === 'block' ? 403 : 200;
+    return res.status(statusCode).json(response);
   } catch (error) {
     console.error('Verification handler error:', error);
     return res.status(500).json({

@@ -238,7 +238,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // 3. Handle No-JS graceful fallback verification request
     if (token === 'no-js-fallback') {
-      return res.status(200).json({
+      return res.status(403).json({
         success: false,
         decision: 'block',
         engine_version: 'v2.2',
@@ -581,7 +581,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // 8. Output Response
-    return res.status(200).json({
+    const statusCode = decision === 'block' ? 403 : 200;
+    return res.status(statusCode).json({
       success: decision === 'allow',
       decision,
       engine_version: 'v2.2',
