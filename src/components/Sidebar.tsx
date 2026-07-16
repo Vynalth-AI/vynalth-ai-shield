@@ -162,6 +162,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
           <line x1="8" y1="11" x2="14" y2="11" />
         </svg>
       )
+    },
+    {
+      id: 'status',
+      label: 'System Status',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="16" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12.01" y2="8" />
+        </svg>
+      )
     }
   ];
 

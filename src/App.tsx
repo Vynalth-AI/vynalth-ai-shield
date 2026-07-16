@@ -16,6 +16,7 @@ import { ChecklistPage } from './components/ChecklistPage';
 import { NegativeTraining } from './components/NegativeTraining';
 import { SearchIntelligence } from './components/SearchIntelligence';
 import { TrustCenter } from './components/TrustCenter';
+import { StatusPage } from './components/StatusPage';
 import { getApiBaseUrl } from './lib/api';
 import type { ShieldConfig, VerificationLog } from './types';
 
@@ -102,6 +103,16 @@ const INITIAL_LOGS: VerificationLog[] = [
 ];
 
 function App() {
+  // Check if standalone status page mode is requested
+  const isStatusSubdomain = typeof window !== 'undefined' && (
+    window.location.hostname.includes('status') || 
+    window.location.search.includes('status=true')
+  );
+  
+  if (isStatusSubdomain) {
+    return <StatusPage isStandalone={true} />;
+  }
+
   const [viewMode, setViewMode] = useState<'marketing' | 'auth' | 'console'>('marketing');
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [user, setUser] = useState<any>(() => {
@@ -302,6 +313,8 @@ function App() {
         return <ChecklistPage />;
       case 'search_intelligence':
         return <SearchIntelligence logs={logs} />;
+      case 'status':
+        return <StatusPage />;
       default:
         return <Dashboard config={config} logs={logs} onAddLog={handleAddLog} />;
     }
