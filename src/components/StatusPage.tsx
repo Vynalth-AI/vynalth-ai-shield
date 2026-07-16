@@ -9,6 +9,8 @@ interface ComponentStatus {
   history: Array<{ day: number; uptime: number }>;
 }
 
+const OFFICIAL_LOGO_DATA = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHJ4PSIxMjgiIGZpbGw9IiMwQTBBMEIiLz4KICAKICA8IS0tIE91dGVyIFN3aXJscyAtLT4KICA8cGF0aCBkPSJNNDAwIDI1NkM0MDAgMzM1LjUyOSAzMzUuNTI5IDQwMCAyNTYgNDAwQzE3Ni40NzEgNDAwIDExMiAzMzUuNTI5IDExMiAyNTZDMTEyIDE3Ni40NzEgMTc2LjQ3MSAxMTIgMjU2IDExMkMzMzUuNTI5IDExMiA0MDAgMTc2LjQ3MSA0MDAgMjU2WiIgZmlsbD0idXJsKCNwYWludDBfYW5ndWxhcl9sb2dvKSIgZmlsbC1vcGFjaXR5PSIwLjgiLz4KICAKICA8IS0tIFBsYW5ldCAtLT4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjY0IiBmaWxsPSJ1cmwoI3BhaW50MV9yYWRpYWxfbG9nbykiLz4KICAKICA8IS0tIFBsYW5ldCBSaW5nIC0tPgogIDxlbGxpcHNlIGN4PSIyNTYiIGN5PSIyNTYiIHJ4PSIxMDAiIHJ5PSIyMCIgdHJhbnNmb3JtPSJyb3RhdGUoLTE1IDI1NiAyNTYpIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1vcGFjaXR5PSIwLjYiLz4KICAKICA8IS0tIFN0YXJzIC0tPgogIDxjaXJjbGUgY3g9IjE1MCIgY3k9IjE1MCIgcj0iNCIgZmlsbD0id2hpdGUiIGZpbGwtb3BhY2l0eT0iMC44Ij4KICAgIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9Im9wYWNpdHkiIHZhbHVlcz0iMC40OzE7MC40IiBkdXI9IjJzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIgLz4KICA8L2NpcmNsZT4KICA8Y2lyY2xlIGN4PSIzODAiIGN5PSIxMjAiIHI9IjMiIGZpbGw9IiM2MEE1RkEiIGZpbGwtb3BhY2l0eT0iMC44Ij4KICAgIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9Im9wYWNpdHkiIHZhbHVlcz0iMC40OzE7MC40IiBkdXI9IjNzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIgLz4KICA8L2NpcmNsZT4KICA8Y2lyY2xlIGN4PSI0MjAiIGN5PSIzNTAiIHI9IjUiIGZpbGw9IiNGNDcyQjYiIGZpbGwtb3BhY2l0eT0iMC44Ij4KICAgIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9Im9wYWNpdHkiIHZhbHVlcz0iMC40OzE7MC40IiBkdXI9IjIuNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogIDwvY2lyY2xlPgogIDxjaXJjbGUgY3g9IjEyMCIgY3k9IjQwMCIgcj0iMyIgZmlsbD0iIzgxOENGOCIgZmlsbC1vcGFjaXR5PSIwLjgiPgogICAgPGFuaW1hdGUgYXR0cmlidXRlTmFtZT0ib3BhY2l0eSIgdmFsdWVzPSIwLjQ7MTswLjQiIGR1cj0iNHMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogIDwvY2lyY2xlPgogIDxjaXJjbGUgY3g9IjIwMCIgY3k9IjEwMCIgcj0iMiIgZmlsbD0id2hpdGUiIGZpbGwtb3BhY2l0eT0iMC42Ii8+CiAgPGNpcmNsZSBjeD0iNDUwIiBjeT0iMjAwIiByPSIyIiBmaWxsPSJ3aGl0ZSIgZmlsbC1vcGFjaXR5PSIwLjYiLz4KCiAgPGRlZnM+CiAgICA8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50MF9hbmd1bGFyX2xvZ28iIGN4PSIwIiBjeT0iMCIgcj0iMSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIGdyYWRpZW50VHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjU2IDI1Nikgcm90YXRlKDkwKSBzY2FsZSgxNDQpIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM0I4MkY2Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMC4zMyIgc3RvcC1jb2xvcj0iIzhCNUNGNiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNjYiIHN0b3AtY29sb3I9IiNFQzQ4OTkiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRjU5RTBCIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSJwYWludDFfcmFkaWFsX2xvZ28iIGN4PSIwIiBjeT0iMCIgcj0iMSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIGdyYWRpZW50VHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjU2IDI1Nikgcm90YXRlKDkwKSBzY2FsZSg2NCkiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM0RjQ2RTUiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMUUxQjRCIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogIDwvZGVmcz4KPC9zdmc+Cg==";
+
 export const StatusPage: React.FC<{ isStandalone?: boolean }> = ({ isStandalone = false }) => {
   const [statusData, setStatusData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -229,30 +231,7 @@ export const StatusPage: React.FC<{ isStandalone?: boolean }> = ({ isStandalone 
               justifyContent: 'center',
               boxShadow: '0 0 10px rgba(139, 92, 246, 0.15)'
             }} title="VitaMind AI (Parent Company)">
-              <svg width="100%" height="100%" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="512" height="512" fill="#0A0A0B"/>
-                <path d="M400 256C400 335.529 335.529 400 256 400C176.471 400 112 335.529 112 256C112 176.471 176.471 112 256 112C335.529 112 400 176.471 400 256Z" fill="url(#paint0_angular_logo_status)" fillOpacity="0.8"/>
-                <circle cx="256" cy="256" r="64" fill="url(#paint1_radial_logo_status)"/>
-                <ellipse cx="256" cy="256" rx="100" ry="20" transform="rotate(-15 256 256)" stroke="white" strokeWidth="4" strokeOpacity="0.6"/>
-                <circle cx="150" cy="150" r="4" fill="white" fill-opacity="0.8"/>
-                <circle cx="380" cy="120" r="3" fill="#60A5FA" fill-opacity="0.8"/>
-                <circle cx="420" cy="350" r="5" fill="#F472B6" fill-opacity="0.8"/>
-                <circle cx="120" cy="400" r="3" fill="#818CF8" fill-opacity="0.8"/>
-                <circle cx="200" cy="100" r="2" fill="white" fill-opacity="0.6"/>
-                <circle cx="450" cy="200" r="2" fill="white" fill-opacity="0.6"/>
-                <defs>
-                  <radialGradient id="paint0_angular_logo_status" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(256 256) rotate(90) scale(144)">
-                    <stop offset="0" stop-color="#3B82F6"/>
-                    <stop offset="0.33" stop-color="#8B5CF6"/>
-                    <stop offset="0.66" stop-color="#EC4899"/>
-                    <stop offset="1" stop-color="#F59E0B"/>
-                  </radialGradient>
-                  <radialGradient id="paint1_radial_logo_status" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(256 256) rotate(90) scale(64)">
-                    <stop offset="0" stop-color="#4F46E5"/>
-                    <stop offset="1" stop-color="#1E1B4B"/>
-                  </radialGradient>
-                </defs>
-              </svg>
+              <img src={OFFICIAL_LOGO_DATA} alt="SomnoAI Official Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
             
             {/* Operator symbol */}
