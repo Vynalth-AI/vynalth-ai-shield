@@ -44,21 +44,29 @@ export const VerificationWidget: React.FC<VerificationWidgetProps> = ({
       }
 
       // Restrict to Malaysia (MY) or Singapore (SG) in July 2026
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const lang = navigator.language.toLowerCase();
-      return (
-        tz.includes('Singapore') || 
-        tz.includes('Kuala_Lumpur') || 
-        lang.includes('-sg') || 
-        lang.includes('-my') || 
-        lang.includes('singapore') || 
-        lang.includes('malaysia') || 
-        lang.startsWith('ms')
+      const offset = d.getTimezoneOffset(); // -480 for GMT+8 (Malaysia and Singapore)
+      const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || '').toLowerCase();
+      const browserLangs = (navigator.languages || [navigator.language]).map(l => l.toLowerCase());
+      
+      const hasMYSGLang = browserLangs.some(l => 
+        l.includes('my') || 
+        l.includes('sg') || 
+        l.startsWith('ms')
       );
+
+      const hasMYSGTz = tz.includes('kuala_lumpur') || 
+                        tz.includes('singapore') || 
+                        tz.includes('kuching') || 
+                        tz.includes('malaysia');
+
+      const isGMT8 = offset === -480;
+
+      return hasMYSGLang || hasMYSGTz || isGMT8;
     } catch {
       return false;
     }
   };
+
 
 
 

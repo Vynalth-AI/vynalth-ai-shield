@@ -35,7 +35,7 @@ export const TrustCenter: React.FC<TrustCenterProps> = ({ logs }) => {
       doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(20);
-      doc.text('SOMNOAI / VITAMIND AI & VITASHIELD', 15, 18);
+      doc.text('VITAMIND AI & VITASHIELD', 15, 18);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
       doc.setTextColor(148, 163, 184);
@@ -55,7 +55,7 @@ export const TrustCenter: React.FC<TrustCenterProps> = ({ logs }) => {
       doc.setFontSize(9.5);
       doc.setTextColor(71, 85, 105);
       doc.text([
-        'This whitepaper serves as an active security and operational disclosure report for the SomnoAI Digital',
+        'This whitepaper serves as an active security and operational disclosure report for the VitaMind AI Digital',
         'Sleep Laboratory, integrated with the VitaMind AI analysis pipeline and protected by the VitaShield API',
         'Gateway network. Security telemetry, verification logs, and active edge blockades are tracked and audited',
         'real-time to ensure maximum confidentiality, integrity, and availability.'
@@ -141,7 +141,7 @@ export const TrustCenter: React.FC<TrustCenterProps> = ({ logs }) => {
       doc.text(`SESSION_SECURE_HASH: ${randomSessionHash}`, 19, 186);
       doc.text('This is a dynamically generated, 100% verified security whitelist audit report signed by sleepsomno.com.', 19, 191);
 
-      doc.save('SomnoAI_Security_Report.pdf');
+      doc.save('VitaMind_AI_Security_Report.pdf');
     } catch (e) {
       console.error('Failed to generate PDF Report:', e);
     } finally {

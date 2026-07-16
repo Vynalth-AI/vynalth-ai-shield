@@ -32,21 +32,29 @@ export const PlaybookPages: React.FC<PlaybookPagesProps> = ({ currentPath, onBac
       }
 
       // Restrict to Malaysia (MY) or Singapore (SG) in July 2026
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const lang = navigator.language.toLowerCase();
-      return (
-        tz.includes('Singapore') || 
-        tz.includes('Kuala_Lumpur') || 
-        lang.includes('-sg') || 
-        lang.includes('-my') || 
-        lang.includes('singapore') || 
-        lang.includes('malaysia') || 
-        lang.startsWith('ms')
+      const offset = d.getTimezoneOffset(); // -480 for GMT+8 (Malaysia and Singapore)
+      const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || '').toLowerCase();
+      const browserLangs = (navigator.languages || [navigator.language]).map(l => l.toLowerCase());
+      
+      const hasMYSGLang = browserLangs.some(l => 
+        l.includes('my') || 
+        l.includes('sg') || 
+        l.startsWith('ms')
       );
+
+      const hasMYSGTz = tz.includes('kuala_lumpur') || 
+                        tz.includes('singapore') || 
+                        tz.includes('kuching') || 
+                        tz.includes('malaysia');
+
+      const isGMT8 = offset === -480;
+
+      return hasMYSGLang || hasMYSGTz || isGMT8;
     } catch {
       return false;
     }
   };
+
 
   const allowedRegion = isEligibleMYSG();
 
@@ -420,9 +428,7 @@ export const PlaybookPages: React.FC<PlaybookPagesProps> = ({ currentPath, onBac
             </div>
             <span style={{ color: '#475569', fontSize: '0.75rem', fontWeight: 800 }}>✕</span>
             <div style={styles.logoWrapperShield}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" strokeWidth="2.5">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              </svg>
+              <img src="/logo.jpg" alt="VitaShield Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
             </div>
           </div>
           <div>

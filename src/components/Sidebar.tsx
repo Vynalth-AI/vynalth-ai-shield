@@ -217,16 +217,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
             width: '30px',
             height: '30px',
             borderRadius: '8px',
-            background: 'rgba(6, 182, 212, 0.08)',
-            border: '1px solid rgba(6, 182, 212, 0.25)',
+            overflow: 'hidden',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             boxShadow: '0 0 10px rgba(6, 182, 212, 0.15)'
           }} title="VitaShield Gateway (Security Subsidiary)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg>
+            <img src="/logo.jpg" alt="VitaShield Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         </div>
         <div style={styles.brandText}>
@@ -236,7 +233,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
       </div>
 
       {/* Navigation List */}
-      <nav style={styles.nav}>
+      <nav style={styles.nav} className="vms-sidebar-nav">
         <ul style={styles.navList}>
           {menuItems.map((item) => {
             const isActive = activeTab === item.id;
@@ -367,8 +364,13 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   nav: {
     flex: 1,
-    marginTop: '2rem'
+    marginTop: '1rem',
+    overflowY: 'auto',
+    maxHeight: 'calc(100vh - 200px)',
+    scrollbarWidth: 'none',
+    msOverflowStyle: 'none'
   },
+
   navList: {
     listStyle: 'none',
     display: 'flex',
