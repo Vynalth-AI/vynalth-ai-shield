@@ -188,22 +188,40 @@ export const StatusPage: React.FC<{ isStandalone?: boolean }> = ({ isStandalone 
       <div style={styles.header}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-            {/* Logo 1: VitaMind AI (Parent Company - Purple Glow) */}
+            {/* Logo 1: VitaMind AI (Parent Company - Official Planet SVG Logo) */}
             <div style={{
               width: '32px',
               height: '32px',
               borderRadius: '8px',
-              background: 'rgba(139, 92, 246, 0.08)',
-              border: '1px solid rgba(139, 92, 246, 0.25)',
+              overflow: 'hidden',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               boxShadow: '0 0 10px rgba(139, 92, 246, 0.15)'
             }} title="VitaMind AI (Parent Company)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                <path d="M2 12h20" />
+              <svg width="100%" height="100%" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="512" height="512" fill="#0A0A0B"/>
+                <path d="M400 256C400 335.529 335.529 400 256 400C176.471 400 112 335.529 112 256C112 176.471 176.471 112 256 112C335.529 112 400 176.471 400 256Z" fill="url(#paint0_angular_logo_status)" fillOpacity="0.8"/>
+                <circle cx="256" cy="256" r="64" fill="url(#paint1_radial_logo_status)"/>
+                <ellipse cx="256" cy="256" rx="100" ry="20" transform="rotate(-15 256 256)" stroke="white" strokeWidth="4" strokeOpacity="0.6"/>
+                <circle cx="150" cy="150" r="4" fill="white" fill-opacity="0.8"/>
+                <circle cx="380" cy="120" r="3" fill="#60A5FA" fill-opacity="0.8"/>
+                <circle cx="420" cy="350" r="5" fill="#F472B6" fill-opacity="0.8"/>
+                <circle cx="120" cy="400" r="3" fill="#818CF8" fill-opacity="0.8"/>
+                <circle cx="200" cy="100" r="2" fill="white" fill-opacity="0.6"/>
+                <circle cx="450" cy="200" r="2" fill="white" fill-opacity="0.6"/>
+                <defs>
+                  <radialGradient id="paint0_angular_logo_status" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(256 256) rotate(90) scale(144)">
+                    <stop offset="0" stop-color="#3B82F6"/>
+                    <stop offset="0.33" stop-color="#8B5CF6"/>
+                    <stop offset="0.66" stop-color="#EC4899"/>
+                    <stop offset="1" stop-color="#F59E0B"/>
+                  </radialGradient>
+                  <radialGradient id="paint1_radial_logo_status" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(256 256) rotate(90) scale(64)">
+                    <stop offset="0" stop-color="#4F46E5"/>
+                    <stop offset="1" stop-color="#1E1B4B"/>
+                  </radialGradient>
+                </defs>
               </svg>
             </div>
             
