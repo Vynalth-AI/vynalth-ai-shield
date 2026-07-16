@@ -372,20 +372,33 @@ export const MediaPage: React.FC = () => {
       {/* Footer note */}
       <div style={{
         marginTop: '2rem',
-        padding: '1rem 1.25rem',
+        padding: '1.25rem',
         borderRadius: '10px',
         background: 'rgba(6, 182, 212, 0.04)',
         border: '1px solid rgba(6, 182, 212, 0.1)',
         fontSize: '0.78rem',
         color: '#64748b',
-        lineHeight: 1.6
+        lineHeight: 1.6,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.75rem'
       }}>
-        <span style={{ color: '#06b6d4', fontWeight: 700 }}>Usage Guidelines: </span>
-        VitaShield and VitaMind AI logos may be used in editorial, partner integrations, and press coverage.
-        Do not alter colors, proportions, or apply effects to the logos. For commercial licensing inquiries, contact{' '}
-        <a href="mailto:contact@sleepsomno.com" style={{ color: '#06b6d4', textDecoration: 'none', fontWeight: 600 }}>
-          contact@sleepsomno.com
-        </a>
+        <div>
+          <span style={{ color: '#06b6d4', fontWeight: 700 }}>Usage Guidelines: </span>
+          VitaShield and VitaMind AI logos may be used in editorial, partner integrations, and press coverage.
+          Do not alter colors, proportions, or apply effects to the logos. For commercial licensing inquiries, contact{' '}
+          <a href="mailto:contact@sleepsomno.com" style={{ color: '#06b6d4', textDecoration: 'none', fontWeight: 600 }}>
+            contact@sleepsomno.com
+          </a>
+        </div>
+        
+        <div style={{ borderTop: '1px solid rgba(6, 182, 212, 0.1)', paddingTop: '0.75rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: 700, color: '#f8fafc' }}>Official Links:</span>
+          <a href="https://www.instagram.com/_vitashield/" target="_blank" rel="noopener noreferrer" style={{ color: '#a855f7', textDecoration: 'none', fontWeight: 600 }}>Instagram</a>
+          <a href="https://www.linkedin.com/company/real-vitashield" target="_blank" rel="noopener noreferrer" style={{ color: '#0077b5', textDecoration: 'none', fontWeight: 600 }}>LinkedIn</a>
+          <a href="https://www.crunchbase.com/organization/vitashield" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 600 }}>Crunchbase (Company)</a>
+          <a href="https://www.crunchbase.com/person/vyncus-lim" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 600 }}>Crunchbase (Founder)</a>
+        </div>
       </div>
     </div>
   );
