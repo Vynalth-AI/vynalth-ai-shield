@@ -17,7 +17,9 @@ import { NegativeTraining } from './components/NegativeTraining';
 import { SearchIntelligence } from './components/SearchIntelligence';
 import { TrustCenter } from './components/TrustCenter';
 import { StatusPage } from './components/StatusPage';
+import { PlaybookPages } from './components/PlaybookPages';
 import { getApiBaseUrl } from './lib/api';
+
 import type { ShieldConfig, VerificationLog } from './types';
 
 // Initial dummy logs that feed the dashboard charts and tables
@@ -122,7 +124,41 @@ function App() {
     }
   }
 
+  const [currentPath, setCurrentPath] = useState<string>(() => {
+    return typeof window !== 'undefined' ? window.location.pathname : '/';
+  });
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const cleanPath = currentPath.toLowerCase().replace(/^\//, '');
+  const isPlaybookRoute = [
+    'sounds-on-the-web',
+    '12-principles-of-animation',
+    'emilkowal-animations',
+    'web-design-guidelines',
+    'generating-sounds-with-ai'
+  ].includes(cleanPath);
+
+  if (isPlaybookRoute) {
+    return (
+      <PlaybookPages 
+        currentPath={currentPath} 
+        onBack={() => {
+          window.history.pushState({}, '', '/');
+          setCurrentPath('/');
+        }} 
+      />
+    );
+  }
+
   const [viewMode, setViewMode] = useState<'marketing' | 'auth' | 'console'>('marketing');
+
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [user, setUser] = useState<any>(() => {
     try {

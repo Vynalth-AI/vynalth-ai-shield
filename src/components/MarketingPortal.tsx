@@ -248,7 +248,17 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
           <a href="#pipeline" style={styles.navLink}>How it Works</a>
           <a href="#matrix" style={styles.navLink}>Defense Matrix</a>
           <a href="#docs" style={styles.navLink}>Documentation</a>
-          <a href="#contact" style={styles.navLink}>Contact</a>
+          <a 
+            href="/emilkowal-animations" 
+            onClick={(e) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/emilkowal-animations');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+            style={styles.navLink}
+          >
+            Design Playbook
+          </a>
           <button onClick={onEnterConsole} style={styles.consoleBtn}>Go to Console</button>
         </nav>
       </header>
