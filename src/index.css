@@ -691,3 +691,24 @@ h1, h2, h3, h4, h5, h6 {
     margin-top: 60px; /* If top header is added */
   }
 }
+
+/* Custom Radar and Glow Keyframes */
+@keyframes radar-scan {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 5px rgba(6, 182, 212, 0.4), 0 0 10px rgba(6, 182, 212, 0.2); }
+  50% { box-shadow: 0 0 15px rgba(6, 182, 212, 0.8), 0 0 25px rgba(6, 182, 212, 0.4); }
+  100% { box-shadow: 0 0 5px rgba(6, 182, 212, 0.4), 0 0 10px rgba(6, 182, 212, 0.2); }
+}
+@keyframes blink-threat {
+  0% { opacity: 0.35; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.35); }
+  100% { opacity: 0.35; transform: scale(0.95); }
+}
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
