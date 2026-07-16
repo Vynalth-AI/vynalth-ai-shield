@@ -187,8 +187,45 @@ export const StatusPage: React.FC<{ isStandalone?: boolean }> = ({ isStandalone 
       {/* Brand Header */}
       <div style={styles.header}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={styles.logoWrapper}>
-            <img src="/logo.jpg" alt="Logo" style={{ width: '100%', height: '100%', borderRadius: '6px', objectFit: 'cover' }} />
+          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+            {/* Logo 1: VitaMind AI (Parent Company - Purple Glow) */}
+            <div style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
+              background: 'rgba(139, 92, 246, 0.08)',
+              border: '1px solid rgba(139, 92, 246, 0.25)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 0 10px rgba(139, 92, 246, 0.15)'
+            }} title="VitaMind AI (Parent Company)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                <path d="M2 12h20" />
+              </svg>
+            </div>
+            
+            {/* Operator symbol */}
+            <span style={{ color: 'var(--text-dark)', fontSize: '0.75rem', fontWeight: 800 }}>✕</span>
+
+            {/* Logo 2: VitaShield (Subsidiary - Blue Glow) */}
+            <div style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
+              background: 'rgba(6, 182, 212, 0.08)',
+              border: '1px solid rgba(6, 182, 212, 0.25)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 0 10px rgba(6, 182, 212, 0.15)'
+            }} title="VitaShield (Security Subsidiary)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+            </div>
           </div>
           <div>
             <h1 style={styles.brandTitle}>sleepsomno.com</h1>

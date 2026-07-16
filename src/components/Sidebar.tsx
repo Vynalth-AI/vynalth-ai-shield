@@ -180,12 +180,49 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
     <aside style={styles.sidebar}>
       {/* Brand Header */}
       <div style={styles.brandContainer}>
-        <div style={{ ...styles.logoIcon, background: 'transparent', border: 'none' }}>
-          <img src="/logo.jpg" alt="VitaShield Logo" style={{ width: '100%', height: '100%', borderRadius: '4px', objectFit: 'cover' }} />
+        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          {/* Logo 1: VitaMind AI (Mother Company - Purple Glow) */}
+          <div style={{
+            width: '30px',
+            height: '30px',
+            borderRadius: '8px',
+            background: 'rgba(139, 92, 246, 0.08)',
+            border: '1px solid rgba(139, 92, 246, 0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 0 10px rgba(139, 92, 246, 0.15)'
+          }} title="VitaMind AI (Parent Company)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              <path d="M2 12h20" />
+            </svg>
+          </div>
+          
+          {/* Joint operator symbol */}
+          <span style={{ color: 'var(--text-dark)', fontSize: '0.65rem', fontWeight: 800 }}>✕</span>
+
+          {/* Logo 2: VitaShield (Child Product/Gateway - Blue Glow) */}
+          <div style={{
+            width: '30px',
+            height: '30px',
+            borderRadius: '8px',
+            background: 'rgba(6, 182, 212, 0.08)',
+            border: '1px solid rgba(6, 182, 212, 0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 0 10px rgba(6, 182, 212, 0.15)'
+          }} title="VitaShield Gateway (Security Subsidiary)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+          </div>
         </div>
         <div style={styles.brandText}>
           <div style={styles.brandTitle}>VitaShield</div>
-          <div style={styles.brandSubtitle}>BY VITAMIND AI</div>
+          <div style={styles.brandSubtitle}>VitaMind AI Security</div>
         </div>
       </div>
 
