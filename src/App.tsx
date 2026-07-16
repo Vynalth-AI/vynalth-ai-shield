@@ -113,6 +113,15 @@ function App() {
     return <StatusPage isStandalone={true} />;
   }
 
+  // Client-side fallback redirect for main domain status paths
+  if (typeof window !== 'undefined') {
+    const path = window.location.pathname.toLowerCase();
+    if (path === '/status' || path === '/en/status' || path === '/cn/status' || path === '/ms/status' || path === '/status/') {
+      window.location.replace('https://status.sleepsomno.com');
+      return null;
+    }
+  }
+
   const [viewMode, setViewMode] = useState<'marketing' | 'auth' | 'console'>('marketing');
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [user, setUser] = useState<any>(() => {

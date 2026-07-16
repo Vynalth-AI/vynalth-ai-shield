@@ -1,4 +1,26 @@
 {
+  "redirects": [
+    {
+      "source": "/en/status",
+      "destination": "https://status.sleepsomno.com",
+      "permanent": true
+    },
+    {
+      "source": "/cn/status",
+      "destination": "https://status.sleepsomno.com",
+      "permanent": true
+    },
+    {
+      "source": "/ms/status",
+      "destination": "https://status.sleepsomno.com",
+      "permanent": true
+    },
+    {
+      "source": "/status",
+      "destination": "https://status.sleepsomno.com",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/v1/verify",
