@@ -23,6 +23,10 @@
   ],
   "rewrites": [
     {
+      "source": "/api/model/deploy",
+      "destination": "/api/model/latest"
+    },
+    {
       "source": "/v1/verify",
       "destination": "/api/verify"
     },
