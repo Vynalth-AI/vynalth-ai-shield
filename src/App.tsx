@@ -18,6 +18,7 @@ import { SearchIntelligence } from './components/SearchIntelligence';
 import { TrustCenter } from './components/TrustCenter';
 import { StatusPage } from './components/StatusPage';
 import { PlaybookPages } from './components/PlaybookPages';
+import { MediaPage } from './components/MediaPage';
 import { getApiBaseUrl } from './lib/api';
 
 import type { ShieldConfig, VerificationLog } from './types';
@@ -360,6 +361,8 @@ function App() {
         return <SearchIntelligence logs={logs} />;
       case 'status':
         return <StatusPage />;
+      case 'media':
+        return <MediaPage />;
       default:
         return <Dashboard config={config} logs={logs} onAddLog={handleAddLog} />;
     }
