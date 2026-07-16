@@ -23,6 +23,10 @@
   ],
   "rewrites": [
     {
+      "source": "/api/config",
+      "destination": "/api/status?config=true"
+    },
+    {
       "source": "/api/model/deploy",
       "destination": "/api/model/latest"
     },

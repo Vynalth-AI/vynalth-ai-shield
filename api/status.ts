@@ -12,6 +12,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).end();
   }
 
+  if (req.query.config === 'true') {
+    const origin = req.headers.origin;
+    if (origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+    return res.status(200).json({
+      supabaseUrl: process.env.SUPABASE_URL || '',
+      supabaseAnonKey: process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY || ''
+    });
+  }
+
   const startTime = Date.now();
   let dbStatus: 'operational' | 'degraded' | 'outage' = 'operational';
   let mlStatus: 'operational' | 'degraded' | 'outage' = 'operational';
