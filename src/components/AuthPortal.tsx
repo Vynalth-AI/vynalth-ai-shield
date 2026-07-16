@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { useBehaviorTracker } from './VerificationWidget/useBehaviorTracker';
-
-// Supabase details from user configuration
-const SUPABASE_URL = 'https://qgoelcorfcqxberbayul.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_Dkkd8-9400Yu7PoSDM-cAw_Url6CiRx';
+import { getApiBaseUrl } from '../lib/api';
 
 interface AuthPortalProps {
   onAuthSuccess: (session: any) => void;
@@ -114,9 +111,22 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({ onAuthSuccess, onBackToH
     setSuccessMsg(null);
 
     try {
+      // Fetch dynamic configuration to avoid public exposures
+      const configRes = await fetch(`${getApiBaseUrl()}/api/config`);
+      if (!configRes.ok) {
+        throw new Error('Failed to retrieve authentication gateway configuration.');
+      }
+      const config = await configRes.json();
+      const supabaseUrl = config.supabaseUrl;
+      const supabaseAnonKey = config.supabaseAnonKey;
+
+      if (!supabaseUrl || !supabaseAnonKey) {
+        throw new Error('Authentication gateway configuration is not set. Please check system environment variables.');
+      }
+
       const endpoint = isSignUp 
-        ? `${SUPABASE_URL}/auth/v1/signup` 
-        : `${SUPABASE_URL}/auth/v1/token?grant_type=password`;
+        ? `${supabaseUrl}/auth/v1/signup` 
+        : `${supabaseUrl}/auth/v1/token?grant_type=password`;
 
       const bodyObj = isSignUp 
         ? { email, password } 
@@ -126,8 +136,8 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({ onAuthSuccess, onBackToH
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          'apikey': supabaseAnonKey,
+          'Authorization': `Bearer ${supabaseAnonKey}`
         },
         body: JSON.stringify(bodyObj)
       });

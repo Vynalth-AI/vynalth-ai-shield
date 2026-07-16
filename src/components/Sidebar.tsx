@@ -29,7 +29,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           <path d="M9 12l2 2 4-4" />
         </svg>
-      )
+      ),
+      isExternalLink: true,
+      url: 'https://trust.sleepsomno.com'
     },
     {
       id: 'playground',
@@ -255,8 +257,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
                   onClick={() => {
                     const anyItem = item as any;
                     if (anyItem.isExternalLink && anyItem.url) {
-                      window.history.pushState({}, '', anyItem.url);
-                      window.dispatchEvent(new PopStateEvent('popstate'));
+                      if (anyItem.url.startsWith('http')) {
+                        window.location.href = anyItem.url;
+                      } else {
+                        window.history.pushState({}, '', anyItem.url);
+                        window.dispatchEvent(new PopStateEvent('popstate'));
+                      }
                     } else {
                       setActiveTab(item.id);
                     }

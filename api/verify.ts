@@ -176,7 +176,7 @@ function decryptAES256GCM(ciphertextBase64: string, decryptionKey: Buffer): stri
   }
 }
 
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://qgoelcorfcqxberbayul.supabase.co';
+const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY || '';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
