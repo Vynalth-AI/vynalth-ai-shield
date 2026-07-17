@@ -8,9 +8,15 @@ import { DotMatrixLoader } from './ui/DotMatrixLoader';
 
 interface MarketingPortalProps {
   onEnterConsole: () => void;
+  onNavigateToPricing?: () => void;
+  onNavigateToWhitepaper?: () => void;
 }
 
-export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole }) => {
+export const MarketingPortal: React.FC<MarketingPortalProps> = ({ 
+  onEnterConsole,
+  onNavigateToPricing,
+  onNavigateToWhitepaper
+}) => {
   const [activeStep, setActiveStep] = useState<number>(0);
   const [demoResults, setDemoResults] = useState<any>(null);
   const [demoLoading, setDemoLoading] = useState<boolean>(false);
@@ -252,6 +258,18 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({ onEnterConsole
           <a href="#pipeline" style={styles.navLink}>HOW IT WORKS</a>
           <a href="#matrix" style={styles.navLink}>DEFENSE MATRIX</a>
           <a href="#docs" style={styles.navLink}>DOCUMENTATION</a>
+          <button 
+            onClick={onNavigateToPricing} 
+            style={{ ...styles.navLink, background: 'none', border: 'none', cursor: 'pointer', padding: 0, textTransform: 'uppercase' }}
+          >
+            Pricing
+          </button>
+          <button 
+            onClick={onNavigateToWhitepaper} 
+            style={{ ...styles.navLink, background: 'none', border: 'none', cursor: 'pointer', padding: 0, textTransform: 'uppercase' }}
+          >
+            Whitepaper
+          </button>
           <a 
             href="/emilkowal-animations" 
             onClick={(e) => {

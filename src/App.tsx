@@ -19,6 +19,8 @@ import { TrustCenter } from './components/TrustCenter';
 import { StatusPage } from './components/StatusPage';
 import { PlaybookPages } from './components/PlaybookPages';
 import { MediaPage } from './components/MediaPage';
+import { PricingPage } from './components/PricingPage';
+import { WhitepaperPage } from './components/WhitepaperPage';
 import { getApiBaseUrl } from './lib/api';
 
 import type { ShieldConfig, VerificationLog } from './types';
@@ -158,7 +160,7 @@ function App() {
     );
   }
 
-  const [viewMode, setViewMode] = useState<'marketing' | 'auth' | 'console'>('marketing');
+  const [viewMode, setViewMode] = useState<'marketing' | 'auth' | 'console' | 'pricing' | 'whitepaper'>('marketing');
 
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [user, setUser] = useState<any>(() => {
@@ -379,6 +381,8 @@ function App() {
             setViewMode('auth');
           }
         }} 
+        onNavigateToPricing={() => setViewMode('pricing')}
+        onNavigateToWhitepaper={() => setViewMode('whitepaper')}
       />
     );
   }
@@ -393,6 +397,38 @@ function App() {
           setActiveTab('dashboard');
         }}
         onBackToHome={() => setViewMode('marketing')}
+      />
+    );
+  }
+
+  if (viewMode === 'pricing') {
+    return (
+      <PricingPage 
+        onGetStarted={() => {
+          if (user) {
+            setViewMode('console');
+            setActiveTab('dashboard');
+          } else {
+            setViewMode('auth');
+          }
+        }}
+        onBack={() => setViewMode('marketing')}
+      />
+    );
+  }
+
+  if (viewMode === 'whitepaper') {
+    return (
+      <WhitepaperPage 
+        onBack={() => setViewMode('marketing')}
+        onDeployConsole={() => {
+          if (user) {
+            setViewMode('console');
+            setActiveTab('dashboard');
+          } else {
+            setViewMode('auth');
+          }
+        }}
       />
     );
   }
