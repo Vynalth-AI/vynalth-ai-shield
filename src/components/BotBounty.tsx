@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 // ──────────────────────────────────────────────────────────────────
 // BotBounty.tsx
 // Security researcher portal:
-//   - Active bounty program listing
-//   - Researcher leaderboard
+//   - Active bounty program listing (Reputation Points only)
+//   - Researcher leaderboard (Aligned with Hall of Fame)
 //   - Vulnerability submission form (CVSSv3-style scoring)
 //   - Disclosure timeline tracker
 // ──────────────────────────────────────────────────────────────────
@@ -14,8 +14,7 @@ interface Bounty {
   title: string;
   category: string;
   severity: 'critical' | 'high' | 'medium' | 'low';
-  minReward: number;
-  maxReward: number;
+  reputationPoints: number;
   status: 'open' | 'in_review' | 'closed';
   scope: string;
   description: string;
@@ -27,7 +26,7 @@ interface Researcher {
   country: string;
   reports: number;
   accepted: number;
-  totalReward: number;
+  score: number;
   badge: string;
 }
 
@@ -35,53 +34,53 @@ const BOUNTIES: Bounty[] = [
   {
     id: 'b001', title: 'Authentication Bypass via Biometric Token Replay',
     category: 'Authentication', severity: 'critical',
-    minReward: 5_000, maxReward: 20_000, status: 'open',
+    reputationPoints: 1000, status: 'open',
     scope: 'api/verify, api/session/*',
     description: 'Find any method to bypass VitaShield\'s behavioral verification by replaying or forging biometric telemetry tokens.',
   },
   {
     id: 'b002', title: 'Bot Detection Evasion — Mouse Trajectory Spoofing',
     category: 'Anti-Bot', severity: 'high',
-    minReward: 2_000, maxReward: 8_000, status: 'open',
+    reputationPoints: 500, status: 'open',
     scope: 'SDK / client-side JS',
     description: 'Demonstrate a reliable technique for generating synthetic mouse paths that fool the curvature analysis into scoring ≥70 Trust Score.',
   },
   {
     id: 'b003', title: 'Tenant API Key Enumeration',
     category: 'Information Disclosure', severity: 'high',
-    minReward: 1_500, maxReward: 5_000, status: 'open',
+    reputationPoints: 400, status: 'open',
     scope: 'api/keys/*, api/admin/*',
     description: 'Enumerate or brute-force another tenant\'s API keys or webhook secrets through any endpoint.',
   },
   {
     id: 'b004', title: 'PDPA / GDPR Data Leakage — Cross-Tenant PII',
     category: 'Privacy', severity: 'critical',
-    minReward: 5_000, maxReward: 15_000, status: 'open',
+    reputationPoints: 800, status: 'open',
     scope: 'All API endpoints',
     description: 'Access personally identifiable information belonging to another tenant\'s users through IDOR, improper scoping, or data pipeline errors.',
   },
   {
     id: 'b005', title: 'Rate Limiting Bypass — Credential Stuffing Enablement',
     category: 'Rate Limiting', severity: 'medium',
-    minReward: 500, maxReward: 2_000, status: 'in_review',
+    reputationPoints: 200, status: 'in_review',
     scope: 'api/verify, api/auth/*',
     description: 'Bypass the per-IP / per-tenant rate limiter to enable credential stuffing attacks at scale.',
   },
   {
     id: 'b006', title: 'WebAuthn FIDO2 Attestation Bypass',
     category: 'Authentication', severity: 'high',
-    minReward: 3_000, maxReward: 10_000, status: 'open',
+    reputationPoints: 600, status: 'open',
     scope: 'api/webauthn/*',
     description: 'Bypass WebAuthn attestation verification to register a FIDO2 credential without a real authenticator.',
   },
 ];
 
 const LEADERBOARD: Researcher[] = [
-  { rank: 1, handle: 'null0x1f', country: '🇸🇬', reports: 14, accepted: 11, totalReward: 34_500, badge: '🥇 Top Researcher' },
-  { rank: 2, handle: 'vrdrkode', country: '🇮🇳', reports: 9, accepted: 7, totalReward: 21_000, badge: '🥈 Elite Hacker' },
-  { rank: 3, handle: 'sleepless_pwner', country: '🇲🇾', reports: 12, accepted: 8, totalReward: 18_750, badge: '🥉 Local Legend' },
-  { rank: 4, handle: 'asyncvoid', country: '🇵🇱', reports: 6, accepted: 5, totalReward: 12_000, badge: '⭐ Senior Researcher' },
-  { rank: 5, handle: 'biobyte99', country: '🇧🇷', reports: 8, accepted: 5, totalReward: 9_500, badge: '⭐ Senior Researcher' },
+  { rank: 1, handle: 'null0x1f', country: '🇸🇬', reports: 14, accepted: 11, score: 3250, badge: '🥇 Legend' },
+  { rank: 2, handle: 'vrdrkode', country: '🇮🇳', reports: 9, accepted: 7, score: 2100, badge: '🥈 Elite' },
+  { rank: 3, handle: 'sleepless_pwner', country: '🇲🇾', reports: 12, accepted: 8, score: 1850, badge: '🥉 Elite' },
+  { rank: 4, handle: 'asyncvoid', country: '🇵🇱', reports: 6, accepted: 5, score: 1200, badge: '⭐ Advanced' },
+  { rank: 5, handle: 'biobyte99', country: '🇧🇷', reports: 8, accepted: 5, score: 950, badge: '⭐ Advanced' },
 ];
 
 const CVSS_VECTORS = ['Network', 'Adjacent', 'Local', 'Physical'];
@@ -116,8 +115,8 @@ export const BotBounty: React.FC = () => {
   };
 
   const tabs = [
-    { id: 'bounties', label: '🎯 Active Bounties', color: '#ef4444' },
-    { id: 'leaderboard', label: '🏆 Leaderboard', color: '#f59e0b' },
+    { id: 'bounties', label: '🎯 Active Programs', color: '#ef4444' },
+    { id: 'leaderboard', label: '🏆 Hall of Fame', color: '#f59e0b' },
     { id: 'submit', label: '📝 Submit Report', color: '#10b981' },
   ] as const;
 
@@ -127,18 +126,18 @@ export const BotBounty: React.FC = () => {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '1.5rem', alignItems: 'start' }}>
         <div>
           <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.03em', margin: 0 }} className="gradient-text">
-            Bot Bounty Program
+            Security Vulnerability Disclosure
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', margin: '0.25rem 0 0' }}>
-            Help us protect health data and fight bots. Report vulnerabilities, earn rewards, and join Malaysia's #1 security research community.
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', margin: '0.25rem 0 0', lineHeight: 1.5 }}>
+            Help protect health data and fight automation. Note: We operate a **non-monetary** vulnerability program. Top contributors are recognized in the public **[Security Hall of Fame](https://sleepsomno.com/en/security/hall-of-fame)** reputation leaderboard.
           </p>
         </div>
         {/* Stats */}
         <div style={{ display: 'flex', gap: '1rem' }}>
           {[
-            { label: 'Total Paid', value: '$96K+', color: '#10b981' },
-            { label: 'Open Bounties', value: BOUNTIES.filter(b => b.status === 'open').length.toString(), color: '#38bdf8' },
-            { label: 'Researchers', value: '142', color: '#818cf8' },
+            { label: 'Total Reports', value: '148', color: '#10b981' },
+            { label: 'Open Scopes', value: BOUNTIES.filter(b => b.status === 'open').length.toString(), color: '#38bdf8' },
+            { label: 'Hall of Fame', value: '24', color: '#818cf8' },
           ].map(({ label, value, color }) => (
             <div key={label} style={{ textAlign: 'center', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: '0.75rem 1rem' }}>
               <div style={{ fontSize: '1.4rem', fontWeight: 800, color }}>{value}</div>
@@ -189,8 +188,8 @@ export const BotBounty: React.FC = () => {
                     <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>{bounty.description}</p>
                   </div>
                   <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: '1rem' }}>
-                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#10b981' }}>${bounty.minReward.toLocaleString()}</div>
-                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>up to ${bounty.maxReward.toLocaleString()}</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f59e0b' }}>{bounty.reputationPoints} pts</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Reputation Score</div>
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: '1rem', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
@@ -206,7 +205,7 @@ export const BotBounty: React.FC = () => {
       {/* Bounty Detail */}
       {activeTab === 'bounties' && selectedBounty && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <button onClick={() => setSelectedBounty(null)} style={{ alignSelf: 'flex-start', background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, padding: '0.35rem 0.75rem', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.8rem' }}>← Back to bounties</button>
+          <button onClick={() => setSelectedBounty(null)} style={{ alignSelf: 'flex-start', background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, padding: '0.35rem 0.75rem', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.8rem' }}>← Back to active scopes</button>
           <div className="glass-panel" style={{ padding: '1.75rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
               <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#f1f5f9' }}>{selectedBounty.title}</span>
@@ -215,10 +214,9 @@ export const BotBounty: React.FC = () => {
             <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: '1.5rem' }}>{selectedBounty.description}</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
               {[
-                { label: 'Min Reward', value: `$${selectedBounty.minReward.toLocaleString()}`, color: '#10b981' },
-                { label: 'Max Reward', value: `$${selectedBounty.maxReward.toLocaleString()}`, color: '#10b981' },
+                { label: 'Reputation Reward', value: `${selectedBounty.reputationPoints} pts`, color: '#f59e0b' },
                 { label: 'Category', value: selectedBounty.category, color: '#38bdf8' },
-                { label: 'Scope', value: selectedBounty.scope, color: '#f59e0b' },
+                { label: 'Scope', value: selectedBounty.scope, color: '#10b981' },
               ].map(({ label, value, color }) => (
                 <div key={label} style={{ background: 'rgba(0,0,0,0.2)', borderRadius: 8, padding: '0.75rem 1rem' }}>
                   <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>{label}</div>
@@ -226,39 +224,47 @@ export const BotBounty: React.FC = () => {
                 </div>
               ))}
             </div>
-            <button onClick={() => setActiveTab('submit')} style={{ padding: '0.75rem 1.5rem', background: 'linear-gradient(135deg, #ef4444, #f59e0b)', border: 'none', borderRadius: 8, color: '#fff', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer' }}>
-              Submit Report for this Bounty →
+            <button onClick={() => setActiveTab('submit')} style={{ padding: '0.75rem 1.5rem', background: 'linear-gradient(135deg, #38bdf8, #818cf8)', border: 'none', borderRadius: 8, color: '#fff', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer' }}>
+              Submit Report for this Scope →
             </button>
           </div>
         </div>
       )}
 
-      {/* ── Leaderboard ── */}
+      {/* ── Leaderboard (Hall of Fame) ── */}
       {activeTab === 'leaderboard' && (
-        <div className="glass-panel" style={{ padding: '1.5rem' }}>
-          <p style={{ margin: '0 0 1.25rem', fontSize: '0.7rem', fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-            Hall of Fame — Security Researchers
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {LEADERBOARD.map(r => (
-              <div key={r.rank} style={{ display: 'grid', gridTemplateColumns: '2rem 1fr auto', alignItems: 'center', gap: '1rem', padding: '1rem 1.25rem', background: r.rank <= 3 ? `rgba(${r.rank === 1 ? '245,158,11' : r.rank === 2 ? '148,163,184' : '180,120,60'},0.07)` : 'rgba(0,0,0,0.12)', borderRadius: 10, border: r.rank === 1 ? '1px solid rgba(245,158,11,0.2)' : '1px solid rgba(255,255,255,0.04)' }}>
-                <span style={{ fontSize: '1.1rem', fontWeight: 800, color: r.rank === 1 ? '#f59e0b' : r.rank === 2 ? '#94a3b8' : r.rank === 3 ? '#b47c3c' : 'var(--text-muted)', textAlign: 'center' }}>#{r.rank}</span>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                    <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#f1f5f9', fontFamily: 'var(--font-mono)' }}>{r.handle}</span>
-                    <span>{r.country}</span>
-                    <span style={{ fontSize: '0.7rem', color: '#f59e0b', fontWeight: 700 }}>{r.badge}</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '0.75rem 1rem', alignItems: 'center' }}>
+            <span>🏆</span>
+            <p style={{ margin: 0, fontSize: '0.82rem', color: '#f59e0b', lineHeight: 1.5 }}>
+              This leaderboard syncs directly with the live public repository at **[sleepsomno.com/en/security/hall-of-fame](https://sleepsomno.com/en/security/hall-of-fame)**. Only verified security researchers with accepted findings are listed.
+            </p>
+          </div>
+          <div className="glass-panel" style={{ padding: '1.5rem' }}>
+            <p style={{ margin: '0 0 1.25rem', fontSize: '0.7rem', fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              Verified Security Contributors
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {LEADERBOARD.map(r => (
+                <div key={r.rank} style={{ display: 'grid', gridTemplateColumns: '2rem 1fr auto', alignItems: 'center', gap: '1rem', padding: '1rem 1.25rem', background: r.rank <= 3 ? `rgba(${r.rank === 1 ? '245,158,11' : r.rank === 2 ? '148,163,184' : '180,120,60'},0.07)` : 'rgba(0,0,0,0.12)', borderRadius: 10, border: r.rank === 1 ? '1px solid rgba(245,158,11,0.2)' : '1px solid rgba(255,255,255,0.04)' }}>
+                  <span style={{ fontSize: '1.1rem', fontWeight: 800, color: r.rank === 1 ? '#f59e0b' : r.rank === 2 ? '#94a3b8' : r.rank === 3 ? '#b47c3c' : 'var(--text-muted)', textAlign: 'center' }}>#{r.rank}</span>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                      <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#f1f5f9', fontFamily: 'var(--font-mono)' }}>{r.handle}</span>
+                      <span>{r.country}</span>
+                      <span style={{ fontSize: '0.7rem', color: '#f59e0b', fontWeight: 700 }}>{r.badge}</span>
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                      {r.reports} reports · {r.accepted} accepted
+                    </div>
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    {r.reports} reports · {r.accepted} accepted
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f59e0b' }}>{r.score}</div>
+                    <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Reputation Score</div>
                   </div>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#10b981' }}>${r.totalReward.toLocaleString()}</div>
-                  <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>earned</div>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}
