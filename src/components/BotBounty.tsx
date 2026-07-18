@@ -240,30 +240,81 @@ export const BotBounty: React.FC = () => {
               This leaderboard syncs directly with the live public repository at **[sleepsomno.com/en/security/hall-of-fame](https://sleepsomno.com/en/security/hall-of-fame)**. Only verified security researchers with accepted findings are listed.
             </p>
           </div>
-          <div className="glass-panel" style={{ padding: '1.5rem' }}>
-            <p style={{ margin: '0 0 1.25rem', fontSize: '0.7rem', fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              Verified Security Contributors
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {LEADERBOARD.map(r => (
-                <div key={r.rank} style={{ display: 'grid', gridTemplateColumns: '2rem 1fr auto', alignItems: 'center', gap: '1rem', padding: '1rem 1.25rem', background: r.rank <= 3 ? `rgba(${r.rank === 1 ? '245,158,11' : r.rank === 2 ? '148,163,184' : '180,120,60'},0.07)` : 'rgba(0,0,0,0.12)', borderRadius: 10, border: r.rank === 1 ? '1px solid rgba(245,158,11,0.2)' : '1px solid rgba(255,255,255,0.04)' }}>
-                  <span style={{ fontSize: '1.1rem', fontWeight: 800, color: r.rank === 1 ? '#f59e0b' : r.rank === 2 ? '#94a3b8' : r.rank === 3 ? '#b47c3c' : 'var(--text-muted)', textAlign: 'center' }}>#{r.rank}</span>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                      <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#f1f5f9', fontFamily: 'var(--font-mono)' }}>{r.handle}</span>
-                      <span>{r.country}</span>
-                      <span style={{ fontSize: '0.7rem', color: '#f59e0b', fontWeight: 700 }}>{r.badge}</span>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '1.5rem', alignItems: 'start' }}>
+            {/* Left Column: Leaderboard */}
+            <div className="glass-panel" style={{ padding: '1.5rem' }}>
+              <p style={{ margin: '0 0 1.25rem', fontSize: '0.7rem', fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                Verified Security Contributors
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {LEADERBOARD.map(r => (
+                  <div key={r.rank} style={{ display: 'grid', gridTemplateColumns: '2rem 1fr auto', alignItems: 'center', gap: '1rem', padding: '0.85rem 1rem', background: r.rank <= 3 ? `rgba(${r.rank === 1 ? '245,158,11' : r.rank === 2 ? '148,163,184' : '180,120,60'},0.07)` : 'rgba(0,0,0,0.12)', borderRadius: 10, border: r.rank === 1 ? '1px solid rgba(245,158,11,0.2)' : '1px solid rgba(255,255,255,0.04)' }}>
+                    <span style={{ fontSize: '1.1rem', fontWeight: 800, color: r.rank === 1 ? '#f59e0b' : r.rank === 2 ? '#94a3b8' : r.rank === 3 ? '#b47c3c' : 'var(--text-muted)', textAlign: 'center' }}>#{r.rank}</span>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                        <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#f1f5f9', fontFamily: 'var(--font-mono)' }}>{r.handle}</span>
+                        <span>{r.country}</span>
+                        <span style={{ fontSize: '0.7rem', color: '#f59e0b', fontWeight: 700 }}>{r.badge}</span>
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        {r.reports} reports · {r.accepted} accepted
+                      </div>
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                      {r.reports} reports · {r.accepted} accepted
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f59e0b' }}>{r.score}</div>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Reputation Score</div>
                     </div>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f59e0b' }}>{r.score}</div>
-                    <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Reputation Score</div>
-                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right Column: Founder's Security Journey */}
+            <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <p style={{ margin: 0, fontSize: '0.7rem', fontWeight: 700, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                Founder's Security Journey
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '0.75rem' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', overflow: 'hidden' }}>
+                  👨‍💻
                 </div>
-              ))}
+                <div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f1f5f9' }}>Vyncus Lim</div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Founder & CEO, VitaMind AI & VitaShield</div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', fontSize: '0.78rem', lineHeight: 1.5, color: '#cbd5e1' }}>
+                <div style={{ borderLeft: '2px solid #38bdf8', paddingLeft: '0.75rem' }}>
+                  <strong style={{ color: '#38bdf8', fontSize: '0.82rem' }}>Age 12 — The First Bot Shield</strong>
+                  <p style={{ margin: '0.15rem 0 0', color: 'var(--text-muted)' }}>
+                    Wrote custom PHP/Python firewall regex scripts to mitigate credential brute-force and DDoS spam bots targeting a private gaming forum.
+                  </p>
+                </div>
+                <div style={{ borderLeft: '2px solid #38bdf8', paddingLeft: '0.75rem' }}>
+                  <strong style={{ color: '#38bdf8', fontSize: '0.82rem' }}>Age 14 — Path Kinetics Discovery</strong>
+                  <p style={{ margin: '0.15rem 0 0', color: 'var(--text-muted)' }}>
+                    Discovered mouse velocity and curvature analysis. Swapped hard IP bans for silent behavioral metrics, testing on local Linux servers.
+                  </p>
+                </div>
+                <div style={{ borderLeft: '2px solid #818cf8', paddingLeft: '0.75rem' }}>
+                  <strong style={{ color: '#818cf8', fontSize: '0.82rem' }}>Age 16 — Decentralized Identity</strong>
+                  <p style={{ margin: '0.15rem 0 0', color: 'var(--text-muted)' }}>
+                    Researched Decentralized Identifiers (DIDs) and zero-knowledge proofs to establish sovereign user control over raw biometric records.
+                  </p>
+                </div>
+                <div style={{ borderLeft: '2px solid #10b981', paddingLeft: '0.75rem' }}>
+                  <strong style={{ color: '#10b981', fontSize: '0.82rem' }}>Age 18 — Protecting Health Networks</strong>
+                  <p style={{ margin: '0.15rem 0 0', color: 'var(--text-muted)' }}>
+                    Founded VitaMind AI & VitaShield. Deployed edge security rules defending digital sleep clinic diagnostics from scrapers and automated attacks.
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ marginTop: '0.5rem', padding: '0.75rem', background: 'rgba(0,0,0,0.2)', borderRadius: 8, fontSize: '0.74rem', border: '1px dashed rgba(255,255,255,0.04)', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                "Security shouldn't look like an interrogation room. By measuring the kinematics of natural motor control, we protect health records silently while maintaining absolute user privacy."
+              </div>
             </div>
           </div>
         </div>

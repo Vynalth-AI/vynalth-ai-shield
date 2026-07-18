@@ -90,6 +90,30 @@ export const ChecklistPage: React.FC = () => {
         { name: 'Advanced Audit Reporting & Analytics Dashboards', current: '8/10', target: '9/10', difficulty: 'Medium', timeline: '4-6 Weeks', impact: 'High', completed: false },
         { name: 'Real-time Threat Intelligence API Feed', current: '2/10', target: '8/10', difficulty: 'Complex', timeline: '6-8 Weeks', impact: 'Medium', completed: false }
       ]
+    },
+    {
+      title: '6.1 Testing & Quality Assurance Layer (P1)',
+      items: [
+        { name: 'Automated Red-Blue Team Playwright Attack Suite', current: '1/10', target: '8/10', difficulty: 'Complex', timeline: '4-6 Weeks', impact: 'High', completed: false },
+        { name: 'Chaos Engineering Anomaly Injection (Fake Telemetry / Delay)', current: '0/10', target: '7/10', difficulty: 'Complex', timeline: '6-8 Weeks', impact: 'Medium', completed: false },
+        { name: 'Monthly Penetration Testing Checklist Self-Checks', current: '8/10', target: '8/10', difficulty: 'Easy', timeline: 'Completed (Q1-Q4)', impact: 'High', completed: true }
+      ]
+    },
+    {
+      title: '6.2 Scalability & Performance Engine (P1)',
+      items: [
+        { name: 'Global Multi-Region Deployments (Cloudflare Workers + Supabase)', current: '3/10', target: '9/10', difficulty: 'Complex', timeline: '8-10 Weeks', impact: 'High', completed: false },
+        { name: 'Model Versioning & A/B Testing Switches (Mouse vs Health Context)', current: '2/10', target: '8/10', difficulty: 'Complex', timeline: '6-8 Weeks', impact: 'Medium', completed: false },
+        { name: 'Telemetry Queue Handlers (Cloudflare Queues / Realtime)', current: '1/10', target: '9/10', difficulty: 'Complex', timeline: '8-10 Weeks', impact: 'High', completed: false }
+      ]
+    },
+    {
+      title: '6.3 Frontier Technology R&D (P2)',
+      items: [
+        { name: 'Privacy Computing (MPC / Homomorphic Encryption)', current: '0/10', target: '7/10', difficulty: 'Very Complex', timeline: '12-16 Weeks', impact: 'High', completed: false },
+        { name: 'Continuous Background Silent Authentication', current: '2/10', target: '9/10', difficulty: 'Complex', timeline: '8-10 Weeks', impact: 'High', completed: false },
+        { name: 'Decentralized Identifiers (DID) Health Data Integration', current: '0/10', target: '8/10', difficulty: 'Very Complex', timeline: '10-12 Weeks', impact: 'Medium', completed: false }
+      ]
     }
   ]);
 
