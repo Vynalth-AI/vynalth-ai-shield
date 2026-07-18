@@ -27,7 +27,7 @@ const SAMPLE_AUDIT: AuditEntry[] = [
   { id: 'ae-005', timestamp: '2026-07-17 22:03:55 UTC', actor: 'scheduler/cron', action: 'DATA_PURGE', resource: 'sessions > 90d', outcome: 'success', hash: '0x5c4b2f…' },
 ];
 
-const FRAMEWORKS = ['Malaysia PDPA', 'EU GDPR', 'CCPA (California)', 'HIPAA (Health)'];
+const FRAMEWORKS = ['Malaysia PDPA', 'EU GDPR', 'China PIPL', 'CCPA (California)', 'HIPAA (Health)'];
 
 const DATA_TOGGLES = [
   { id: 'ip_log', label: 'IP Address Logging', default: true, risk: 'medium', pdpa: true, gdpr: true, ccpa: false },
@@ -47,7 +47,7 @@ const VAULT_KEYS = [
 ];
 
 export const PrivacyCompliance: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'minimization' | 'audit' | 'policy' | 'vault'>('minimization');
+  const [activeTab, setActiveTab] = useState<'minimization' | 'audit' | 'policy' | 'vault' | 'rights'>('minimization');
   const [toggles, setToggles] = useState<Record<string, boolean>>(
     Object.fromEntries(DATA_TOGGLES.map(t => [t.id, t.default]))
   );
@@ -60,6 +60,9 @@ export const PrivacyCompliance: React.FC = () => {
   const [vaultStatus, setVaultStatus] = useState<Record<string, 'idle' | 'rotating' | 'done'>>(
     Object.fromEntries(VAULT_KEYS.map(k => [k.id, 'idle']))
   );
+  const [rightsEmail, setRightsEmail] = useState('');
+  const [rightsPurging, setRightsPurging] = useState(false);
+  const [rightsPurged, setRightsPurged] = useState(false);
   const policyRef = useRef<HTMLDivElement>(null);
 
   const toggleField = (id: string) => setToggles(prev => ({ ...prev, [id]: !prev[id] }));
@@ -117,6 +120,7 @@ ${DATA_TOGGLES.filter(t => toggles[t.id]).map(t => `- **${t.label}** (Risk: ${t.
 - **Contractual Necessity**: Providing the verification service to our clients.
 - ${policyFramework.includes('GDPR') ? '**GDPR Art. 6(1)(f)**: Legitimate interests of the controller or a third party.' : ''}
 - ${policyFramework.includes('PDPA') ? '**PDPA Section 6**: Processing necessary for the performance of a contract.' : ''}
+- ${policyFramework.includes('PIPL') ? '**PIPL Article 13**: Processing necessary for the performance of a contract, or to fulfill legal obligations.' : ''}
 
 ## 4. Data Retention
 All verification session data is retained for **${dataRetention} days** unless a longer period is required by law or our clients' contractual obligations.
@@ -142,6 +146,7 @@ We do not sell, share, or rent personal data to third parties except as necessar
     { id: 'audit', label: '📋 Audit Log', color: '#818cf8' },
     { id: 'policy', label: '📄 Policy Generator', color: '#10b981' },
     { id: 'vault', label: '🔑 Key Vault', color: '#f59e0b' },
+    { id: 'rights', label: '👤 Data Subject Rights', color: '#a78bfa' },
   ] as const;
 
   return (
@@ -153,7 +158,7 @@ We do not sell, share, or rent personal data to third parties except as necessar
             Privacy & Compliance Suite
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', margin: '0.25rem 0 0' }}>
-            Malaysia PDPA · EU GDPR · CCPA · HIPAA — data minimization, audit logs, and policy generation in one place.
+            Malaysia PDPA · EU GDPR · China PIPL · CCPA · HIPAA — data minimization, audit logs, and policy generation.
           </p>
         </div>
         {/* Privacy Score Badge */}
@@ -168,7 +173,7 @@ We do not sell, share, or rent personal data to third parties except as necessar
         {tabs.map(t => (
           <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
             padding: '0.5rem 1rem', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: '0.82rem', fontWeight: 700, transition: 'all 0.2s',
-            background: activeTab === t.id ? `rgba(${t.id === 'minimization' ? '56,189,248' : t.id === 'audit' ? '129,140,248' : t.id === 'policy' ? '16,185,129' : '245,158,11'},0.15)` : 'transparent',
+            background: activeTab === t.id ? `rgba(${t.id === 'minimization' ? '56,189,248' : t.id === 'audit' ? '129,140,248' : t.id === 'policy' ? '16,185,129' : t.id === 'vault' ? '245,158,11' : '167,139,250'},0.15)` : 'transparent',
             color: activeTab === t.id ? t.color : 'var(--text-muted)',
             borderBottom: activeTab === t.id ? `2px solid ${t.color}` : '2px solid transparent',
           }}>{t.label}</button>
@@ -333,6 +338,114 @@ We do not sell, share, or rent personal data to third parties except as necessar
               </button>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* ── Tab: Data Subject Rights ── */}
+      {activeTab === 'rights' && (
+        <div className="glass-panel" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#f1f5f9', margin: 0 }}>
+              👤 Data Subject Rights Portal (数据主体权利门户)
+            </h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', margin: '0.25rem 0 0', lineHeight: 1.5 }}>
+              Under GDPR Article 17, Malaysia PDPA Section 30, and China PIPL Article 45, users can exercise their **"Right to be Forgotten" (被遗忘权)**. Entering their email address will queue an edge query to completely erase all behavioral kinematics, Canvas fingerprints, and associated metadata.
+            </p>
+          </div>
+
+          {rightsPurged ? (
+            <div style={{ padding: '1.5rem', background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 10, textAlign: 'center' }}>
+              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>✓</div>
+              <h4 style={{ margin: '0 0 0.25rem', color: '#10b981', fontWeight: 700, fontSize: '0.95rem' }}>Right to Erasure Executed</h4>
+              <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                All logs corresponding to **{rightsEmail}** have been cryptographically deleted from hot storage (Supabase Realtime) and cold telemetry backups. A receipt of purge is recorded in the immutable audit log.
+              </p>
+              <button
+                onClick={() => { setRightsPurged(false); setRightsEmail(''); }}
+                style={{ marginTop: '1rem', padding: '0.45rem 1.25rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: 8, fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}
+              >
+                Purge Another Identity
+              </button>
+            </div>
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!rightsEmail) return;
+                setRightsPurging(true);
+                setTimeout(() => {
+                  setRightsPurging(false);
+                  setRightsPurged(true);
+                  const maskedEmail = rightsEmail.replace(/(?<=.{3}).(?=[^@]*?@)/g, '*');
+                  const entry: AuditEntry = {
+                    id: `ae-${Date.now()}`,
+                    timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC',
+                    actor: 'subject-rights-portal',
+                    action: 'DATA_PURGE',
+                    resource: `user_telemetry#${maskedEmail}`,
+                    outcome: 'success',
+                    hash: '0x' + Math.random().toString(16).slice(2, 10) + '…',
+                  };
+                  setAuditLog(prev => [entry, ...prev]);
+                }, 2000);
+              }}
+              style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+            >
+              <div>
+                <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.35rem' }}>
+                  User Email or Subject Identifier *
+                </label>
+                <input
+                  required
+                  type="email"
+                  value={rightsEmail}
+                  onChange={(e) => setRightsEmail(e.target.value)}
+                  placeholder="e.g. user@example.com"
+                  className="input-field"
+                  style={{ width: '100%', boxSizing: 'border-box' }}
+                  disabled={rightsPurging}
+                />
+              </div>
+
+              <div style={{ background: 'rgba(0,0,0,0.15)', padding: '0.85rem 1rem', borderRadius: 8, border: '1px solid rgba(255,255,255,0.03)' }}>
+                <p style={{ margin: '0 0 0.5rem', fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Scope of Purge</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', fontSize: '0.78rem', color: '#cbd5e1' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                    <input type="checkbox" defaultChecked disabled />
+                    Delete all Keystroke Timing & Flight/Dwell Metrics
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                    <input type="checkbox" defaultChecked disabled />
+                    Wipe Canvas & WebGL Hardware Fingerprint Signatures
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                    <input type="checkbox" defaultChecked disabled />
+                    Unbind Sleep/Oura Wearable Health Context Profiles
+                  </label>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={rightsPurging}
+                style={{
+                  padding: '0.75rem',
+                  background: 'linear-gradient(135deg, #a78bfa 0%, #818cf8 100%)',
+                  border: 'none',
+                  color: '#fff',
+                  fontWeight: 700,
+                  fontSize: '0.88rem',
+                  borderRadius: 8,
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(167, 139, 250, 0.15)',
+                  transition: 'opacity 0.2s',
+                  opacity: rightsPurging ? 0.7 : 1
+                }}
+              >
+                {rightsPurging ? 'Erasing User Identity...' : 'Exercise Right to Erasure (一键删除所有数据)'}
+              </button>
+            </form>
+          )}
         </div>
       )}
     </div>

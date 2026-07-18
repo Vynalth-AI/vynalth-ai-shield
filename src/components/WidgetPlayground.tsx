@@ -317,6 +317,10 @@ export const WidgetPlayground: React.FC<WidgetPlaygroundProps> = ({ config, onAd
                 themeBg="rgba(13, 20, 35, 0.55)"
                 themeText={config.themeText}
               />
+              <div style={{ marginTop: '0.65rem', fontSize: '0.68rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.35rem', justifyContent: 'center', lineHeight: 1.4 }}>
+                <span>🛡️</span>
+                <span>免责声明：我们使用匿名行为数据改进 AI 模型以抵抗机器人攻击，<strong>但绝不出售个人健康信息</strong>。</span>
+              </div>
             </div>
 
             <div style={styles.actionRow}>
