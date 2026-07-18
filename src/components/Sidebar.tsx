@@ -144,6 +144,36 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
       )
     },
     {
+      id: 'privacy_compliance',
+      label: 'Privacy & Compliance',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          <line x1="12" y1="16" x2="12" y2="16" />
+        </svg>
+      )
+    },
+    {
+      id: 'health_context',
+      label: 'Health Context Engine',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+        </svg>
+      )
+    },
+    {
+      id: 'bot_bounty',
+      label: 'Bot Bounty Program',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="8" r="6" />
+          <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+        </svg>
+      )
+    },
+    {
       id: 'checklist',
       label: 'Capability Checklist',
       icon: (

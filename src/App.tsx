@@ -21,6 +21,9 @@ import { PlaybookPages } from './components/PlaybookPages';
 import { MediaPage } from './components/MediaPage';
 import { PricingPage } from './components/PricingPage';
 import { WhitepaperPage } from './components/WhitepaperPage';
+import { PrivacyCompliance } from './components/PrivacyCompliance';
+import { HealthContext } from './components/HealthContext';
+import { BotBounty } from './components/BotBounty';
 import { getApiBaseUrl } from './lib/api';
 
 import type { ShieldConfig, VerificationLog } from './types';
@@ -357,6 +360,12 @@ function App() {
         return <NegativeTraining />;
       case 'alerts':
         return <AlertsManager />;
+      case 'privacy_compliance':
+        return <PrivacyCompliance />;
+      case 'health_context':
+        return <HealthContext />;
+      case 'bot_bounty':
+        return <BotBounty />;
       case 'checklist':
         return <ChecklistPage />;
       case 'search_intelligence':
