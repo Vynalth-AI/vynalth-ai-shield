@@ -209,11 +209,37 @@ export const TrustCenter: React.FC<TrustCenterProps> = ({ logs }) => {
       (activeFilter === 'passed' && log.status === 'passed') || 
       (activeFilter === 'blocked' && log.status === 'blocked');
     
-    const matchesSearch = 
-      log.ipAddress.includes(searchQuery) ||
-      log.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      log.id.includes(searchQuery) ||
-      (log.browser && log.browser.toLowerCase().includes(searchQuery.toLowerCase()));
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return matchesFilter;
+
+    let matchesSearch = false;
+    if (query.startsWith('geo:')) {
+      const geoTerm = query.slice(4).trim();
+      if (geoTerm === 'conflict' || geoTerm === 'anomaly' || geoTerm === 'travel') {
+        matchesSearch = 
+          log.location.toLowerCase().includes('conflict') ||
+          log.flags.includes('impossible_travel_anomaly') ||
+          log.flags.includes('suspicious_geo_velocity_jump');
+      } else {
+        matchesSearch = log.location.toLowerCase().includes(geoTerm);
+      }
+    } else if (query.startsWith('anomaly:') || query.startsWith('flag:')) {
+      const anomalyTerm = query.slice(query.indexOf(':') + 1).trim();
+      matchesSearch = 
+        log.flags.some(f => f.toLowerCase().includes(anomalyTerm)) ||
+        log.deviceAnomalies.some(a => a.toLowerCase().includes(anomalyTerm));
+    } else if (query.startsWith('risk:')) {
+      const riskVal = parseInt(query.slice(5).trim());
+      if (!isNaN(riskVal)) {
+        matchesSearch = log.riskScore >= riskVal;
+      }
+    } else {
+      matchesSearch = 
+        log.ipAddress.includes(searchQuery) ||
+        log.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        log.id.includes(searchQuery) ||
+        (log.browser && log.browser.toLowerCase().includes(searchQuery.toLowerCase()));
+    }
 
     return matchesFilter && matchesSearch;
   });
@@ -361,7 +387,7 @@ export const TrustCenter: React.FC<TrustCenterProps> = ({ logs }) => {
             <h3 style={styles.panelTitle}>Decoupled Telemetry Stream</h3>
             <div style={styles.filterControls}>
               <input 
-                placeholder="Search IP, location, ID..."
+                placeholder="Search IP, location... (e.g. geo:conflict, risk:80)"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={styles.searchBar}
