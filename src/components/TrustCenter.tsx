@@ -573,6 +573,29 @@ export const TrustCenter: React.FC<TrustCenterProps> = ({ logs }) => {
                     </>
                   )}
                 </div>
+
+                {selectedLog.flags?.includes('impossible_travel_anomaly') && (
+                  <div style={{ marginTop: '0.75rem', padding: '0.85rem', background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '8px', fontSize: '0.74rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#f43f5e', fontWeight: 700, marginBottom: '0.35rem' }}>
+                      <span>📍</span>
+                      <span>Geo-Velocity Anomaly (Impossible Travel Blocked)</span>
+                    </div>
+                    <div style={{ color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                      <p style={{ margin: '0 0 0.4rem 0' }}>
+                        <strong>Last Session:</strong> Malaysia (Kuala Lumpur) from IP 175.139.12.85 (17:15:02 UTC)
+                      </p>
+                      <p style={{ margin: '0 0 0.4rem 0' }}>
+                        <strong>Current Attempt:</strong> Russia (Moscow) from IP 45.89.230.12 (17:17:32 UTC)
+                      </p>
+                      <p style={{ margin: '0 0 0.4rem 0' }}>
+                        <strong>Time Delta:</strong> 150 seconds | <strong>Calculated Velocity:</strong> 194,400 km/h
+                      </p>
+                      <span style={{ color: '#f43f5e', fontWeight: 600 }}>
+                        ⚠️ Trigger: Session Blocked (Exceeds physical air-travel limit of 1,000 km/h)
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Cryptographic Signature & Hash details */}

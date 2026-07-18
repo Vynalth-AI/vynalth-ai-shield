@@ -45,6 +45,7 @@ const NEURO_RULES = [
   { id: 'r005', name: 'Telehealth Session Hijack', category: 'Session Security', severity: 'critical', trigger: 'WebRTC session fingerprint mismatch', action: 'TERMINATE', enabled: true },
   { id: 'r006', name: 'HIPAA Audit Trigger', category: 'Compliance', severity: 'medium', trigger: 'Unusual PHI access pattern', action: 'AUDIT + FLAG', enabled: true },
   { id: 'r007', name: 'Oura/Fitbit Token Brute Force', category: 'Credential Attack', severity: 'high', trigger: 'OAuth token replay attack detected', action: 'INVALIDATE + BLOCK', enabled: false },
+  { id: 'r008', name: 'Geo-Velocity Travel Anomaly', category: 'Session Security', severity: 'critical', trigger: 'Impossible travel: sub-5min IP jump between Malaysia and international regions', action: 'BLOCK + ALERT', enabled: true },
 ];
 
 const AI_AGENTS = [

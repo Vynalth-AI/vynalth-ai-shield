@@ -31,6 +31,19 @@ import type { ShieldConfig, VerificationLog } from './types';
 // Initial dummy logs that feed the dashboard charts and tables
 const INITIAL_LOGS: VerificationLog[] = [
   {
+    id: 'req_vms_geo_travel_jump',
+    timestamp: new Date(Date.now() - 30000).toISOString(),
+    ipAddress: '175.139.12.85',
+    location: 'Russia (Moscow) / Malaysia (Kuala Lumpur) Conflict',
+    device: 'Windows Desktop',
+    browser: 'Chrome 126',
+    method: 'behavioral_telemetry',
+    status: 'blocked',
+    riskScore: 99,
+    flags: ['impossible_travel_anomaly', 'suspicious_geo_velocity_jump'],
+    deviceAnomalies: []
+  },
+  {
     id: 'req_vms_9a8f27c3',
     timestamp: new Date(Date.now() - 2 * 60000).toISOString(),
     ipAddress: '185.220.101.4',
