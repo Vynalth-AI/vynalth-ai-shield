@@ -1,4 +1,4 @@
--- VITASHIELD AI SECURITY GATEWAY SCHEMA
+-- VYNALTH AI SHIELD AI SECURITY GATEWAY SCHEMA
 -- Copy and paste this script directly into your Supabase SQL Editor and click "Run" to set up your tables!
 
 -- -------------------------------------------------------------

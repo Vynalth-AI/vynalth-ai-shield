@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 
 export const Integration: React.FC = () => {
   const [activeCodeTab, setActiveCodeTab] = useState<'javascript' | 'react' | 'vue' | 'svelte' | 'ios_swift' | 'android_kotlin' | 'nodejs' | 'python' | 'go' | 'java' | 'php' | 'curl' | 'supabase'>('javascript');
@@ -41,30 +41,30 @@ export const Integration: React.FC = () => {
 
   // Code snippets generator based on current keys state
   const codeSnippets = {
-    javascript: `<!-- Add the VitaShield SDK to your HTML header -->
-<script src="https://vitashield.sleepsomno.com/widget.js" async defer></script>
+    javascript: `<!-- Add the Vynalth AI Shield SDK to your HTML header -->
+<script src="https://shield.sleepsomno.com/widget.js" async defer></script>
 
 <!-- Add this container inside your submission form -->
 <form id="login-form" action="/login" method="POST">
   <input type="text" name="username" placeholder="Username" required />
   <input type="password" name="password" placeholder="Password" required />
 
-  <!-- VitaShield Widget Container -->
-  <div id="vitashield-widget" data-sitekey="${keys.publicKey}"></div>
+  <!-- Vynalth AI Shield Widget Container -->
+  <div id="Vynalth AI Shield-widget" data-sitekey="${keys.publicKey}"></div>
 
   <button type="submit">Submit Securely</button>
 </form>
 
 <script>
   // Optional: Listen for verification success
-  document.getElementById('vitashield-widget')
+  document.getElementById('Vynalth AI Shield-widget')
     .addEventListener('vms-verified', (event) => {
       console.log('Verification token generated:', event.detail.token);
     });
 </script>`,
 
     react: `import React, { useState } from 'react';
-import { VerificationWidget } from '@vitashield/react-sdk';
+import { VerificationWidget } from '@Vynalth AI Shield/react-sdk';
 
 export const LoginForm = () => {
   const [token, setToken] = useState('');
@@ -96,7 +96,7 @@ export const LoginForm = () => {
   <form @submit.prevent="handleSubmit">
     <input type="text" v-model="username" placeholder="Username" required />
     
-    <!-- VitaShield Vue 3 Component -->
+    <!-- Vynalth AI Shield Vue 3 Component -->
     <VerificationWidget
       :siteKey="siteKey"
       @verify="handleVerify"
@@ -108,7 +108,7 @@ export const LoginForm = () => {
 
 <script setup>
 import { ref } from 'vue';
-import { VerificationWidget } from '@vitashield/vue-sdk';
+import { VerificationWidget } from '@Vynalth AI Shield/vue-sdk';
 
 const siteKey = ref('${keys.publicKey}');
 const username = ref('');
@@ -128,7 +128,7 @@ const handleSubmit = async () => {
 </script>`,
 
     svelte: `<script>
-  import { VerificationWidget } from '@vitashield/svelte-sdk';
+  import { VerificationWidget } from '@Vynalth AI Shield/svelte-sdk';
   
   let token = '';
   let username = '';
@@ -159,7 +159,7 @@ import Foundation
 import CoreMotion
 import UIKit
 
-class VitaShieldSDK {
+class Vynalth AI ShieldSDK {
     private let siteKey: String
     private let motionManager = CMMotionManager()
     private var motionSamples: [[String: Any]] = []
@@ -215,7 +215,7 @@ class VitaShieldSDK {
 }`,
 
     android_kotlin: `// Android Native Kotlin SDK Integration Example
-package com.vitashield.sdk
+package com.Vynalth AI Shield.sdk
 
 import android.content.Context
 import android.hardware.Sensor
@@ -225,7 +225,7 @@ import android.hardware.SensorManager
 import android.os.Build
 import org.json.JSONObject
 
-class VitaShieldSDK(private val context: Context, private val siteKey: String) : SensorEventListener {
+class Vynalth AI ShieldSDK(private val context: Context, private val siteKey: String) : SensorEventListener {
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     private val motionSamples = mutableListOf<JSONObject>()
 
@@ -285,8 +285,8 @@ app.post('/login', async (req, res) => {
   const shieldToken = req.body['vms-shield-token'];
   const clientIp = req.ip;
 
-  // Validate the token with VitaShield API
-  const response = await fetch('https://vitashield.sleepsomno.com/api/verify', {
+  // Validate the token with Vynalth AI Shield API
+  const response = await fetch('https://shield.sleepsomno.com/api/verify', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -312,7 +312,7 @@ app.listen(3000);`,
     python: `import requests
 
 def verify_shield_token(token, client_ip):
-    url = "https://vitashield.sleepsomno.com/api/verify"
+    url = "https://shield.sleepsomno.com/api/verify"
     payload = {
         "secret": "${keys.secretKey}",
         "token": token,
@@ -361,7 +361,7 @@ func verifyToken(token, ip string) (bool, error) {
     })
 
     client := &http.Client{Timeout: 5 * time.Second}
-    resp, err := client.Post("https://vitashield.sleepsomno.com/api/verify", "application/json", bytes.NewBuffer(reqBody))
+    resp, err := client.Post("https://shield.sleepsomno.com/api/verify", "application/json", bytes.NewBuffer(reqBody))
     if err != nil {
         return false, err
     }
@@ -386,7 +386,7 @@ public class ShieldVerifier {
         
         HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("https://vitashield.sleepsomno.com/api/verify"))
+            .uri(URI.create("https://shield.sleepsomno.com/api/verify"))
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(json))
             .build();
@@ -398,7 +398,7 @@ public class ShieldVerifier {
 
     php: `<?php
 function verifyShieldToken($token, $ip) {
-    $url = 'https://vitashield.sleepsomno.com/api/verify';
+    $url = 'https://shield.sleepsomno.com/api/verify';
     $data = [
         'secret' => '${keys.secretKey}',
         'token'  => $token,
@@ -423,7 +423,7 @@ function verifyShieldToken($token, $ip) {
 }
 ?>`,
 
-    curl: `curl -X POST https://vitashield.sleepsomno.com/api/verify \\
+    curl: `curl -X POST https://shield.sleepsomno.com/api/verify \\
   -H "Content-Type: application/json" \\
   -d '{
     "secret": "${keys.secretKey}",
@@ -439,12 +439,12 @@ const supabase = createClient(
   'YOUR_SUPABASE_ANON_KEY'
 )
 
-// Trigger OAuth sign-in with custom VitaShield provider (vitamind-ai)
-async function signInWithVitaShield() {
+// Trigger OAuth sign-in with custom Vynalth AI Shield provider (Vynalth-ai)
+async function signInWithVynalth AI Shield() {
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'custom:vitamind-ai',
+    provider: 'custom:Vynalth-ai',
     options: {
-      redirectTo: 'https://vitashield.sleepsomno.com/dashboard',
+      redirectTo: 'https://shield.sleepsomno.com/dashboard',
       scopes: 'openid email profile'
     }
   })
@@ -452,7 +452,7 @@ async function signInWithVitaShield() {
   if (error) {
     console.error('Custom OAuth login failed:', error.message);
   } else {
-    console.log('Redirecting to custom VitaShield auth gateway...');
+    console.log('Redirecting to custom Vynalth AI Shield auth gateway...');
   }
 }`
   };
@@ -525,7 +525,7 @@ async function signInWithVitaShield() {
                   cursor: 'pointer'
                 }}
               >
-                <option value="default">VitaShield Default (vitashield.sleepsomno.com)</option>
+                <option value="default">Vynalth AI Shield Default (shield.sleepsomno.com)</option>
                 <option value="personal">Vyncus Lim Personal Website (vyncuslim.sleepsomno.com)</option>
                 <option value="sleepsomno">SleepSomno Main App (sleepsomno.com)</option>
               </select>
@@ -620,7 +620,7 @@ async function signInWithVitaShield() {
               <span>Download ready-to-test **Postman Collection v2.1 JSON** containing verify endpoints.</span>
             </div>
             <button 
-              onClick={() => handleCopy('https://vitashield.sleepsomno.com/v1/postman_collection.json', 'postman')} 
+              onClick={() => handleCopy('https://shield.sleepsomno.com/v1/postman_collection.json', 'postman')} 
               style={styles.postmanBtn}
             >
               {copiedKey === 'postman' ? 'Link Copied!' : 'Copy Postman Link'}

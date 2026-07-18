@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { globalAutoencoder } from '../lib/riskEngine';
 import { getApiBaseUrl } from '../lib/api';
 
@@ -382,7 +382,7 @@ export const MLEngine: React.FC = () => {
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: '1.8' }}>
                 • Total trained samples: <strong style={{ color: '#fff' }}>{samplesCount}</strong><br />
                 &nbsp;&nbsp;<span style={{ fontSize: '0.72rem', color: '#10b981' }}>
-                  ↳ Includes real visitor traffic from VitaShield &amp; sleepsomno.com
+                  ↳ Includes real visitor traffic from Vynalth AI Shield &amp; sleepsomno.com
                 </span><br />
                 • Running reconstruction error: <strong style={{ color: runningError > 0.18 ? 'var(--danger)' : '#34d399' }}>{runningError.toFixed(4)}</strong><br />
                 • Anomaly threshold limit: <strong>0.180</strong><br />

@@ -1,4 +1,4 @@
-# Handoff Report — worker_initial_setup
+﻿# Handoff Report — worker_initial_setup
 
 ## 1. Observation
 
@@ -6,7 +6,7 @@
   - File written at `C:\Users\lynne\Documents\antigravity\mysterious-maxwell\PROJECT.md`.
   - Verbatim contents of `PROJECT.md`:
     ```markdown
-    # Project: VitaShield Threat Intel Ingestion and Enrichment
+    # Project: Vynalth AI Shield Threat Intel Ingestion and Enrichment
 
     ## Architecture
     - Module/package boundaries, data flow, shared interfaces:

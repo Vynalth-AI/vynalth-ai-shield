@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 
-const BASE = 'https://vitashield.sleepsomno.com';
+const BASE = 'https://shield.sleepsomno.com';
 const SOMNO_BASE = 'https://sleepsomno.com';
 
 interface MediaAsset {
@@ -17,58 +17,58 @@ interface MediaAsset {
 const ASSETS: MediaAsset[] = [
   // ── Logos ──────────────────────────────────────────
   {
-    id: 'vitashield-logo',
+    id: 'Vynalth AI Shield-logo',
     category: 'logo',
-    title: 'VitaShield Logo',
-    description: 'Official VitaShield product logo. Use on dark backgrounds for best contrast.',
-    url: `${BASE}/logo.jpg`,
+    title: 'Vynalth AI Shield Logo',
+    description: 'Official Vynalth AI Shield product logo. Use on dark backgrounds for best contrast.',
+    url: `${BASE}/vynalth_ai_shield_logo.jpg`,
     fileType: 'JPG',
-    preview: `${BASE}/logo.jpg`,
+    preview: `${BASE}/vynalth_ai_shield_logo.jpg`,
     badge: 'Primary'
   },
   {
-    id: 'vitashield-logo512',
+    id: 'Vynalth AI Shield-logo512',
     category: 'logo',
-    title: 'VitaShield Logo 512px',
-    description: 'High-resolution 512×512 VitaShield logo for app icons and marketing materials.',
+    title: 'Vynalth AI Shield Logo 512px',
+    description: 'High-resolution 512×512 Vynalth AI Shield logo for app icons and marketing materials.',
     url: `${BASE}/logo512.png`,
     fileType: 'PNG',
     preview: `${BASE}/logo512.png`,
     badge: 'High-Res'
   },
   {
-    id: 'vitamind-planet',
+    id: 'Vynalth-planet',
     category: 'logo',
-    title: 'VitaMind AI Planet Logo',
-    description: 'VitaMind AI parent company brand logo — cosmic planet design.',
-    url: `${BASE}/brand-logo-new.png`,
+    title: 'Vynalth AI Planet Logo',
+    description: 'Vynalth AI parent company brand logo — cosmic planet design.',
+    url: `${BASE}/vynalth_ai_logo.jpg`,
     fileType: 'PNG',
-    preview: `${BASE}/brand-logo-new.png`,
+    preview: `${BASE}/vynalth_ai_logo.jpg`,
     badge: 'Parent Brand'
   },
   {
-    id: 'vitamind-logo512',
+    id: 'Vynalth-logo512',
     category: 'logo',
-    title: 'VitaMind AI Logo 512px',
-    description: 'Official 512px VitaMind AI logo for web and app use.',
+    title: 'Vynalth AI Logo 512px',
+    description: 'Official 512px Vynalth AI logo for web and app use.',
     url: `${SOMNO_BASE}/logo_512.png`,
     fileType: 'PNG',
     preview: `${SOMNO_BASE}/logo_512.png`,
-    badge: 'VitaMind AI'
+    badge: 'Vynalth AI'
   },
   {
-    id: 'vitamind-og',
+    id: 'Vynalth-og',
     category: 'brand',
-    title: 'VitaMind AI OG / Social Card',
+    title: 'Vynalth AI OG / Social Card',
     description: 'Social media open-graph preview card. Use as Twitter/Facebook sharing thumbnail.',
     url: `${SOMNO_BASE}/og-image.svg`,
     fileType: 'SVG',
     badge: 'Social'
   },
   {
-    id: 'vitashield-favicon',
+    id: 'Vynalth AI Shield-favicon',
     category: 'logo',
-    title: 'VitaShield Favicon',
+    title: 'Vynalth AI Shield Favicon',
     description: 'Vector favicon for browser tabs and PWA manifests.',
     url: `${BASE}/favicon.svg`,
     fileType: 'SVG',
@@ -78,8 +78,8 @@ const ASSETS: MediaAsset[] = [
   {
     id: 'widget-sdk',
     category: 'sdk',
-    title: 'VitaShield Widget SDK',
-    description: 'Drop-in JavaScript SDK. Embed the VitaShield behavioral verification widget on any site.',
+    title: 'Vynalth AI Shield Widget SDK',
+    description: 'Drop-in JavaScript SDK. Embed the Vynalth AI Shield behavioral verification widget on any site.',
     url: `${BASE}/widget.js`,
     fileType: 'JS',
     badge: 'v1 SDK'
@@ -87,7 +87,7 @@ const ASSETS: MediaAsset[] = [
   {
     id: 'widget-sdk-secure',
     category: 'sdk',
-    title: 'VitaShield Widget SDK (Secure)',
+    title: 'Vynalth AI Shield Widget SDK (Secure)',
     description: 'Security-hardened variant of the Widget SDK with enhanced CSP and integrity policies.',
     url: `${BASE}/widget-secure.js`,
     fileType: 'JS',
@@ -107,7 +107,7 @@ const ASSETS: MediaAsset[] = [
     id: 'postman-collection',
     category: 'docs',
     title: 'Postman API Collection',
-    description: 'Pre-configured Postman collection for all VitaShield v1 REST endpoints.',
+    description: 'Pre-configured Postman collection for all Vynalth AI Shield v1 REST endpoints.',
     url: `${BASE}/v1/postman_collection.json`,
     fileType: 'JSON',
     badge: 'API Docs'
@@ -133,7 +133,7 @@ const BADGE_COLORS: Record<string, string> = {
   Primary: '#06b6d4',
   'High-Res': '#10b981',
   'Parent Brand': '#a855f7',
-  'VitaMind AI': '#8b5cf6',
+  'Vynalth AI': '#8b5cf6',
   Social: '#f59e0b',
   Favicon: '#64748b',
   'v1 SDK': '#06b6d4',
@@ -167,19 +167,19 @@ export const MediaPage: React.FC = () => {
             border: '1px solid rgba(6, 182, 212, 0.3)',
             boxShadow: '0 0 16px rgba(6, 182, 212, 0.15)'
           }}>
-            <img src="/logo.jpg" alt="VitaShield" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src="/vynalth_ai_shield_logo.jpg" alt="Vynalth AI Shield" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
           <div>
             <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#f8fafc', margin: 0, letterSpacing: '-0.02em' }}>
               Media Kit
             </h1>
             <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-              VitaShield × VitaMind AI — Brand Resources
+              Vynalth AI Shield × Vynalth AI — Brand Resources
             </p>
           </div>
         </div>
         <p style={{ color: '#94a3b8', fontSize: '0.9rem', lineHeight: 1.6, margin: 0 }}>
-          Official logos, brand assets, SDK scripts, and API documentation for VitaShield and VitaMind AI.
+          Official logos, brand assets, SDK scripts, and API documentation for Vynalth AI Shield and Vynalth AI.
           All assets are publicly accessible via CDN. Right-click images to save, or copy the direct URL.
         </p>
       </div>
@@ -385,7 +385,7 @@ export const MediaPage: React.FC = () => {
       }}>
         <div>
           <span style={{ color: '#06b6d4', fontWeight: 700 }}>Usage Guidelines: </span>
-          VitaShield and VitaMind AI logos may be used in editorial, partner integrations, and press coverage.
+          Vynalth AI Shield and Vynalth AI logos may be used in editorial, partner integrations, and press coverage.
           Do not alter colors, proportions, or apply effects to the logos. For commercial licensing inquiries, contact{' '}
           <a href="mailto:contact@sleepsomno.com" style={{ color: '#06b6d4', textDecoration: 'none', fontWeight: 600 }}>
             contact@sleepsomno.com
@@ -394,9 +394,9 @@ export const MediaPage: React.FC = () => {
         
         <div style={{ borderTop: '1px solid rgba(6, 182, 212, 0.1)', paddingTop: '0.75rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
           <span style={{ fontWeight: 700, color: '#f8fafc' }}>Official Links:</span>
-          <a href="https://www.instagram.com/_vitashield/" target="_blank" rel="noopener noreferrer" style={{ color: '#a855f7', textDecoration: 'none', fontWeight: 600 }}>Instagram</a>
-          <a href="https://www.linkedin.com/company/real-vitashield" target="_blank" rel="noopener noreferrer" style={{ color: '#0077b5', textDecoration: 'none', fontWeight: 600 }}>LinkedIn</a>
-          <a href="https://www.crunchbase.com/organization/vitashield" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 600 }}>Crunchbase (Company)</a>
+          <a href="https://www.instagram.com/_Vynalth AI Shield/" target="_blank" rel="noopener noreferrer" style={{ color: '#a855f7', textDecoration: 'none', fontWeight: 600 }}>Instagram</a>
+          <a href="https://www.linkedin.com/company/real-Vynalth AI Shield" target="_blank" rel="noopener noreferrer" style={{ color: '#0077b5', textDecoration: 'none', fontWeight: 600 }}>LinkedIn</a>
+          <a href="https://www.crunchbase.com/organization/Vynalth AI Shield" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 600 }}>Crunchbase (Company)</a>
           <a href="https://www.crunchbase.com/person/vyncus-lim" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 600 }}>Crunchbase (Founder)</a>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface CheckinState {
@@ -107,10 +107,10 @@ const ConsentModal: React.FC<{ onAccept: () => void; onDecline: () => void }> = 
       <div style={{ textAlign: 'center', marginBottom: '24px' }}>
         <div style={{ fontSize: '40px', marginBottom: '12px' }}>🛡️</div>
         <h2 style={{ color: '#fff', fontSize: '20px', fontWeight: 700, margin: '0 0 8px' }}>
-          Help Train VitaShield AI
+          Help Train Vynalth AI Shield AI
         </h2>
         <p style={{ color: '#94a3b8', fontSize: '13px', lineHeight: 1.6, margin: 0 }}>
-          <strong style={{ color: '#00f2fe' }}>VitaShield Beta · Data Collection</strong>
+          <strong style={{ color: '#00f2fe' }}>Vynalth AI Shield Beta · Data Collection</strong>
         </p>
       </div>
 
@@ -119,10 +119,10 @@ const ConsentModal: React.FC<{ onAccept: () => void; onDecline: () => void }> = 
         borderRadius: '12px', padding: '16px', marginBottom: '20px', fontSize: '13px',
         color: '#94a3b8', lineHeight: 1.7,
       }}>
-        Participating in the daily VitaShield check-in helps us improve our behavioral verification AI models.<br />
+        Participating in the daily Vynalth AI Shield check-in helps us improve our behavioral verification AI models.<br />
         <br />
         Collected telemetry: <strong style={{ color: '#e2e8f0' }}>Click sequences, cursor trajectories, reaction times, device signals</strong><br />
-        Use: <strong style={{ color: '#e2e8f0' }}>Train the VitaShield AI detection system</strong><br />
+        Use: <strong style={{ color: '#e2e8f0' }}>Train the Vynalth AI Shield AI detection system</strong><br />
         Your data is fully secure and will never be sold. Consent can be revoked at any time in settings.
       </div>
 
@@ -616,10 +616,10 @@ const TaskModal: React.FC<{
           </div>
         )}
 
-        {/* VitaShield attribution */}
+        {/* Vynalth AI Shield attribution */}
         <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
           <span style={{ fontSize: '10px', color: '#1e293b' }}>🛡️ Powered by</span>
-          <span style={{ fontSize: '10px', color: '#334155', fontWeight: 700 }}>VitaShield Beta</span>
+          <span style={{ fontSize: '10px', color: '#334155', fontWeight: 700 }}>Vynalth AI Shield Beta</span>
         </div>
       </div>
     </div>
@@ -645,7 +645,7 @@ const RewardModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           Congratulations!
         </h2>
         <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '24px' }}>
-          You have completed the 4-day VitaShield verification streak!
+          You have completed the 4-day Vynalth AI Shield verification streak!
         </p>
 
         <div style={{
@@ -658,7 +658,7 @@ const RewardModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             Neuro Plan · 3 Months
           </div>
           <div style={{ color: '#64748b', fontSize: '13px' }}>
-            Successfully applied to your VitaMind AI account
+            Successfully applied to your Vynalth AI account
           </div>
         </div>
 
@@ -666,7 +666,7 @@ const RewardModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           background: 'rgba(0,242,254,0.06)', border: '1px solid rgba(0,242,254,0.15)',
           borderRadius: '12px', padding: '14px', marginBottom: '24px', fontSize: '12px', color: '#64748b',
         }}>
-          🛡️ Your 4 verification payloads have been securely ingested to train VitaShield's AI model.<br />
+          🛡️ Your 4 verification payloads have been securely ingested to train Vynalth AI Shield's AI model.<br />
           Thank you for helping make the web safer.
         </div>
 
@@ -768,7 +768,7 @@ export const DailyCheckinWidget: React.FC = () => {
     }
 
     // In production: POST to /api/checkin with result + behavior token
-    console.log('[VitaShield DailyCheckin] Task completed', result);
+    console.log('[Vynalth AI Shield DailyCheckin] Task completed', result);
   }, [state]);
 
   const handleRewardClose = () => {
@@ -821,7 +821,7 @@ export const DailyCheckinWidget: React.FC = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
               <span style={{ fontSize: '16px' }}>🛡️</span>
               <span style={{ fontSize: '11px', color: '#a855f7', fontWeight: 700, letterSpacing: '0.08em' }}>
-                VITASHIELD BETA
+                Vynalth AI Shield BETA
               </span>
               <span style={{
                 fontSize: '10px', background: 'rgba(168,85,247,0.15)',

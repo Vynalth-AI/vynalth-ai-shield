@@ -1,8 +1,8 @@
-# Original User Request
+﻿# Original User Request
 
 ## Initial Request — 2026-07-15T14:13:24Z
 
-This project aims to acquire real-time cybersecurity threat intelligence (exploited CVEs, C2 botnet IPs, and malware distribution URLs) via a combination of running the existing VitaShield crawl script and using automated browsing, and populate the VitaShield Supabase database.
+This project aims to acquire real-time cybersecurity threat intelligence (exploited CVEs, C2 botnet IPs, and malware distribution URLs) via a combination of running the existing Vynalth AI Shield crawl script and using automated browsing, and populate the Vynalth AI Shield Supabase database.
 
 Working directory: C:\Users\lynne\Documents\antigravity\mysterious-maxwell
 Integrity mode: development

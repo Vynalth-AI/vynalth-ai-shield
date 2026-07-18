@@ -128,7 +128,7 @@ export const StatusPage: React.FC<{ isStandalone?: boolean }> = ({ isStandalone 
     }
   ];
 
-  const vitamindComponents: ComponentStatus[] = [
+  const VynalthComponents: ComponentStatus[] = [
     {
       key: 'inference',
       name: 'Core AI Inference API',
@@ -219,7 +219,7 @@ export const StatusPage: React.FC<{ isStandalone?: boolean }> = ({ isStandalone 
       <div style={styles.header}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-            {/* Logo 1: VitaMind AI (Parent Company - Official Planet SVG Logo) */}
+            {/* Logo 1: Vynalth AI (Parent Company - Official Planet SVG Logo) */}
             <div style={{
               width: '32px',
               height: '32px',
@@ -229,14 +229,14 @@ export const StatusPage: React.FC<{ isStandalone?: boolean }> = ({ isStandalone 
               alignItems: 'center',
               justifyContent: 'center',
               boxShadow: '0 0 10px rgba(139, 92, 246, 0.15)'
-            }} title="VitaMind AI (Parent Company)">
-              <img src="/brand-logo-new.png" alt="SomnoAI Official Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            }} title="Vynalth AI (Parent Company) - Building the Future of Health AI">
+              <img src="/vynalth_ai_logo.jpg" alt="Vynalth AI Official Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
             
             {/* Operator symbol */}
             <span style={{ color: 'var(--text-dark)', fontSize: '0.75rem', fontWeight: 800 }}>✕</span>
 
-            {/* Logo 2: VitaShield (Subsidiary - Blue Glow) */}
+            {/* Logo 2: Vynalth AI Shield (Subsidiary - Blue Glow) */}
             <div style={{
               width: '32px',
               height: '32px',
@@ -247,15 +247,13 @@ export const StatusPage: React.FC<{ isStandalone?: boolean }> = ({ isStandalone 
               alignItems: 'center',
               justifyContent: 'center',
               boxShadow: '0 0 10px rgba(6, 182, 212, 0.15)'
-            }} title="VitaShield (Security Subsidiary)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              </svg>
+            }} title="Vynalth AI Shield - Invisible Trust, Everywhere">
+              <img src="/vynalth_ai_shield_logo.jpg" alt="Vynalth AI Shield Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
           </div>
           <div>
             <h1 style={styles.brandTitle}>sleepsomno.com</h1>
-            <p style={styles.brandSubtitle}>VitaMind AI & VitaShield System Status</p>
+            <p style={styles.brandSubtitle}>Vynalth AI (Building the Future of Health AI) & Vynalth AI Shield (Invisible Trust, Everywhere)</p>
           </div>
         </div>
         <span style={{
@@ -309,7 +307,7 @@ export const StatusPage: React.FC<{ isStandalone?: boolean }> = ({ isStandalone 
               </h2>
               <p style={styles.bannerSubtitle}>
                 {overallSystemStatus === 'operational'
-                  ? 'VitaShield active defense gates and VitaMind AI endpoints are working normal.'
+                  ? 'Vynalth AI Shield active defense gates and Vynalth AI endpoints are working normal.'
                   : 'We are currently observing degraded response latencies on some backend nodes.'}
               </p>
             </div>
@@ -401,9 +399,9 @@ export const StatusPage: React.FC<{ isStandalone?: boolean }> = ({ isStandalone 
         </div>
       )}
 
-      {/* Group 1: VitaShield */}
+      {/* Group 1: Vynalth AI Shield */}
       <div className="glass-panel" style={styles.panel}>
-        <h3 style={styles.sectionHeader}>VITASHIELD OPERATION ENGINE</h3>
+        <h3 style={styles.sectionHeader}>Vynalth AI Shield OPERATION ENGINE</h3>
         <div style={styles.componentsList}>
           {shieldComponents.map((c, i) => (
             <div key={i} style={styles.componentItem}>
@@ -438,11 +436,11 @@ export const StatusPage: React.FC<{ isStandalone?: boolean }> = ({ isStandalone 
         </div>
       </div>
 
-      {/* Group 2: VitaMind AI */}
+      {/* Group 2: Vynalth AI */}
       <div className="glass-panel" style={styles.panel}>
-        <h3 style={styles.sectionHeader}>VITAMIND AI INFERENCE PLATFORM</h3>
+        <h3 style={styles.sectionHeader}>Vynalth AI INFERENCE PLATFORM</h3>
         <div style={styles.componentsList}>
-          {vitamindComponents.map((c, i) => (
+          {VynalthComponents.map((c, i) => (
             <div key={i} style={styles.componentItem}>
               <div style={styles.componentMetaRow}>
                 <span style={styles.componentName}>{c.name}</span>

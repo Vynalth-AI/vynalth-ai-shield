@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useBehaviorTracker } from './VerificationWidget/useBehaviorTracker';
 import { getApiBaseUrl } from '../lib/api';
 import { DotMatrixLoader } from './ui/DotMatrixLoader';
@@ -97,7 +97,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({ onAuthSuccess, onBackToH
     }
 
     if (isSuspicious) {
-      setErrorMsg('VitaShield: Suspicious automation trajectory detected. Please drag the slider to unlock.');
+      setErrorMsg('Vynalth AI Shield: Suspicious automation trajectory detected. Please drag the slider to unlock.');
       setChallengeActive(true);
       return;
     }
@@ -184,9 +184,9 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({ onAuthSuccess, onBackToH
         {/* Brand Header */}
         <div style={styles.brandHeader}>
           <div style={{ ...styles.logoIcon, background: 'transparent', border: 'none' }}>
-            <img src="/logo.jpg" alt="VitaShield Logo" style={{ width: '100%', height: '100%', borderRadius: '4px', objectFit: 'cover' }} />
+            <img src="/vynalth_ai_shield_logo.jpg" alt="Vynalth AI Shield Logo" style={{ width: '100%', height: '100%', borderRadius: '4px', objectFit: 'cover' }} />
           </div>
-          <h2 style={styles.brandName}>VitaShield Console</h2>
+          <h2 style={styles.brandName}>Vynalth AI Shield Console</h2>
         </div>
 
         <p style={styles.authSubtitle}>

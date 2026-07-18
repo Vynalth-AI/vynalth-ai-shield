@@ -1,5 +1,5 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// VitaShield 安全 SDK - 客户端集成 (widget-secure.js)
+﻿// ─────────────────────────────────────────────────────────────────────────────
+// Vynalth AI Shield 安全 SDK - 客户端集成 (widget-secure.js)
 // ─────────────────────────────────────────────────────────────────────────────
 
 (function() {
@@ -46,7 +46,7 @@
   function verifySDKIntegrity() {
     try {
       // 简单混淆哈希自检以确认脚本 namespace 未被破坏
-      var isSelfValid = typeof window.VitaShield === 'object';
+      var isSelfValid = typeof window.Vynalth AI Shield === 'object';
       return isSelfValid;
     } catch (error) {
       return false;
@@ -57,7 +57,7 @@
   // 3. 核心 SDK 类
   // ─────────────────────────────────────────────────────────────────────────
 
-  class VitaShieldSecure {
+  class Vynalth AI ShieldSecure {
     constructor(config = {}) {
       this.config = Object.assign({
         siteKey: '',
@@ -105,7 +105,7 @@
           this.config.callbacks.onReady();
         }
       } catch (error) {
-        console.error('VitaShield initialization error:', error);
+        console.error('Vynalth AI Shield initialization error:', error);
         if (typeof this.config.callbacks.onError === 'function') {
           this.config.callbacks.onError(error);
         }
@@ -160,7 +160,7 @@
         ctx.fillStyle = '#f60';
         ctx.fillRect(125, 1, 62, 20);
         ctx.fillStyle = '#069';
-        ctx.fillText('VitaShield', 2, 15);
+        ctx.fillText('Vynalth AI Shield', 2, 15);
 
         var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         var data = imageData.data;
@@ -438,20 +438,20 @@
   // 4. 全局 API
   // ─────────────────────────────────────────────────────────────────────────
 
-  window.VitaShield = {
+  window.Vynalth AI Shield = {
     init: function(config) {
-      return new VitaShieldSecure(config);
+      return new Vynalth AI ShieldSecure(config);
     }
   };
 
   document.addEventListener('DOMContentLoaded', () => {
-    var element = document.querySelector('[data-vitashield]');
+    var element = document.querySelector('[data-Vynalth AI Shield]');
     if (element) {
       var config = {};
       try {
-        config = JSON.parse(element.getAttribute('data-vitashield') || '{}');
+        config = JSON.parse(element.getAttribute('data-Vynalth AI Shield') || '{}');
       } catch (e) {}
-      window.VitaShield.init(config);
+      window.Vynalth AI Shield.init(config);
     }
   });
 })();

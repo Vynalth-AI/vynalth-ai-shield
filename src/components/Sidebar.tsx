@@ -239,7 +239,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
       {/* Brand Header */}
       <div style={styles.brandContainer}>
         <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-          {/* Logo 1: VitaMind AI (Mother Company - Official Planet SVG Logo) */}
+          {/* Logo 1: Vynalth AI (Mother Company - Official Planet SVG Logo) */}
           <div style={{
             width: '30px',
             height: '30px',
@@ -249,14 +249,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
             alignItems: 'center',
             justifyContent: 'center',
             boxShadow: '0 0 10px rgba(139, 92, 246, 0.15)'
-          }} title="VitaMind AI (Parent Company)">
-            <img src="/brand-logo-new.png" alt="SomnoAI Official Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          }} title="Vynalth AI (Parent Company) - Building the Future of Health AI">
+            <img src="/vynalth_ai_logo.jpg" alt="Vynalth AI Official Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>
           
           {/* Joint operator symbol */}
           <span style={{ color: 'var(--text-dark)', fontSize: '0.65rem', fontWeight: 800 }}>✕</span>
 
-          {/* Logo 2: VitaShield (Child Product/Gateway - Blue Glow) */}
+          {/* Logo 2: Vynalth AI Shield (Child Product/Gateway - Blue Glow) */}
           <div style={{
             width: '30px',
             height: '30px',
@@ -266,13 +266,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
             alignItems: 'center',
             justifyContent: 'center',
             boxShadow: '0 0 10px rgba(6, 182, 212, 0.15)'
-          }} title="VitaShield Gateway (Security Subsidiary)">
-            <img src="/logo.jpg" alt="VitaShield Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          }} title="Vynalth AI Shield Gateway - Invisible Trust, Everywhere">
+            <img src="/vynalth_ai_shield_logo.jpg" alt="Vynalth AI Shield Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         </div>
         <div style={styles.brandText}>
-          <div style={styles.brandTitle}>VitaShield</div>
-          <div style={styles.brandSubtitle}>VitaMind AI Security</div>
+          <div style={styles.brandTitle}>Vynalth AI Shield</div>
+          <div style={styles.brandSubtitle}>Invisible Trust, Everywhere</div>
         </div>
       </div>
 
@@ -354,7 +354,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
             <div style={styles.statusDesc}>V1.2 - Global Gateway</div>
           </div>
         </div>
-        <div style={styles.footerVersion}>© 2026 VitaMind AI Inc.</div>
+        <div style={styles.footerVersion}>© 2026 Vynalth AI Inc.</div>
       </div>
     </aside>
   );

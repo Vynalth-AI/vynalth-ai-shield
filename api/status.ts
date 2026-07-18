@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+﻿import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
@@ -155,7 +155,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         title: 'Mitigating: Coordinated Login & Credential Stuffing Anomaly',
         status: 'MITIGATING',
         date: `${dateStr} - ${timeStr} (Active)`,
-        description: `Shield Edge Gateways have detected abnormal credential submission patterns matching headless browser signatures. VitaShield is dropping invalid sessions via HTTP 403 Forbidden. Core systems remain fully operational, and client endpoints are guarded.`
+        description: `Shield Edge Gateways have detected abnormal credential submission patterns matching headless browser signatures. Vynalth AI Shield is dropping invalid sessions via HTTP 403 Forbidden. Core systems remain fully operational, and client endpoints are guarded.`
       },
       ...auditedIncidents
     ];
@@ -175,7 +175,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           title: 'Embedding vector pipeline optimization',
           status: 'COMPLETED',
           date: 'July 10, 2026 - 02:00 UTC',
-          description: 'Scheduled rolling maintenance completed on VitaMind AI embedding vector server pools. Average inference time reduced.'
+          description: 'Scheduled rolling maintenance completed on Vynalth AI embedding vector server pools. Average inference time reduced.'
         }
       ];
     }

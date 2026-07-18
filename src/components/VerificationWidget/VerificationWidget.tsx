@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useBehaviorTracker } from './useBehaviorTracker';
 
 interface VerificationWidgetProps {
@@ -436,7 +436,7 @@ export const VerificationWidget: React.FC<VerificationWidgetProps> = ({
             {verified ? (
               <span>Verification Passed</span>
             ) : (
-              <span>Protected by <strong style={{ color: '#fff' }}>VitaShield</strong></span>
+              <span>Protected by <strong style={{ color: '#fff' }}>Vynalth AI Shield</strong></span>
             )}
           </span>
         </div>

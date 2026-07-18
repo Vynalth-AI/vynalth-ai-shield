@@ -134,6 +134,14 @@ function App() {
     return <StatusPage isStandalone={true} />;
   }
 
+  // Redirect old subdomain vitashield.sleepsomno.com to new shield.sleepsomno.com domain
+  if (typeof window !== 'undefined') {
+    if (window.location.hostname === 'vitashield.sleepsomno.com') {
+      window.location.replace('https://shield.sleepsomno.com' + window.location.pathname + window.location.search);
+      return null;
+    }
+  }
+
   // Client-side fallback redirect for main domain status paths
   if (typeof window !== 'undefined') {
     const path = window.location.pathname.toLowerCase();
@@ -313,6 +321,100 @@ function App() {
       setActiveTab('dashboard');
     }
   }, [user]);
+
+  // Dynamic SEO Title and Metadata updates for shield.sleepsomno.com
+  useEffect(() => {
+    let title = 'Vynalth AI Shield - AI-Native Human Verification & Anti-Bot Infrastructure';
+    let description = 'Protect your platform, APIs, and Web3 apps from bot networks, credential stuffing, scraping, and malicious AI agents with Vynalth AI Shield. Invisible behavioral telemetry with sub-200ms edge latency.';
+    let keywords = 'anti-bot, human verification, bot protection, sybil protection, AI agent detection, secure captcha, invisible telemetry, cybersecurity infrastructure';
+
+    if (isPlaybookRoute) {
+      const pageName = cleanPath.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      title = `${pageName} | Vynalth AI Design Playbook`;
+      description = `Learn guidelines for ${pageName} matching Emil Kowalski and Disney standards on shield.sleepsomno.com.`;
+    } else if (viewMode === 'marketing') {
+      title = 'Vynalth AI Shield - Invisible Trust, Everywhere | Anti-Bot & AI Verification';
+      description = 'Protect health diagnostic systems, APIs, and B2B platforms from advanced bot networks and crawlers. Vynalth AI Shield is the security division of Vynalth AI, building the future of health AI.';
+    } else if (viewMode === 'auth') {
+      title = 'Login | Vynalth AI Shield Console';
+      description = 'Log in to Vynalth AI Shield console to monitor telemetry logs, manage WAF rules, and review health-context auth settings.';
+    } else if (viewMode === 'pricing') {
+      title = 'Pricing Plans | Vynalth AI Shield';
+      description = 'Choose the best behavioral biometrics plan for your platform. From Freemium to custom Enterprise plans designed for digital therapeutics and B2B SaaS.';
+    } else if (viewMode === 'whitepaper') {
+      title = 'Whitepaper | Vynalth AI Shield Research';
+      description = 'Read our research paper on countering advanced AI operators and automated browser scrapers via micro-interaction dynamics and sub-pixel biometrics.';
+    } else if (viewMode === 'console') {
+      const tabTitle = activeTab.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      title = `${tabTitle} | Vynalth AI Shield Console`;
+      
+      switch (activeTab) {
+        case 'dashboard':
+          description = 'Real-time security telemetry, traffic maps, and trust score metrics for shield.sleepsomno.com.';
+          break;
+        case 'trust_center':
+          title = 'Trust & Compliance Portal | Vynalth AI Shield';
+          description = 'Public compliance documentation, impossible travel logs, right to erasure portal, and real-time security assurance.';
+          break;
+        case 'playground':
+          description = 'Test and stress-test the invisible behavioral verification widget and view real-time score updates.';
+          break;
+        case 'logs':
+          description = 'Comprehensive audit trail of behavioral verification logs and bot blocks.';
+          break;
+        case 'settings':
+          description = 'Configure WAF strictness levels, custom themes, IP bypass lists, and client SDK presets.';
+          break;
+        case 'rules':
+          title = 'WAF Rules Engine | Vynalth AI Shield';
+          description = 'Manage active firewall security rules including Cloudflare Worker r008 Impossible Travel and behavioral biometrics.';
+          break;
+        case 'privacy_compliance':
+          title = 'Privacy & Compliance Portal | Vynalth AI Shield';
+          description = 'Generate dynamic privacy policies for Malaysia PDPA, China PIPL, and EU GDPR. Exercise the Right to be Forgotten.';
+          break;
+        case 'health_context':
+          title = 'Health Context Engine | Vynalth AI Shield';
+          description = 'Integrate Oura Ring, Apple Health, and sleep scores to adaptively scale authentication thresholds.';
+          break;
+        case 'bot_bounty':
+          title = 'Security Bot Bounty | Vynalth AI Shield';
+          description = 'Submit vulnerability reports to help protect the digital sleep network and earn recognition in our Hall of Fame.';
+          break;
+      }
+    }
+
+    document.title = title;
+
+    // Update meta description
+    const descMeta = document.querySelector('meta[name="description"]');
+    if (descMeta) {
+      descMeta.setAttribute('content', description);
+    } else {
+      const meta = document.createElement('meta');
+      meta.name = 'description';
+      meta.content = description;
+      document.head.appendChild(meta);
+    }
+
+    // Update meta keywords
+    const keywordsMeta = document.querySelector('meta[name="keywords"]');
+    if (keywordsMeta) {
+      keywordsMeta.setAttribute('content', keywords);
+    }
+
+    // Update OpenGraph Title
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) {
+      ogTitle.setAttribute('content', title);
+    }
+
+    // Update OpenGraph Description
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) {
+      ogDesc.setAttribute('content', description);
+    }
+  }, [viewMode, activeTab, currentPath, cleanPath, isPlaybookRoute]);
 
   // Appends verification telemetry dynamically from widget triggers
   const handleAddLog = (

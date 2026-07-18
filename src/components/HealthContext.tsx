@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 
 // ──────────────────────────────────────────────────────────────────
 // HealthContext.tsx
-// VitaMind AI Health Differentiation:
+// Vynalth AI Health Differentiation:
 //   - Sleep / wearable context simulator (Oura-style)
 //   - Adaptive Trust strictness engine
 //   - AI Agent credential trust panel
@@ -49,8 +49,8 @@ const NEURO_RULES = [
 ];
 
 const AI_AGENTS = [
-  { id: 'agent-001', name: 'SleepSomno Analysis Engine', provider: 'vitamind.ai', trustLevel: 'verified', scope: ['read:sleep', 'read:hrv', 'write:insights'], lastSeen: '2 min ago', requestsToday: 1_842 },
-  { id: 'agent-002', name: 'NeuroShield Threat Classifier', provider: 'vitashield.io', trustLevel: 'verified', scope: ['read:threat_intel', 'write:block_rules'], lastSeen: '12 min ago', requestsToday: 4_120 },
+  { id: 'agent-001', name: 'SleepSomno Analysis Engine', provider: 'Vynalth.ai', trustLevel: 'verified', scope: ['read:sleep', 'read:hrv', 'write:insights'], lastSeen: '2 min ago', requestsToday: 1_842 },
+  { id: 'agent-002', name: 'NeuroShield Threat Classifier', provider: 'Vynalth AI Shield.io', trustLevel: 'verified', scope: ['read:threat_intel', 'write:block_rules'], lastSeen: '12 min ago', requestsToday: 4_120 },
   { id: 'agent-003', name: 'Health Coach GPT-4o', provider: 'openai.com', trustLevel: 'provisional', scope: ['read:sleep', 'read:activity'], lastSeen: '1 hr ago', requestsToday: 345 },
   { id: 'agent-004', name: 'Unknown Scraper Bot', provider: 'unregistered', trustLevel: 'blocked', scope: [], lastSeen: '3 hrs ago', requestsToday: 8_903 },
 ];
@@ -94,7 +94,7 @@ export const HealthContext: React.FC = () => {
       {/* Header */}
       <div>
         <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.03em', margin: 0 }} className="gradient-text">
-          VitaMind Health Context Engine
+          Vynalth Health Context Engine
         </h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', margin: '0.25rem 0 0' }}>
           The world's first health-aware identity verification layer — adapts security friction to your biometric readiness state.
@@ -237,7 +237,7 @@ export const HealthContext: React.FC = () => {
           <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(56,189,248,0.06)', border: '1px solid rgba(56,189,248,0.2)', borderRadius: 8, padding: '0.75rem 1rem' }}>
             <span>🤖</span>
             <p style={{ margin: 0, fontSize: '0.82rem', color: '#7dd3fc', lineHeight: 1.5 }}>
-              <strong>AI Agent Identity Layer</strong> — VitaShield verifies that AI agents calling your health APIs have valid credentials, declared scopes, and human oversight. Unregistered agents are auto-blocked.
+              <strong>AI Agent Identity Layer</strong> — Vynalth AI Shield verifies that AI agents calling your health APIs have valid credentials, declared scopes, and human oversight. Unregistered agents are auto-blocked.
             </p>
           </div>
           {AI_AGENTS.map(agent => (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 
 interface Rule {
   id: string;
@@ -12,7 +12,7 @@ interface Rule {
 
 export const RulesEngine: React.FC = () => {
   const [rules, setRules] = useState<Rule[]>(() => {
-    const saved = localStorage.getItem('vitashield_custom_rules');
+    const saved = localStorage.getItem('Vynalth AI Shield_custom_rules');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -59,7 +59,7 @@ export const RulesEngine: React.FC = () => {
   });
 
   React.useEffect(() => {
-    localStorage.setItem('vitashield_custom_rules', JSON.stringify(rules));
+    localStorage.setItem('Vynalth AI Shield_custom_rules', JSON.stringify(rules));
   }, [rules]);
 
   const [newField, setNewField] = useState('Risk Score');

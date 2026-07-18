@@ -1,4 +1,4 @@
-# 🛡️ VitaShield: AI-Native Human Verification & Anti-Bot Infrastructure
+﻿# 🛡️ Vynalth AI Shield: AI-Native Human Verification & Anti-Bot Infrastructure
 
 [English](#english-version) | [中文版](#中文版本)
 
@@ -6,7 +6,7 @@
 
 ## 中文版本
 
-**VitaShield** 是由 **VitaMind AI** 團隊研發的企業級、AI 原生人機驗證與反自動化爬蟲防禦系統。旨在為 B2B SaaS、Web3 應用以及 API 網關提供高效、零干擾、隱私友好的防禦方案，有效遏制憑證撞庫、接口惡意刷單、數據爬取以及高級 AI 代理 (AI Operators) 的濫用。
+**Vynalth AI Shield** 是由 **Vynalth AI** 團隊研發的企業級、AI 原生人機驗證與反自動化爬蟲防禦系統。旨在為 B2B SaaS、Web3 應用以及 API 網關提供高效、零干擾、隱私友好的防禦方案，有效遏制憑證撞庫、接口惡意刷單、數據爬取以及高級 AI 代理 (AI Operators) 的濫用。
 
 ### 🌟 當前版本已實現功能 (Currently Implemented)
 
@@ -31,19 +31,19 @@
 ### 🚀 2分鐘快速集成指南
 
 #### 1. 前端 SDK 接入 (Script Tag)
-在您的 HTML 頁面中引入 VitaShield 防禦腳本，並在表單 (Form) 內放置對應的 Widget 容器：
+在您的 HTML 頁面中引入 Vynalth AI Shield 防禦腳本，並在表單 (Form) 內放置對應的 Widget 容器：
 
 ```html
 <!-- 1. 引入防禦 SDK -->
-<script src="https://vitashield.sleepsomno.com/widget.js" defer></script>
+<script src="https://shield.sleepsomno.com/widget.js" defer></script>
 
 <!-- 2. 在表單內放置驗證容器 -->
 <form id="login-form" action="/login" method="POST">
   <input type="email" name="email" required />
   <input type="password" name="password" required />
   
-  <!-- VitaShield 隱形防禦 Widget -->
-  <div id="vitashield-widget" 
+  <!-- Vynalth AI Shield 隱形防禦 Widget -->
+  <div id="Vynalth AI Shield-widget" 
        data-sitekey="vms_pub_live_79a2b8e3df9102ca"
        data-theme-primary="#00f2fe"></div>
   
@@ -53,11 +53,11 @@
 *SDK 將在表單提交時自動採集遙測數據，並注入隱藏輸入框 `<input type="hidden" name="vms-shield-token" />`。*
 
 #### 2. 後端驗證 API (POST /api/verify)
-當您的伺服器接收到表單請求時，將收到的 `vms-shield-token` 發送到 VitaShield API 進行二次校驗：
+當您的伺服器接收到表單請求時，將收到的 `vms-shield-token` 發送到 Vynalth AI Shield API 進行二次校驗：
 
 > **提示**：`/v1/verify` 也可作為別名使用，兩者等效。
 
-*   **請求端點**：`POST https://vitashield.sleepsomno.com/api/verify`
+*   **請求端點**：`POST https://shield.sleepsomno.com/api/verify`
 *   **請求 Body**：
     ```json
     {
@@ -90,7 +90,7 @@
 
 ## English Version
 
-**VitaShield** is an enterprise-grade, AI-native human verification and anti-bot defense infrastructure developed by **VitaMind AI**. Engineered for B2B SaaS, Web3 apps, and API gateways, VitaShield blocks automated script attacks, scraping networks, credential stuffing, and advanced AI Operators with invisible client telemetry.
+**Vynalth AI Shield** is an enterprise-grade, AI-native human verification and anti-bot defense infrastructure developed by **Vynalth AI**. Engineered for B2B SaaS, Web3 apps, and API gateways, Vynalth AI Shield blocks automated script attacks, scraping networks, credential stuffing, and advanced AI Operators with invisible client telemetry.
 
 ### 🌟 Currently Implemented Features
 
@@ -119,11 +119,11 @@ Include the defense script in your HTML and place the verification target div in
 
 ```html
 <!-- Include SDK -->
-<script src="https://vitashield.sleepsomno.com/widget.js" defer></script>
+<script src="https://shield.sleepsomno.com/widget.js" defer></script>
 
 <!-- Place verification placeholder inside form -->
 <form id="signup-form" action="/register" method="POST">
-  <div id="vitashield-widget" 
+  <div id="Vynalth AI Shield-widget" 
        data-sitekey="vms_pub_live_79a2b8e3df9102ca"
        data-theme-primary="#00f2fe"></div>
   <button type="submit">Submit</button>
@@ -133,7 +133,7 @@ Include the defense script in your HTML and place the verification target div in
 #### 2. Backend Verification (POST /api/verify)
 Send the token submitted by the form (`vms-shield-token`) to the verification API:
 
-*   **Endpoint**: `POST https://vitashield.sleepsomno.com/api/verify`
+*   **Endpoint**: `POST https://shield.sleepsomno.com/api/verify`
 *   **Payload**:
     ```json
     {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { VerificationWidget } from './VerificationWidget/VerificationWidget';
 import { useBehaviorTracker } from './VerificationWidget/useBehaviorTracker';
 import { MATRIX_CATEGORIES } from './SystemSpecs';
@@ -245,11 +245,11 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({
       <header style={styles.topHeader}>
         <div style={styles.brand}>
           <div style={styles.logoIcon}>
-            <img src="/logo.jpg" alt="VitaShield Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src="/vynalth_ai_shield_logo.jpg" alt="Vynalth AI Shield Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
           <div>
-            <span style={styles.brandName}>VITASHIELD</span>
-            <span style={styles.brandSub}>BY VITAMIND AI</span>
+            <span style={styles.brandName}>Vynalth AI Shield</span>
+            <span style={styles.brandSub}>Invisible Trust, Everywhere · BY Vynalth AI</span>
           </div>
         </div>
 
@@ -296,7 +296,7 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({
             DEFEND YOUR PLATFORM AGAINST ADVANCED AUTOMATION
           </h1>
           <p style={styles.heroSubtitle}>
-            Engineered to counter synthetic traffic and AI agents. VitaShield silently analyzes sub-pixel human kinetic patterns, verifying users with zero UI friction.
+            Vynalth AI Shield (Invisible Trust, Everywhere) is the security division of Vynalth AI (Building the Future of Health AI). Engineered to counter synthetic traffic and AI agents, our edge infrastructure silently assesses sub-pixel human kinetic patterns with zero user friction.
           </p>
 
           <div style={styles.heroCtas}>
@@ -322,16 +322,16 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({
           {/* Solutions */}
           <div className="glass-panel" style={{ ...styles.gridCard, borderLeft: '3px solid #0066cc' }}>
             <h3 style={{ fontSize: '1rem', color: '#f8fafc', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '8px', letterSpacing: '-0.01em' }}>
-              <span style={{ color: '#0066cc' }}>🛡️</span> THE VITASHIELD PARADIGM
+              <span style={{ color: '#0066cc' }}>🛡️</span> THE Vynalth AI Shield PARADIGM
             </h3>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: '1.6', margin: 0 }}>
-              VitaShield works invisibly. By deploying client-side kinetics trackers, the system analyzes physiological telemetry, mouse jitter frequency, and device hardware specifications in real-time, verifying human users with zero friction.
+              Vynalth AI Shield works invisibly. By deploying client-side kinetics trackers, the system analyzes physiological telemetry, mouse jitter frequency, and device hardware specifications in real-time, verifying human users with zero friction.
             </p>
           </div>
         </div>
       </section>
 
-      {/* ── VitaShield Beta Daily Check-in (Laboratory styled Notion grid) ───────────────────────────────── */}
+      {/* ── Vynalth AI Shield Beta Daily Check-in (Laboratory styled Notion grid) ───────────────────────────────── */}
       <section id="daily-checkin" style={{ ...styles.section, borderTop: '1px solid rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(0,0,0,0.15)' }}>
         <div style={{ width: '100%', maxWidth: '1100px', padding: '1rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1.2fr)', gap: '40px', alignItems: 'center' }}>
@@ -349,7 +349,7 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({
                 REINFORCE THE MODEL
               </h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
-                Help optimize VitaShield's behavioral neural network. By completing a 10-second daily kinetic challenge, you provide diverse biomechanical samples to distinguish organic human actions from AI test suites.
+                Help optimize Vynalth AI Shield's behavioral neural network. By completing a 10-second daily kinetic challenge, you provide diverse biomechanical samples to distinguish organic human actions from AI test suites.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {[
@@ -532,7 +532,7 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({
             </div>
           </div>
 
-          {/* Why VitaShield */}
+          {/* Why Vynalth AI Shield */}
           <div className="glass-panel" style={styles.gridCard}>
             <h3 style={{ fontSize: '1rem', color: '#f8fafc', fontWeight: 800, marginBottom: '1.25rem', letterSpacing: '-0.02em' }}>ENGINE CHARACTERISTICS</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -806,7 +806,7 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({
         <div style={styles.sectionHeader}>
           <h2 style={styles.sectionTitle}>DEFENSE MATRIX SPECIFICATION</h2>
           <p style={styles.sectionSubtitle}>
-            Browse the active detection algorithms, client checks, and neural thresholds loaded into VitaShield.
+            Browse the active detection algorithms, client checks, and neural thresholds loaded into Vynalth AI Shield.
           </p>
         </div>
 
@@ -857,7 +857,7 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({
                         flexDirection: 'column', 
                         gap: '10px',
                         border: '1px solid rgba(255,255,255,0.06)',
-                        background: cat.id === 'vitashield' ? 'rgba(0, 102, 204, 0.02)' : 'rgba(255, 255, 255, 0.01)',
+                        background: cat.id === 'Vynalth AI Shield' ? 'rgba(0, 102, 204, 0.02)' : 'rgba(255, 255, 255, 0.01)',
                         transition: 'all 0.2s ease'
                       }}
                       onMouseEnter={e => {
@@ -927,7 +927,7 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({
                   {"<script "}
                   <span style={{ color: '#fbbf24' }}>src</span>
                   {"="}
-                  <span style={{ color: '#34d399' }}>"https://vitashield.sleepsomno.com/widget.js"</span>
+                  <span style={{ color: '#34d399' }}>"https://shield.sleepsomno.com/widget.js"</span>
                   {" async defer></script>"}
                 </div>
                 <br />
@@ -954,12 +954,12 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({
                   <span style={{ color: '#34d399' }}>"email"</span>
                   {" required />"}
                   <br />
-                  {"<!-- VitaShield Container -->"}
+                  {"<!-- Vynalth AI Shield Container -->"}
                   <br />
                   {"<div "}
                   <span style={{ color: '#fbbf24' }}>id</span>
                   {"="}
-                  <span style={{ color: '#34d399' }}>"vitashield-widget"</span>
+                  <span style={{ color: '#34d399' }}>"Vynalth AI Shield-widget"</span>
                   {" "}
                   <span style={{ color: '#fbbf24' }}>data-sitekey</span>
                   {"="}
@@ -1017,7 +1017,7 @@ app.post('/submit', async (req, res) => {
   const token = req.body['vms-shield-token'];
   
   // Call secure verification route
-  const verify = await fetch('https://vitashield.sleepsomno.com/api/verify', {
+  const verify = await fetch('https://shield.sleepsomno.com/api/verify', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -1040,7 +1040,7 @@ app.post('/submit', async (req, res) => {
 import requests
 
 def verify_session(token, client_ip):
-    url = "https://vitashield.sleepsomno.com/api/verify"
+    url = "https://shield.sleepsomno.com/api/verify"
     payload = {
         "secret": "vms_sec_live_9c0f73b18274d8a21f7c",
         "token": token,
@@ -1060,13 +1060,13 @@ func verifyToken(token string, ip string) bool {
         "ip":     ip,
     }
     body, _ := json.Marshal(payload)
-    resp, err := client.Post("https://vitashield.sleepsomno.com/api/verify", "application/json", bytes.NewBuffer(body))
+    resp, err := client.Post("https://shield.sleepsomno.com/api/verify", "application/json", bytes.NewBuffer(body))
     return riskScore < 60
 }`}</pre>
                 )}
                 {docsTab === 'curl' && (
                   <pre style={{ margin: 0, color: '#f8fafc' }}>{`# Shell verify query
-curl -X POST https://vitashield.sleepsomno.com/api/verify \\
+curl -X POST https://shield.sleepsomno.com/api/verify \\
   -H "Content-Type: application/json" \\
   -d '{
     "secret": "vms_sec_live_9c0f73b18274d8a21f7c",

@@ -12,7 +12,7 @@ const PLANS = [
     badge: null,
     price: { monthly: 0, annual: 0 },
     unit: 'Free forever',
-    description: 'Integrate VitaShield into your project. No credit card required.',
+    description: 'Integrate Vynalth AI Shield into your project. No credit card required.',
     cta: 'Start Building Free',
     ctaStyle: 'outline',
     verifications: '10,000',
@@ -22,7 +22,7 @@ const PLANS = [
       'JavaScript SDK (Web)',
       'Real-time risk scoring',
       'Community Slack support',
-      'VitaShield branding on widget',
+      'Vynalth AI Shield branding on widget',
     ],
     notIncluded: [
       'Custom domain widget',
@@ -43,7 +43,7 @@ const PLANS = [
     features: [
       'Up to 100,000 verifications / mo',
       'Everything in Developer',
-      'Remove VitaShield branding',
+      'Remove Vynalth AI Shield branding',
       'Custom widget domain',
       'Keyboard + mouse biometrics',
       'Threat intelligence dashboard',
@@ -109,7 +109,7 @@ const PLANS = [
 const FAQS = [
   {
     q: 'What counts as a verification?',
-    a: 'One verification = one session where VitaShield analyzes a visitor and returns a risk score. A single page visit may trigger one verification. Bot blocks and passed sessions both count.',
+    a: 'One verification = one session where Vynalth AI Shield analyzes a visitor and returns a risk score. A single page visit may trigger one verification. Bot blocks and passed sessions both count.',
   },
   {
     q: 'Is there a free trial for paid plans?',
@@ -120,16 +120,16 @@ const FAQS = [
     a: 'We never hard-block traffic. When you exceed your plan\'s limit, we automatically switch to a lightweight scoring mode and notify you. You can upgrade or purchase overage credits at $0.0002 per verification.',
   },
   {
-    q: 'Is VitaShield compliant with Bank Negara Malaysia\'s RMiT policy?',
+    q: 'Is Vynalth AI Shield compliant with Bank Negara Malaysia\'s RMiT policy?',
     a: 'Business and Enterprise plans include BNM RMiT compliance reporting. We generate the audit logs and evidence packages required for Malaysian financial institutions. Our team has experience with NACSA-listed framework requirements.',
   },
   {
-    q: 'Can I self-host VitaShield?',
+    q: 'Can I self-host Vynalth AI Shield?',
     a: 'On-premise and private VPC deployment is available on Enterprise plans. Contact our sales team to discuss your infrastructure requirements.',
   },
   {
-    q: 'What is VitaMind AI\'s relationship to VitaShield?',
-    a: 'VitaShield is the flagship security product of VitaMind AI. VitaMind AI is the parent company building AI-native security infrastructure for the post-CAPTCHA, agentic AI era.',
+    q: 'What is Vynalth AI\'s relationship to Vynalth AI Shield?',
+    a: 'Vynalth AI Shield (Invisible Trust, Everywhere) is the security division of Vynalth AI (Building the Future of Health AI). Vynalth AI is the parent company focused on building next-generation AI-native health and security infrastructure.',
   },
 ];
 
@@ -193,7 +193,7 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onGetStarted, onBack }
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             </svg>
           </div>
-          <span style={{ fontWeight: 700, fontSize: '1rem', color: '#f1f5f9' }}>VitaShield</span>
+          <span style={{ fontWeight: 700, fontSize: '1rem', color: '#f1f5f9' }}>Vynalth AI Shield</span>
         </div>
 
         <button
@@ -246,7 +246,7 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onGetStarted, onBack }
         </h1>
 
         <p style={{ color: '#94a3b8', fontSize: '1.125rem', maxWidth: 520, margin: '0 auto 2.5rem', lineHeight: 1.7 }}>
-          VitaShield's behavioral AI protects your web and API surfaces from bots, fraud, and agentic AI attacks.
+          Vynalth AI Shield's behavioral AI protects your web and API surfaces from bots, fraud, and agentic AI attacks.
           Transparent pricing. No credit card to start.
         </p>
 
@@ -453,7 +453,7 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onGetStarted, onBack }
         {/* Compare with competitors */}
         <div style={{ maxWidth: 820, margin: '5rem auto 0', padding: '0 1rem' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.5rem', color: '#f1f5f9' }}>
-            How VitaShield compares
+            How Vynalth AI Shield compares
           </h2>
           <p style={{ color: '#64748b', marginBottom: '2.5rem', fontSize: '0.925rem' }}>
             Enterprise bot protection without the enterprise price tag.
@@ -463,7 +463,7 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onGetStarted, onBack }
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
               <thead>
                 <tr>
-                  {['Feature', 'VitaShield Business', 'Cloudflare Enterprise', 'DataDome', 'Arkose Labs'].map((h, i) => (
+                  {['Feature', 'Vynalth AI Shield Business', 'Cloudflare Enterprise', 'DataDome', 'Arkose Labs'].map((h, i) => (
                     <th key={i} style={{
                       padding: '0.75rem 1rem',
                       textAlign: i === 0 ? 'left' : 'center',
@@ -592,7 +592,7 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onGetStarted, onBack }
             Start for free →
           </button>
           <p style={{ marginTop: '1rem', color: '#475569', fontSize: '0.8rem' }}>
-            A VitaMind AI product · Made for the post-CAPTCHA era
+            A Vynalth AI product (Building the Future of Health AI) · Vynalth AI Shield (Invisible Trust, Everywhere)
           </p>
         </div>
       </div>

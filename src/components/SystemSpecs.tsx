@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 
 export const MATRIX_CATEGORIES = [
   {
@@ -154,8 +154,8 @@ export const MATRIX_CATEGORIES = [
     ]
   },
   {
-    id: 'vitashield',
-    title: '🛡️ VitaShield Proprietary Heuristics',
+    id: 'Vynalth AI Shield',
+    title: '🛡️ Vynalth AI Shield Proprietary Heuristics',
     description: 'Our proprietary algorithms designed specifically to counter advanced human-mimicking AI Agents and bot automation scripts.',
     methods: [
       { name: 'Sub-pixel Jitter Bio-noise Mapping', desc: 'Analyze cursor streams for sub-pixel physiological tremors. Script paths lack these micro-vibrations.', power: 'Maximum', difficulty: 'Medium' },
@@ -185,7 +185,7 @@ export const SystemSpecs: React.FC = () => {
       <div style={styles.header}>
         <div>
           <h1 style={styles.title} className="gradient-text">System Specifications & Architecture</h1>
-          <p style={styles.subtitle}>VitaShield platform blueprints, database models, and commercial roadmap.</p>
+          <p style={styles.subtitle}>Vynalth AI Shield platform blueprints, database models, and commercial roadmap.</p>
         </div>
       </div>
 
@@ -222,7 +222,7 @@ export const SystemSpecs: React.FC = () => {
         {activeSpecTab === 'blueprint' && (
           <div style={styles.specBody}>
             <h2 style={styles.specHeaderTitle}>Multi-Layer AI-Native Security Architecture</h2>
-            <p style={styles.specDesc}>VitaShield separates security criteria across Product, Tech, Detection, Security, and Compliance.</p>
+            <p style={styles.specDesc}>Vynalth AI Shield separates security criteria across Product, Tech, Detection, Security, and Compliance.</p>
 
             <div style={styles.blueprintGrid}>
               <div style={styles.blueprintCard}>
@@ -285,14 +285,14 @@ export const SystemSpecs: React.FC = () => {
                 <h4>Compliance & Privacy Specs</h4>
               </div>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
-                VitaShield strictly complies with global data privacy frameworks including <strong>GDPR (Europe)</strong> and <strong>PDPA (Malaysia)</strong>.
+                Vynalth AI Shield strictly complies with global data privacy frameworks including <strong>GDPR (Europe)</strong> and <strong>PDPA (Malaysia)</strong>.
                 The system is engineered with a Zero-PII architecture: dynamic IP addresses are cryptographically hashed (one-way salted hashes) prior to ingestion. Biometric heuristics are evaluated entirely on the client-side inside our sandboxed SDK, <strong>never uploading or saving raw facial images or voice cadences to our servers</strong>. This ensures compliance with enterprise security requirements, aligning with <strong>SOC2 Type II</strong> auditing standards.
               </p>
             </div>
 
             {/* Implementation Roadmap */}
             <div style={styles.roadmapBox}>
-              <h3 style={styles.sectionTitle}>VitaShield Development Roadmap</h3>
+              <h3 style={styles.sectionTitle}>Vynalth AI Shield Development Roadmap</h3>
               <div style={styles.roadmapGrid}>
                 <div style={styles.roadmapCol}>
                   <div style={styles.roadmapHeader}>Phase 1 - MVP</div>
@@ -470,7 +470,7 @@ Content-Type: application/json`}
           <div style={styles.specBody}>
             <h2 style={styles.specHeaderTitle}>Defense Capability Matrix</h2>
             <p style={styles.specDesc}>
-              VitaShield aggregates all industry-standard verification mechanisms alongside our proprietary biological kinetics behavioral checks.
+              Vynalth AI Shield aggregates all industry-standard verification mechanisms alongside our proprietary biological kinetics behavioral checks.
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '2rem', marginTop: '1.5rem', alignItems: 'start' }}>
@@ -518,8 +518,8 @@ Content-Type: application/json`}
                             display: 'flex', 
                             flexDirection: 'column', 
                             gap: '10px',
-                            border: cat.id === 'vitashield' ? '1px solid rgba(6, 182, 212, 0.2)' : '1px solid rgba(255,255,255,0.04)',
-                            background: cat.id === 'vitashield' ? 'rgba(6, 182, 212, 0.02)' : 'rgba(255, 255, 255, 0.01)',
+                            border: cat.id === 'Vynalth AI Shield' ? '1px solid rgba(6, 182, 212, 0.2)' : '1px solid rgba(255,255,255,0.04)',
+                            background: cat.id === 'Vynalth AI Shield' ? 'rgba(6, 182, 212, 0.02)' : 'rgba(255, 255, 255, 0.01)',
                             transition: 'all 0.3s ease'
                           }}
                         >

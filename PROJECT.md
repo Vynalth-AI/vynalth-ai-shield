@@ -1,4 +1,4 @@
-# Project: VitaShield Threat Intel Ingestion and Enrichment
+﻿# Project: Vynalth AI Shield Threat Intel Ingestion and Enrichment
 
 ## Architecture
 - Module/package boundaries, data flow, shared interfaces:

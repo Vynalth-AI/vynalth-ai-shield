@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 
 
 
@@ -427,11 +427,11 @@ export const PlaybookPages: React.FC<PlaybookPagesProps> = ({ currentPath, onBac
           <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
             {/* Double Logo */}
             <div style={styles.logoWrapper}>
-              <img src="/brand-logo-new.png" alt="SomnoAI Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              <img src="/vynalth_ai_logo.jpg" alt="Vynalth AI Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
             <span style={{ color: '#475569', fontSize: '0.75rem', fontWeight: 800 }}>✕</span>
             <div style={styles.logoWrapperShield}>
-              <img src="/logo.jpg" alt="VitaShield Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
+              <img src="/vynalth_ai_shield_logo.jpg" alt="Vynalth AI Shield Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
             </div>
           </div>
           <div>

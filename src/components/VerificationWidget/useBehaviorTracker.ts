@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+﻿import { useEffect, useRef } from 'react';
 import type { TelemetryPayload, TouchPoint, MotionSample, OrientationSample } from './types';
 
 const SDK_VERSION = '2.2';
@@ -204,9 +204,9 @@ export const useBehaviorTracker = () => {
       ctx.fillStyle = '#f60';
       ctx.fillRect(125, 1, 62, 20);
       ctx.fillStyle = '#069';
-      ctx.fillText('VitaShield🛡️', 2, 15);
+      ctx.fillText('Vynalth AI Shield🛡️', 2, 15);
       ctx.fillStyle = 'rgba(102,204,0,0.7)';
-      ctx.fillText('VitaShield🛡️', 4, 17);
+      ctx.fillText('Vynalth AI Shield🛡️', 4, 17);
       const raw = cv.toDataURL();
       let h = 0;
       for (let i = 0; i < raw.length; i++) { h = ((h << 5) - h) + raw.charCodeAt(i); h |= 0; }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 
 // ──────────────────────────────────────────────────────────────────
 // BotBounty.tsx
@@ -36,7 +36,7 @@ const BOUNTIES: Bounty[] = [
     category: 'Authentication', severity: 'critical',
     reputationPoints: 1000, status: 'open',
     scope: 'api/verify, api/session/*',
-    description: 'Find any method to bypass VitaShield\'s behavioral verification by replaying or forging biometric telemetry tokens.',
+    description: 'Find any method to bypass Vynalth AI Shield\'s behavioral verification by replaying or forging biometric telemetry tokens.',
   },
   {
     id: 'b002', title: 'Bot Detection Evasion — Mouse Trajectory Spoofing',
@@ -281,7 +281,7 @@ export const BotBounty: React.FC = () => {
                 </div>
                 <div>
                   <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f1f5f9' }}>Vyncus Lim</div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Founder & CEO, VitaMind AI & VitaShield</div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Founder & CEO, Vynalth AI & Vynalth AI Shield</div>
                 </div>
               </div>
 
@@ -307,7 +307,7 @@ export const BotBounty: React.FC = () => {
                 <div style={{ borderLeft: '2px solid #10b981', paddingLeft: '0.75rem' }}>
                   <strong style={{ color: '#10b981', fontSize: '0.82rem' }}>Age 18 — Protecting Health Networks</strong>
                   <p style={{ margin: '0.15rem 0 0', color: 'var(--text-muted)' }}>
-                    Founded VitaMind AI & VitaShield. Deployed edge security rules defending digital sleep clinic diagnostics from scrapers and automated attacks.
+                    Founded Vynalth AI & Vynalth AI Shield. Deployed edge security rules defending digital sleep clinic diagnostics from scrapers and automated attacks.
                   </p>
                 </div>
               </div>
@@ -370,7 +370,7 @@ export const BotBounty: React.FC = () => {
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.35rem' }}>Proof of Concept (code, curl, screenshot URL)</label>
-                  <textarea value={submitForm.poc} onChange={e => setSubmitForm(f => ({ ...f, poc: e.target.value }))} className="input-field" rows={3} placeholder="curl -X POST https://api.vitashield.io/api/verify -d '{...}'" style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical', fontFamily: 'var(--font-mono)', fontSize: '0.78rem' }} />
+                  <textarea value={submitForm.poc} onChange={e => setSubmitForm(f => ({ ...f, poc: e.target.value }))} className="input-field" rows={3} placeholder="curl -X POST https://api.Vynalth AI Shield.io/api/verify -d '{...}'" style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical', fontFamily: 'var(--font-mono)', fontSize: '0.78rem' }} />
                 </div>
                 <div>
                   <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.35rem' }}>CVE ID (if known)</label>

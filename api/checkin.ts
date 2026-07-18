@@ -1,6 +1,6 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+﻿import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-// ─── VitaShield Daily Check-in API ───────────────────────────────────────────
+// ─── Vynalth AI Shield Daily Check-in API ───────────────────────────────────────────
 // Records daily verification check-in data for model training.
 // Manages streak tracking, anti-abuse, and Neuro Plan reward granting.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -37,7 +37,7 @@ function isAbuseDetected(ip: string): boolean {
 // ── Supabase helpers ─────────────────────────────────────────────────────────
 async function getOrCreateCheckinRecord(userId: string, today: string) {
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/vitashield_checkins?user_id=eq.${encodeURIComponent(userId)}&select=*&order=created_at.desc&limit=10`,
+    `${SUPABASE_URL}/rest/v1/Vynalth AI Shield_checkins?user_id=eq.${encodeURIComponent(userId)}&select=*&order=created_at.desc&limit=10`,
     {
       headers: {
         'apikey': SUPABASE_KEY,
@@ -61,7 +61,7 @@ async function insertCheckin(data: {
   ip_hash: string;
   rewarded: boolean;
 }) {
-  return fetch(`${SUPABASE_URL}/rest/v1/vitashield_checkins`, {
+  return fetch(`${SUPABASE_URL}/rest/v1/Vynalth AI Shield_checkins`, {
     method: 'POST',
     headers: {
       'apikey': SUPABASE_KEY,
@@ -88,8 +88,8 @@ async function grantNeuroPlan(userId: string, months: number) {
     body: JSON.stringify({
       plan: 'neuro',
       plan_until: until.toISOString(),
-      vitashield_reward: true,
-      vitashield_reward_at: new Date().toISOString(),
+      Vynalth AI Shield_reward: true,
+      Vynalth AI Shield_reward_at: new Date().toISOString(),
     }),
   });
 }
@@ -137,7 +137,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(429).json({
         success: false,
         error: 'Rate limit exceeded',
-        vitashield_risk: 'abuse_detected',
+        Vynalth AI Shield_risk: 'abuse_detected',
       });
     }
 
@@ -177,7 +177,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           await grantNeuroPlan(userId, 3);
         }
       } catch (dbErr) {
-        console.error('[VitaShield Checkin] DB error:', dbErr);
+        console.error('[Vynalth AI Shield Checkin] DB error:', dbErr);
         // Non-fatal — still return success to user
       }
     }
@@ -199,7 +199,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
   } catch (err: any) {
-    console.error('[VitaShield Checkin] Error:', err);
+    console.error('[Vynalth AI Shield Checkin] Error:', err);
     return res.status(500).json({ success: false, error: 'Internal error' });
   }
 }

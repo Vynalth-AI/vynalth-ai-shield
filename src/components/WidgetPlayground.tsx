@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { ShieldConfig } from '../types';
 import { VerificationWidget } from './VerificationWidget/VerificationWidget';
 import { getApiBaseUrl } from '../lib/api';
@@ -19,9 +19,9 @@ function computeCanvasHash(): string {
     ctx.fillStyle = '#f60';
     ctx.fillRect(125, 1, 62, 20);
     ctx.fillStyle = '#069';
-    ctx.fillText('VitaShield🛡️', 2, 15);
+    ctx.fillText('Vynalth AI Shield🛡️', 2, 15);
     ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
-    ctx.fillText('VitaShield🛡️', 4, 17);
+    ctx.fillText('Vynalth AI Shield🛡️', 4, 17);
     const data = c.toDataURL();
     let h = 0;
     for (let i = 0; i < data.length; i++) { h = (Math.imul(31, h) + data.charCodeAt(i)) | 0; }
@@ -238,7 +238,7 @@ export const WidgetPlayground: React.FC<WidgetPlaygroundProps> = ({ config, onAd
       <div style={styles.header}>
         <div>
           <h1 style={styles.title} className="gradient-text">Verification Widget Playground</h1>
-          <p style={styles.subtitle}>Test how VitaShield renders and behaves inside mock web transaction routers.</p>
+          <p style={styles.subtitle}>Test how Vynalth AI Shield renders and behaves inside mock web transaction routers.</p>
         </div>
       </div>
 
@@ -264,7 +264,7 @@ export const WidgetPlayground: React.FC<WidgetPlaygroundProps> = ({ config, onAd
               <>
                 <div className="input-group">
                   <label className="input-label">Social Username</label>
-                  <input required type="text" placeholder="vitamind_fan" value={username} onChange={e=>setUsername(e.target.value)} className="input-field" />
+                  <input required type="text" placeholder="Vynalth_fan" value={username} onChange={e=>setUsername(e.target.value)} className="input-field" />
                 </div>
                 <div className="input-group">
                   <label className="input-label">User Description (Bio)</label>

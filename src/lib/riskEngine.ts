@@ -1,4 +1,4 @@
-// ─── VitaShield Risk Engine v2.2 ─────────────────────────────────────────────
+﻿// ─── Vynalth AI Shield Risk Engine v2.2 ─────────────────────────────────────────────
 // New layers: fingerprint consistency, over-spoofing detection, performance
 // timing anomaly, accelerometer gravity check, gyroscope variance, touch
 // trajectory analysis, network consistency, WebGL vendor cross-check,
@@ -1167,7 +1167,7 @@ function applyCustomRules(
   reputationScore: number
 ): 'allow' | 'challenge' | 'block' | null {
   if (typeof window === 'undefined') return null;
-  const saved = window.localStorage.getItem('vitashield_custom_rules');
+  const saved = window.localStorage.getItem('Vynalth AI Shield_custom_rules');
   if (!saved) return null;
 
   try {

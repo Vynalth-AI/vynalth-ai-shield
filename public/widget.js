@@ -1,5 +1,5 @@
-(function () {
-  // ─── VitaShield Widget v2.2 ─────────────────────────────────────────────────
+﻿(function () {
+  // ─── Vynalth AI Shield Widget v2.2 ─────────────────────────────────────────────────
   // New: multi-dimensional fingerprint fusion, WebGL extended params,
   // fingerprint consistency data, network info, performance timing,
   // navigator vendor/platform/pluginNames, storage availability,
@@ -40,8 +40,8 @@
       .then(function(r) { return r.json(); })
       .then(function(d) {
         if (d && d.hash) {
-          // Confirm global VitaShield namespace hasn't been intercepted or modified
-          var isTampered = typeof window.VitaShield !== 'object' || typeof window.VitaShield.init !== 'function';
+          // Confirm global Vynalth AI Shield namespace hasn't been intercepted or modified
+          var isTampered = typeof window.Vynalth AI Shield !== 'object' || typeof window.Vynalth AI Shield.init !== 'function';
           if (isTampered) {
             sdkIntegrityFailed = true;
           }
@@ -91,9 +91,9 @@
     }
   }
 
-  function initVitaShield() {
+  function initVynalth AI Shield() {
     var startTime = Date.now();
-    var container = document.getElementById('vitashield-widget') || document.querySelector('[data-sitekey]');
+    var container = document.getElementById('Vynalth AI Shield-widget') || document.querySelector('[data-sitekey]');
     if (!container) return;
 
     if (container.getAttribute('data-vms-initialized') === 'true') return;
@@ -107,7 +107,7 @@
 
     var log = debugMode ? function() {
       var args = Array.prototype.slice.call(arguments);
-      args.unshift('[VitaShield]');
+      args.unshift('[Vynalth AI Shield]');
       console.log.apply(console, args);
     } : function() {};
 
@@ -124,7 +124,7 @@
         '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="' + themePrimary + '" stroke-width="2.5">' +
           '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>' +
         '</svg>' +
-        '<span style="font-size:11px;color:' + themeText + ';font-weight:600;letter-spacing:0.02em;">Protected by VitaShield</span>' +
+        '<span style="font-size:11px;color:' + themeText + ';font-weight:600;letter-spacing:0.02em;">Protected by Vynalth AI Shield</span>' +
         '<svg id="vms-spinner" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="' + themePrimary + '" stroke-width="3" style="animation:vms-spin 1.2s linear infinite;opacity:0.7;">' +
           '<path d="M12 2a10 10 0 0 1 10 10"/>' +
         '</svg>' +
@@ -183,9 +183,9 @@
         ctx.fillStyle = '#f60';
         ctx.fillRect(125, 1, 62, 20);
         ctx.fillStyle = '#069';
-        ctx.fillText('VitaShield\uD83D\uDEE1', 2, 15);
+        ctx.fillText('Vynalth AI Shield\uD83D\uDEE1', 2, 15);
         ctx.fillStyle = 'rgba(102,204,0,0.7)';
-        ctx.fillText('VitaShield\uD83D\uDEE1', 4, 17);
+        ctx.fillText('Vynalth AI Shield\uD83D\uDEE1', 4, 17);
         var raw = cv.toDataURL();
         var h = 0;
         for (var i = 0; i < raw.length; i++) { h = ((h << 5) - h) + raw.charCodeAt(i); h |= 0; }
@@ -307,7 +307,7 @@
 
     function verifySDKIntegrity() {
       try {
-        var src = initVitaShield.toString();
+        var src = initVynalth AI Shield.toString();
         var hash = 2166136261;
         for (var i = 0; i < src.length; i++) {
           hash ^= src.charCodeAt(i);
@@ -757,20 +757,20 @@
       });
     }
 
-    log('VitaShield v' + SDK_VERSION + ' initialized. Mobile:', isMobile, '| Debug:', debugMode);
+    log('Vynalth AI Shield v' + SDK_VERSION + ' initialized. Mobile:', isMobile, '| Debug:', debugMode);
 
     // Fire ready callbacks
-    if (typeof window.onVitaShieldReady === 'function') {
-      window.onVitaShieldReady({ version: SDK_VERSION, isMobile: isMobile });
+    if (typeof window.onVynalth AI ShieldReady === 'function') {
+      window.onVynalth AI ShieldReady({ version: SDK_VERSION, isMobile: isMobile });
     }
-    window.dispatchEvent(new CustomEvent('vitashield:ready', { detail: { version: SDK_VERSION, isMobile: isMobile } }));
+    window.dispatchEvent(new CustomEvent('Vynalth AI Shield:ready', { detail: { version: SDK_VERSION, isMobile: isMobile } }));
   }
 
   // Structured SDK Initialization API (P1 audit issue resolution)
-  window.VitaShield = {
+  window.Vynalth AI Shield = {
     version: SDK_VERSION,
     init: function(options) {
-      var container = document.getElementById('vitashield-widget') || document.querySelector('[data-sitekey]');
+      var container = document.getElementById('Vynalth AI Shield-widget') || document.querySelector('[data-sitekey]');
       if (container && options) {
         if (options.siteKey) container.setAttribute('data-sitekey', options.siteKey);
         if (options.theme) {
@@ -786,15 +786,15 @@
           }
         }
       }
-      initVitaShield();
+      initVynalth AI Shield();
     }
   };
 
   // Auto-init fallback if elements are found on load
   function autoInit() {
-    var container = document.getElementById('vitashield-widget') || document.querySelector('[data-sitekey]');
+    var container = document.getElementById('Vynalth AI Shield-widget') || document.querySelector('[data-sitekey]');
     if (container) {
-      window.VitaShield.init();
+      window.Vynalth AI Shield.init();
     }
   }
 

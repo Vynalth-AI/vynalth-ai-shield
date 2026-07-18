@@ -1,11 +1,11 @@
-## 2026-07-15T14:15:00Z
+﻿## 2026-07-15T14:15:00Z
 You are worker_initial_setup.
 Your working directory is C:\Users\lynne\Documents\antigravity\mysterious-maxwell\.agents\worker_initial_setup.
 
 Tasks:
 1. Write the PROJECT.md file at C:\Users\lynne\Documents\antigravity\mysterious-maxwell\PROJECT.md. Here is the exact content to write:
 ```markdown
-# Project: VitaShield Threat Intel Ingestion and Enrichment
+# Project: Vynalth AI Shield Threat Intel Ingestion and Enrichment
 
 ## Architecture
 - Module/package boundaries, data flow, shared interfaces:

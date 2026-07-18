@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 
 interface WhitepaperPageProps {
   onBack?: () => void;
@@ -72,7 +72,7 @@ export const WhitepaperPage: React.FC<WhitepaperPageProps> = ({ onBack, onDeploy
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             </svg>
           </div>
-          <span style={{ fontWeight: 700, fontSize: '1rem', color: '#f1f5f9', letterSpacing: '-0.02em' }}>VITASHIELD LABS</span>
+          <span style={{ fontWeight: 700, fontSize: '1rem', color: '#f1f5f9', letterSpacing: '-0.02em' }}>Vynalth AI Shield LABS</span>
         </div>
 
         <button
@@ -137,7 +137,7 @@ export const WhitepaperPage: React.FC<WhitepaperPageProps> = ({ onBack, onDeploy
             borderTop: '1px solid rgba(255,255,255,0.06)',
             paddingTop: '1rem',
           }}>
-            <span>By <strong>VitaShield Security Lab</strong></span>
+            <span>By <strong>Vynalth AI Shield Security Lab</strong></span>
             <span>•</span>
             <span>July 2026</span>
             <span>•</span>
@@ -229,20 +229,20 @@ export const WhitepaperPage: React.FC<WhitepaperPageProps> = ({ onBack, onDeploy
           </div>
 
           <h2 style={{ color: '#f1f5f9', fontSize: '1.5rem', fontWeight: 700, marginTop: '2.5rem', marginBottom: '1rem', borderLeft: '3px solid #38bdf8', paddingLeft: '0.75rem' }}>
-            三、 VitaShield 的防御实践：自适应双端校验机制
+            三、 Vynalth AI Shield 的防御实践：自适应双端校验机制
           </h2>
           <p>
-            作为 **VitaMind AI** 旗下的核心安全系统，VitaShield 基于微观行为学，结合边缘神经网络与多模态大模型对抗逻辑，设计了三层防御防线：
+            作为 **Vynalth AI** 旗下的核心安全系统，Vynalth AI Shield 基于微观行为学，结合边缘神经网络与多模态大模型对抗逻辑，设计了三层防御防线：
           </p>
           <ol style={{ paddingLeft: '1.25rem' }}>
             <li style={{ marginBottom: '1rem' }}>
-              <strong>边缘自编码器模型（Edge Autoencoder）：</strong> 在用户浏览器端，VitaShield 收集前 2500ms 的生理运动特征，不上传任何隐私文本，仅将其转化为行为曲率张量。通过轻量化 WASM/JS 神经网络对该张量进行自编码重构。由于重构误差在模拟脚本上会产生数量级的偏离，边缘端即可做出初步判定。
+              <strong>边缘自编码器模型（Edge Autoencoder）：</strong> 在用户浏览器端，Vynalth AI Shield 收集前 2500ms 的生理运动特征，不上传任何隐私文本，仅将其转化为行为曲率张量。通过轻量化 WASM/JS 神经网络对该张量进行自编码重构。由于重构误差在模拟脚本上会产生数量级的偏离，边缘端即可做出初步判定。
             </li>
             <li style={{ marginBottom: '1rem' }}>
               <strong>动态工作量证明（Dynamic Proof of Work）：</strong> 一旦自编码器识别到可疑迹象，服务端将向浏览器下发具有对抗性质的高强度 PoW 计算挑战。AI 代理的并发运行通常面临极高的时间与功耗成本，引入 PoW 增加了攻击者的计算单价，从而在经济学层面上阻止了大规模自动化行为。
             </li>
             <li style={{ marginBottom: '1rem' }}>
-              <strong>自适应意图判定（Intent Governance）：</strong> VitaShield 的自适应控制台允许对流量进行“分类共治”，而非粗暴封禁。例如，支持符合 IETF WBA 标准的合法搜索引擎与生产力 AI Agent 签名通过，保护业务生态的开放性；同时对未签名的恶意撞库 bot 予以拦截。
+              <strong>自适应意图判定（Intent Governance）：</strong> Vynalth AI Shield 的自适应控制台允许对流量进行“分类共治”，而非粗暴封禁。例如，支持符合 IETF WBA 标准的合法搜索引擎与生产力 AI Agent 签名通过，保护业务生态的开放性；同时对未签名的恶意撞库 bot 予以拦截。
             </li>
           </ol>
 
@@ -250,13 +250,13 @@ export const WhitepaperPage: React.FC<WhitepaperPageProps> = ({ onBack, onDeploy
             四、 区域合规实践：迎合马来西亚金融级 RMiT 规范
           </h2>
           <p>
-            不仅是技术领先，针对亚太及东南亚金融和互联网平台，VitaShield 提供了完全本地化的合规支持。
+            不仅是技术领先，针对亚太及东南亚金融和互联网平台，Vynalth AI Shield 提供了完全本地化的合规支持。
           </p>
           <p>
             针对马来西亚国家银行（Bank Negara Malaysia）颁布的 **RMiT（Risk Management in Technology，技术风险管理）** 准则，金融机构必须在网络边界对高敏感交易（如转账、账户设置修改）提供非静态、防重放攻击的安全审计日志。
           </p>
           <p>
-            VitaShield 提供了专用的 RMiT 合规证据链生成器：
+            Vynalth AI Shield 提供了专用的 RMiT 合规证据链生成器：
           </p>
           <ul>
             <li style={{ marginBottom: '0.5rem' }}>
@@ -283,7 +283,7 @@ export const WhitepaperPage: React.FC<WhitepaperPageProps> = ({ onBack, onDeploy
                 下载完整 PDF 白皮书
               </h3>
               <p style={{ color: '#64748b', fontSize: '0.875rem', marginBottom: '1.5rem', maxWidth: 480, margin: '0 auto 1.5rem' }}>
-                输入您的工作邮箱以获取由 VitaMind AI 团队撰写的 32 页详细研究报告《Agentic AI 时代的网络身份验证与对抗机制》。
+                输入您的工作邮箱以获取由 Vynalth AI 团队撰写的 32 页详细研究报告《Agentic AI 时代的网络身份验证与对抗机制》。
               </p>
               <div style={{ display: 'flex', gap: '0.5rem', maxWidth: 420, margin: '0 auto' }}>
                 <input
@@ -350,7 +350,7 @@ export const WhitepaperPage: React.FC<WhitepaperPageProps> = ({ onBack, onDeploy
           color: '#475569',
           fontSize: '0.8rem',
         }}>
-          <p>© 2026 VitaMind AI Inc. All rights reserved. VitaShield is a subsidiary product of VitaMind AI.</p>
+          <p>© 2026 Vynalth AI Inc. All rights reserved. Vynalth AI Shield is a subsidiary product of Vynalth AI.</p>
           <p style={{ marginTop: '0.5rem' }}>Designed for security compliance & friction-free user authentication.</p>
         </footer>
 

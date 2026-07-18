@@ -1,6 +1,6 @@
-# VitaShield Developer Integration Guide
+﻿# Vynalth AI Shield Developer Integration Guide
 
-Welcome to the **VitaShield** integration guide. This document details how to integrate our AI-native invisible behavioral verification infrastructure into your web application in under 2 minutes.
+Welcome to the **Vynalth AI Shield** integration guide. This document details how to integrate our AI-native invisible behavioral verification infrastructure into your web application in under 2 minutes.
 
 ---
 
@@ -14,9 +14,9 @@ For traditional multipage static HTML forms, inject the CDN script and place the
   <!-- Standard fields -->
   <input type="email" name="email" required />
   
-  <!-- 1. The VitaShield Widget Container -->
+  <!-- 1. The Vynalth AI Shield Widget Container -->
   <div 
-    id="vitashield-widget" 
+    id="Vynalth AI Shield-widget" 
     data-sitekey="your_public_sitekey_here"
     data-theme-primary="#00f2fe"
     data-theme-bg="rgba(13, 20, 35, 0.55)"
@@ -27,15 +27,15 @@ For traditional multipage static HTML forms, inject the CDN script and place the
 </form>
 
 <!-- 2. Embed the SDK script at the bottom of the body -->
-<script src="https://vitashield.sleepsomno.com/widget.js" defer></script>
+<script src="https://shield.sleepsomno.com/widget.js" defer></script>
 ```
 
 #### Programmatic Initialization (Flexible Options & Custom Themes)
 For more advanced setups or single-page integrations, initialize the widget programmatically:
 
 ```javascript
-window.onVitaShieldReady = function() {
-  window.VitaShield.init({
+window.onVynalth AI ShieldReady = function() {
+  window.Vynalth AI Shield.init({
     siteKey: 'your_public_sitekey_here',
     theme: {
       primary: '#00f2fe',
@@ -95,7 +95,7 @@ export const SignupForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) {
-      alert("Please complete the VitaShield verification badge first!");
+      alert("Please complete the Vynalth AI Shield verification badge first!");
       return;
     }
 
@@ -133,7 +133,7 @@ Once your server-side handler intercepts the submitted form, fetch our API gatew
 
 ### Endpoint Specifications
 *   **Method**: `POST`
-*   **Gateway URL**: `https://vitashield.sleepsomno.com/api/verify`
+*   **Gateway URL**: `https://shield.sleepsomno.com/api/verify`
 *   **Headers**: `Content-Type: application/json`
 
 ### Request Body
@@ -175,7 +175,7 @@ Once your server-side handler intercepts the submitted form, fetch our API gatew
 
 ## 3. Mathematical Behavioral Rationale (行为动力学数学原理)
 
-VitaShield leverages sub-pixel biological noise and device anomalies to distinguish humans from bots. Here is the mathematical framework running inside our client SDK and risk engine:
+Vynalth AI Shield leverages sub-pixel biological noise and device anomalies to distinguish humans from bots. Here is the mathematical framework running inside our client SDK and risk engine:
 
 ### 3.1 Mouse Path Straightness Ratio (轨迹直线度)
 Let the captured mouse coordinate stream be a sequence of points \(P_0, P_1, \dots, P_n\). The Straightness Ratio \(S\) is calculated as:

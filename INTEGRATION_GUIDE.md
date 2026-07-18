@@ -1,6 +1,6 @@
-# 🛡️ VitaShield Integration & Troubleshooting Guide
+﻿# 🛡️ Vynalth AI Shield Integration & Troubleshooting Guide
 
-This guide documents crucial integration warnings, common errors developers encounter when deploying VitaShield telemetry scripts, their resolutions, and how to proactively prevent them.
+This guide documents crucial integration warnings, common errors developers encounter when deploying Vynalth AI Shield telemetry scripts, their resolutions, and how to proactively prevent them.
 
 ---
 
@@ -11,7 +11,7 @@ The browser console throws a blocking exception:
 ```text
 Uncaught ReferenceError: Cannot access 'sections' before initialization
 ```
-This error halts all subsequent JavaScript execution on the page, including the VitaShield SDK initialization.
+This error halts all subsequent JavaScript execution on the page, including the Vynalth AI Shield SDK initialization.
 
 ### Cause
 In standard frontend scripts (e.g. `script.js`), page-load triggers (such as `handleScroll()` or `highlightActiveLink()`) are executed immediately upon document ready. If the constants/variables they reference (e.g., `const sections = ...`) are defined *below* those function calls in the file layout, the JavaScript engine triggers a **Temporal Dead Zone (TDZ)** violation.
@@ -60,7 +60,7 @@ Update your server's Content Security Policy headers to whitelist the required C
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://vitashield.sleepsomno.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://vitashield.sleepsomno.com;"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://shield.sleepsomno.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://shield.sleepsomno.com;"
         }
       ]
     }
@@ -76,7 +76,7 @@ Update your server's Content Security Policy headers to whitelist the required C
 
 ## ℹ️ 3. Silent SDK Ingestions & Developer Output Warnings
 
-When integrating the VitaShield script (`widget.js`), developers may see the following console alerts. These are normal and do not require code fixes:
+When integrating the Vynalth AI Shield script (`widget.js`), developers may see the following console alerts. These are normal and do not require code fixes:
 
 ### A. `/api/sdk-integrity-hash` 404 Response
 *   **What it is**: The SDK client periodically sends environment checks to verify that the loaded script is secure. For fully static frontend sites, this endpoint will return a harmless `404 Not Found` response.
@@ -93,9 +93,9 @@ When integrating the VitaShield script (`widget.js`), developers may see the fol
 ## 🌐 4. CORS Preflight Credentials Wildcard Block (`credentials: 'include' vs '*'`)
 
 ### Symptom
-Browser blocks outgoing requests to VitaShield endpoints (`/api/model/train` or `/api/verify`) with CORS error:
+Browser blocks outgoing requests to Vynalth AI Shield endpoints (`/api/model/train` or `/api/verify`) with CORS error:
 ```text
-Access to resource at 'https://vitashield.sleepsomno.com/api/model/train' from origin 'https://sleepsomno.com' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: The value of the 'Access-Control-Allow-Origin' header in the response must not be the wildcard '*' when the request's credentials mode is 'include'.
+Access to resource at 'https://shield.sleepsomno.com/api/model/train' from origin 'https://sleepsomno.com' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: The value of the 'Access-Control-Allow-Origin' header in the response must not be the wildcard '*' when the request's credentials mode is 'include'.
 ```
 
 ### Cause

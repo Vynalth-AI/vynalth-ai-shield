@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { globalAutoencoder } from '../lib/riskEngine';
 import { getApiBaseUrl } from '../lib/api';
 
@@ -236,7 +236,7 @@ export const NegativeTraining: React.FC = () => {
       <div style={styles.header}>
         <div>
           <h1 style={styles.title} className="gradient-text">Adversarial ML Sandbox</h1>
-          <p style={styles.subtitle}>Train VitaShield's Autoencoder to block scripts/bots using Gradient Ascent (Negative Reinforcement).</p>
+          <p style={styles.subtitle}>Train Vynalth AI Shield's Autoencoder to block scripts/bots using Gradient Ascent (Negative Reinforcement).</p>
         </div>
       </div>
 

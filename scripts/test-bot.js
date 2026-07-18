@@ -1,4 +1,4 @@
-// Standalone Security Sandbox & Anti-Bot Test Suite
+﻿// Standalone Security Sandbox & Anti-Bot Test Suite
 // Run this file in your terminal: node scripts/test-bot.js
 
 import { Buffer } from 'buffer';
@@ -12,7 +12,7 @@ const CYAN = '\x1b[36m';
 const RESET = '\x1b[0m';
 const BOLD = '\x1b[1m';
 
-console.log(`${BOLD}${CYAN}=== VITASHIELD ANTI-BOT SIMULATOR TEST SUITE ===${RESET}\n`);
+console.log(`${BOLD}${CYAN}=== Vynalth AI Shield ANTI-BOT SIMULATOR TEST SUITE ===${RESET}\n`);
 
 function decryptAES256GCM(ciphertextBase64, keySeed) {
   const parts = ciphertextBase64.split(':');
@@ -164,7 +164,7 @@ function runLocalVerify(token, clientIp, userAgent) {
     flags.push('sub_500ms_form_submission_speed');
   }
 
-  // 4. VitaShield Original Heuristics
+  // 4. Vynalth AI Shield Original Heuristics
   const lastPasteTime = behavior.lastPasteTime || 0;
   const submitPauseMs = behavior.submitPauseMs || 0;
   const backspaceCount = behavior.backspaceCount || 0;

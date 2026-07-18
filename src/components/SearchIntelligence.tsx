@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import type { VerificationLog } from '../types';
 import { DotMatrixLoader } from './ui/DotMatrixLoader';
 
@@ -60,7 +60,7 @@ export const SearchIntelligence: React.FC<SearchIntelligenceProps> = ({ logs }) 
       const anomalies = Array.from(new Set(results.flatMap(r => r.deviceAnomalies || [])));
       const flags = Array.from(new Set(results.flatMap(r => r.flags || [])));
 
-      let analysisMarkdown = `### 🤖 VitaShield AI Threat Intelligence Report
+      let analysisMarkdown = `### 🤖 Vynalth AI Shield AI Threat Intelligence Report
 **Query Matrix:** "${query || 'Recent Active Logs'}"  
 **Report Generated:** ${new Date().toLocaleString()}  
 **Target Profile Severity:** ${avgRisk > 70 ? '🔴 CRITICAL THREAT' : avgRisk > 40 ? '🟡 SUSPICIOUS' : '🟢 SECURE / LOW RISK'}
@@ -344,7 +344,7 @@ No active botnets, scrapers, or automation frameworks have been flagged for this
               <chat-page-snippet 
                 api-url="https://8e6afc0f-9bfc-4aba-8b16-5b452ed6e065.search.ai.cloudflare.com"
                 theme="dark"
-                placeholder="Ask VitaShield AI Search Intelligence anything about your system or docs..."
+                placeholder="Ask Vynalth AI Shield AI Search Intelligence anything about your system or docs..."
                 style="height: 100%; display: block;">
               </chat-page-snippet>
             `

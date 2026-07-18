@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+﻿import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY || '';
@@ -16,7 +16,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
       if (response.ok) {
         const data = await response.json();
-        crawledUrls = data.map((item: any) => `https://vitashield.sleepsomno.com/intel/${item.id}`);
+        crawledUrls = data.map((item: any) => `https://shield.sleepsomno.com/intel/${item.id}`);
       }
     } catch (err) {
       console.error('Failed to fetch sitemap intel from Supabase:', err);
@@ -26,7 +26,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   let sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://vitashield.sleepsomno.com/</loc>
+    <loc>https://shield.sleepsomno.com/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>\n`;

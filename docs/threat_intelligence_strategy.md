@@ -1,5 +1,5 @@
-# Cloudflare Threat Events & Cloudy Integration Strategy
-This document outlines the architectural blueprint for combining Cloudflare's Threat Events, Cloudy AI, and VitaShield's AI Search instance to establish a Real-Time B2B Threat Intelligence pipeline.
+﻿# Cloudflare Threat Events & Cloudy Integration Strategy
+This document outlines the architectural blueprint for combining Cloudflare's Threat Events, Cloudy AI, and Vynalth AI Shield's AI Search instance to establish a Real-Time B2B Threat Intelligence pipeline.
 
 ---
 
@@ -31,7 +31,7 @@ A managed RAG (Retrieval-Augmented Generation) search service designed specifica
 | Engine / Component | Core Purpose | Combined Integration |
 | :--- | :--- | :--- |
 | **Threat Events + Cloudy** | Global Real-Time Threat Feeds | Extract weekly tactical intelligence (TTPs, IP lists, signature trends). |
-| **VitaShield AI Search** | Private Semantic Knowledge Base | Index the aggregated notes, enabling dynamic RAG-based verify endpoints to consult locally. |
+| **Vynalth AI Shield AI Search** | Private Semantic Knowledge Base | Index the aggregated notes, enabling dynamic RAG-based verify endpoints to consult locally. |
 
 ### 2.1 Operational Lifecycle
 ```
@@ -41,10 +41,10 @@ A managed RAG (Retrieval-Augmented Generation) search service designed specifica
     [Cloudy AI Agent] ───> (Weekly Summaries & Threat Profiles)
            │
            ▼ (Convert to Markdown/JSON Notes)
- [VitaShield AI Search] ───> (Indexed in Vector Database)
+ [Vynalth AI Shield AI Search] ───> (Indexed in Vector Database)
            │
            ▼ (Consulted during telemetry evaluation)
-  [VitaShield Verify API] ───> (Dynamic Risk Threshold Tuning)
+  [Vynalth AI Shield Verify API] ───> (Dynamic Risk Threshold Tuning)
 ```
 
 1.  **Weekly Curation**: Query Cloudy for the latest WAF bypass and compromised device proxy trends targeting health/AI platforms.

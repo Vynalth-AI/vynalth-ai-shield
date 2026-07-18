@@ -1,11 +1,11 @@
-/**
- * VitaShield Passive Behavioral Collector v1.0
+﻿/**
+ * Vynalth AI Shield Passive Behavioral Collector v1.0
  * ─────────────────────────────────────────────────────────────────────────────
  * 嵌入到任何网站（如 sleepsomno.com）以静默采集真实用户行为信号，
- * 并自动发送到 VitaShield 训练端点以持续改进 AI 反欺诈模型。
+ * 并自动发送到 Vynalth AI Shield 训练端点以持续改进 AI 反欺诈模型。
  *
  * 集成方法（仅需一行代码）:
- *   <script src="https://YOUR-VITASHIELD-DOMAIN/collector.js"
+ *   <script src="https://YOUR-Vynalth AI Shield-DOMAIN/collector.js"
  *           data-site="sleepsomno.com"
  *           defer></script>
  *
@@ -32,7 +32,7 @@
         return u.origin + '/api/model/train';
       } catch (_) { return null; }
     })() ||
-    'https://vitashield.sleepsomno.com/api/model/train';
+    'https://shield.sleepsomno.com/api/model/train';
 
   var MIN_MS         = 8000;   // 至少采集 8 秒
   var MAX_POINTS     = 80;     // 最多存 80 个鼠标点

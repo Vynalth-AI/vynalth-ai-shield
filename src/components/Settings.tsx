@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import type { ShieldConfig } from '../types';
 import { DotMatrixLoader } from './ui/DotMatrixLoader';
 
@@ -119,7 +119,7 @@ export const Settings: React.FC<SettingsProps> = ({ config, setConfig }) => {
 
           <div className="glass-panel" style={styles.panel}>
             <h3 style={styles.panelTitle}>Risk Threshold Rules</h3>
-            <p style={styles.panelSubtitle}>Determine how aggressively VitaShield flags sessions.</p>
+            <p style={styles.panelSubtitle}>Determine how aggressively Vynalth AI Shield flags sessions.</p>
 
             <div style={styles.strictnessSelector}>
               <div style={styles.sliderLabelRow}>
@@ -336,7 +336,7 @@ export const Settings: React.FC<SettingsProps> = ({ config, setConfig }) => {
             <div style={{ marginTop: '1.5rem', background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(6, 182, 212, 0.15)' }}>
               <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--secondary)', marginBottom: '6px' }}>Generated Custom Script Embed Code:</div>
               <pre style={{ margin: 0, fontSize: '0.75rem', color: '#fff', overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-{`<div id="vitashield-widget"
+{`<div id="Vynalth AI Shield-widget"
      data-sitekey="vms_pub_live_79a2b8e3df9102ca"
      data-theme-primary="${localConfig.themePrimary || '#00f2fe'}"
      data-theme-bg="${localConfig.themeBg || '#0b1329'}"
@@ -355,7 +355,7 @@ export const Settings: React.FC<SettingsProps> = ({ config, setConfig }) => {
             <div style={styles.statusBox}>
               <div style={styles.statusRow}>
                 <span style={styles.statusLabel}>Current Gateway</span>
-                <span style={styles.statusVal}>vitashield.sleepsomno.com</span>
+                <span style={styles.statusVal}>shield.sleepsomno.com</span>
               </div>
               <div style={styles.statusRow}>
                 <span style={styles.statusLabel}>TLS Requirement</span>

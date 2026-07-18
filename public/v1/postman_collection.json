@@ -1,8 +1,8 @@
-{
+﻿{
   "info": {
     "_postman_id": "8c4fd2a7-5c21-4f9e-be89-6fa9b8b981f2",
-    "name": "VitaShield API Specifications",
-    "description": "Enterprise API collection for integrating and testing the VitaShield AI-Native Human Verification Platform.",
+    "name": "Vynalth AI Shield API Specifications",
+    "description": "Enterprise API collection for integrating and testing the Vynalth AI Shield AI-Native Human Verification Platform.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -21,10 +21,10 @@
           "raw": "{\n  \"secret\": \"vms_sec_live_your_private_secret_key\",\n  \"token\": \"vmt_live_token_base64_telemetry_here\",\n  \"ip\": \"203.0.113.195\"\n}"
         },
         "url": {
-          "raw": "https://vitashield.sleepsomno.com/api/verify",
+          "raw": "https://shield.sleepsomno.com/api/verify",
           "protocol": "https",
           "host": [
-            "vitashield",
+            "Vynalth AI Shield",
             "sleepsomno",
             "com"
           ],
@@ -33,7 +33,7 @@
             "verify"
           ]
         },
-        "description": "Verifies the client-side telemetry token returned by the VitaShield SDK widget. Returns risk score evaluation analysis and gateway access decisions (Allow, Challenge, or Block)."
+        "description": "Verifies the client-side telemetry token returned by the Vynalth AI Shield SDK widget. Returns risk score evaluation analysis and gateway access decisions (Allow, Challenge, or Block)."
       },
       "response": [
         {

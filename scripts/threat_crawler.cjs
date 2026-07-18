@@ -1,4 +1,4 @@
-/**
+﻿/**
  * scripts/threat_crawler.cjs
  * 
  * An automated, recursive web threat crawler that mimics a search engine.
@@ -20,7 +20,7 @@ const { URL } = require('url');
 // Configuration
 const INTEL_DIR = path.join(__dirname, '../public/intel');
 const SITEMAP_PATH = path.join(__dirname, '../public/sitemap.xml');
-const BASE_HOST = 'https://vitashield.sleepsomno.com';
+const BASE_HOST = 'https://shield.sleepsomno.com';
 
 // Ensure output directory exists
 if (!fs.existsSync(INTEL_DIR)) {
@@ -51,7 +51,7 @@ function fetchPage(targetUrl) {
     
     const req = client.get(targetUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; VitaShieldThreatCrawler/1.0; +https://vitashield.sleepsomno.com)'
+        'User-Agent': 'Mozilla/5.0 (compatible; VitaShieldThreatCrawler/1.0; +https://shield.sleepsomno.com)'
       }
     }, (res) => {
       if (res.statusCode !== 200) {
