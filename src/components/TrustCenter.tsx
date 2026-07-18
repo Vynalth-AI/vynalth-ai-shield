@@ -218,16 +218,16 @@ export const TrustCenter: React.FC<TrustCenterProps> = ({ logs }) => {
       if (geoTerm === 'conflict' || geoTerm === 'anomaly' || geoTerm === 'travel') {
         matchesSearch = 
           log.location.toLowerCase().includes('conflict') ||
-          log.flags.includes('impossible_travel_anomaly') ||
-          log.flags.includes('suspicious_geo_velocity_jump');
+          (log.flags || []).includes('impossible_travel_anomaly') ||
+          (log.flags || []).includes('suspicious_geo_velocity_jump');
       } else {
         matchesSearch = log.location.toLowerCase().includes(geoTerm);
       }
     } else if (query.startsWith('anomaly:') || query.startsWith('flag:')) {
       const anomalyTerm = query.slice(query.indexOf(':') + 1).trim();
       matchesSearch = 
-        log.flags.some(f => f.toLowerCase().includes(anomalyTerm)) ||
-        log.deviceAnomalies.some(a => a.toLowerCase().includes(anomalyTerm));
+        (log.flags || []).some(f => f.toLowerCase().includes(anomalyTerm)) ||
+        (log.deviceAnomalies || []).some(a => a.toLowerCase().includes(anomalyTerm));
     } else if (query.startsWith('risk:')) {
       const riskVal = parseInt(query.slice(5).trim());
       if (!isNaN(riskVal)) {
@@ -238,7 +238,7 @@ export const TrustCenter: React.FC<TrustCenterProps> = ({ logs }) => {
         log.ipAddress.includes(searchQuery) ||
         log.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
         log.id.includes(searchQuery) ||
-        (log.browser && log.browser.toLowerCase().includes(searchQuery.toLowerCase()));
+        !!(log.browser && log.browser.toLowerCase().includes(searchQuery.toLowerCase()));
     }
 
     return matchesFilter && matchesSearch;
