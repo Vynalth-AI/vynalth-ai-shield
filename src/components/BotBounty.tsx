@@ -287,27 +287,27 @@ export const BotBounty: React.FC = () => {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', fontSize: '0.78rem', lineHeight: 1.5, color: '#cbd5e1' }}>
                 <div style={{ borderLeft: '2px solid #38bdf8', paddingLeft: '0.75rem' }}>
-                  <strong style={{ color: '#38bdf8', fontSize: '0.82rem' }}>Age 8 — The First Bot Shield</strong>
+                  <strong style={{ color: '#38bdf8', fontSize: '0.82rem' }}>Age 12 — The First Bot Shield</strong>
                   <p style={{ margin: '0.15rem 0 0', color: 'var(--text-muted)' }}>
-                    Wrote simple firewall scripts to filter bot requests and prevent spam comments on a private gaming forum.
+                    Wrote custom PHP/Python firewall regex scripts to mitigate credential brute-force and DDoS spam bots targeting a private gaming forum.
                   </p>
                 </div>
                 <div style={{ borderLeft: '2px solid #38bdf8', paddingLeft: '0.75rem' }}>
-                  <strong style={{ color: '#38bdf8', fontSize: '0.82rem' }}>Age 10 — Behavior Path Kinetics</strong>
+                  <strong style={{ color: '#38bdf8', fontSize: '0.82rem' }}>Age 14 — Path Kinetics Discovery</strong>
                   <p style={{ margin: '0.15rem 0 0', color: 'var(--text-muted)' }}>
-                    Discovered mouse kinematic profiling. Replaced static IP blocklists with silent curvature heuristic analyzers.
+                    Discovered mouse velocity and curvature analysis. Swapped hard IP bans for silent behavioral metrics, testing on local Linux servers.
                   </p>
                 </div>
                 <div style={{ borderLeft: '2px solid #818cf8', paddingLeft: '0.75rem' }}>
-                  <strong style={{ color: '#818cf8', fontSize: '0.82rem' }}>Age 11 — Cryptography & MPC</strong>
+                  <strong style={{ color: '#818cf8', fontSize: '0.82rem' }}>Age 16 — Decentralized Identity</strong>
                   <p style={{ margin: '0.15rem 0 0', color: 'var(--text-muted)' }}>
-                    Explored Multi-Party Computation (MPC) and Decentralized Identifiers (DIDs) to keep raw biometric records under user sovereignty.
+                    Researched Decentralized Identifiers (DIDs) and zero-knowledge proofs to establish sovereign user control over raw biometric records.
                   </p>
                 </div>
                 <div style={{ borderLeft: '2px solid #10b981', paddingLeft: '0.75rem' }}>
-                  <strong style={{ color: '#10b981', fontSize: '0.82rem' }}>Age 12 (Now) — Protecting Sleep Networks</strong>
+                  <strong style={{ color: '#10b981', fontSize: '0.82rem' }}>Age 18 — Protecting Health Networks</strong>
                   <p style={{ margin: '0.15rem 0 0', color: 'var(--text-muted)' }}>
-                    Founded VitaMind AI & VitaShield. Deployed active Edge Web WAF rules protecting diagnostic clinics from medical records scraping.
+                    Founded VitaMind AI & VitaShield. Deployed edge security rules defending digital sleep clinic diagnostics from scrapers and automated attacks.
                   </p>
                 </div>
               </div>
