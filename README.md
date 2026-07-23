@@ -61,7 +61,7 @@
 
 ```json
 {
-  "secret": "vms_sec_live_9c0f73b18274d8a21f7c",
+  "secret": "vms_sec_live_your_private_secret_key",
   "token": "vmt_live_token_base64_telemetry_here",
   "ip": "203.0.113.195"
 }
