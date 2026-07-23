@@ -1,4 +1,4 @@
-﻿# 🛡️ Vynalth AI Shield: AI-Native Human Verification & Anti-Bot Infrastructure
+# 🛡️ Vynalth AI Shield: AI-Native Human Verification & Anti-Bot Infrastructure
 
 [English](#english-version) | [中文版](#中文版本)
 
@@ -10,31 +10,37 @@
 
 ### 🌟 當前版本已實現功能 (Currently Implemented)
 
-*   **行為生物遙測探針**：前端 SDK 靜默採集滑鼠移動坐標、打字延遲規律、退格修正動作、剪貼簿粘貼頻率，以及 WebGL GPU 驅動特徵等指紋特徵。
-*   **多維風險引擎 (Risk Engine v2)**：後台模組化評分算法（包含軌跡直線度檢測、速度方差檢測、打字均勻度分析、提交停留時長檢測），輸出 0-100 的 Risk/Trust 分數。
-*   **漸進式無感挑戰**：對正常人類實現 95% 以上零干擾隱身通過；僅在識別到可疑行為（如無滑鼠移動、常數打字間隔等）時，自動升級為前端滑塊 Captcha 挑戰。
-*   **複製貼上後行為鏈檢測**：特徵化識別撞庫機器人「填充文字後瞬間（<350ms）提交且無滑鼠軌跡」的特徵，精準阻斷。
-*   **操作猶豫期（Deceleration Pause）分析**：分析最後一次滑鼠移動與按鈕點擊間的生理減速停頓，攔截機器人無減速的模擬點擊。
-*   **自定義 widget 主題配置**：支持通過 `data-theme-primary`、`data-theme-bg`、`data-theme-text` 屬性動態同步網頁配色；後台提供可視化色彩配置面板與代碼生成器。
-*   **實時人機體驗沙盒 (Live Sandbox)**：Landing Page 提供實時對接沙盒，可直觀查看自身操作的直線度比率、按鍵標準差，以及觸發的行為 flag。
-*   **自動化機器人模擬測試腳本 (`scripts/test-bot.js`)**：提供一鍵化測試指令，自動模擬真人曲線 vs WebDriver 機械動作與無頭 VM 爬蟲，以驗證引擎精度。
+*   **Vynalth HumanProof™ 3-Tier AI 決策引擎**：
+    *   **低風險 (Human Score ≥ 80)**：✅ 直接通過 (Human Verified) — 無感透明通行。
+    *   **中風險 (40 ≤ Human Score < 80)**：⚠️ 啟動 Vynalth HumanProof™ Challenge（微手勢 / 活體驗證）。
+    *   **高風險 (Human Score < 40)**：❌ Block 阻斷 / 企業規則攔截。
+*   **Multi-Signal 融合評分 (+20/+20/+25/+35 = 100)**：
+    *   🖱️ 滑鼠軌跡熵与動態曲率：最高 **+20**
+    *   📱 觸控/手勢加速度方差：最高 **+20**
+    *   💻 設備/WebGL 渲染器信譽：最高 **+25**
+    *   🧩 互動/活體挑戰結果：**+35**
+*   **Vynalth HumanProof™ 活體驗證 (Liveness Verification)**：
+    *   Web Camera API 實時捕捉人臉框（Reticle Oval）。
+    *   自然眨眼（Eye Blink）與頭部微轉（Head Tilt）防照片/視頻翻拍。
+    *   **不保存原始照片**：生成 128 維加密數學特徵向量（`users.face_embedding_encrypted`）。
+*   **完整 10 大 Policy 政策條款體系**：
+    *   包含 Privacy Policy、Human Verification Policy ⭐、Challenge Verification Policy、AI Transparency Policy、Anti-Abuse Policy、Developer API Policy、Data Retention Policy (24h 自動銷毀)、Security Policy (AES-256 Vault)、Responsible AI Policy 與 Vulnerability Disclosure Policy。
+*   **Apple 官方極簡美學設計 (Apple Design System)**：
+    *   採用主背景 Pure White (`#FFFFFF`)、Soft Gray (`#F5F5F7`)、Near Black (`#1D1D1F`)、Deep Navy (`#0A2540`) 与 Soft Teal (`#00C7B1`) 配色。
 
-### 🗺️ 規劃中與未來路線圖 (Future Roadmap)
+### 🗺️ 地區與開放策略 (Regional Access Policy)
 
-*   **動態 PoW 難度自動調校**：在高頻流量攻擊下，自動調整 Proof-of-Work 客戶端算力難度，增加機器人攻擊成本。
-*   **WebAuthn 硬件安全密鑰集成**：對高風險操作引入 YubiKey/TouchID 等物理硬件級驗證。
-*   **實時在線機器人學習與聚類分類 (Online Autoencoder)**：動態更新人機分類模型，自動學習新型自動化框架行為。
-*   **反向檢測 API 陷阱與誘餌 (Honeypot Traps)**：在 DOM 中注入視覺隱形的蜜罐字段與誘餌 API，引誘爬蟲主動暴露特徵。
+*   🇲🇾 **馬來西亞 (MY) 與 🇸🇬 新加坡 (SG)** 地區即刻開放全功能使用。
+*   🌏 **全球其他地區** 安排在 **2026年8月 (Asia/Kuala_Lumpur MYT)** 自動解鎖開放。
 
 ---
 
 ### 🚀 2分鐘快速集成指南
 
 #### 1. 前端 SDK 接入 (Script Tag)
-在您的 HTML 頁面中引入 Vynalth AI Shield 防禦腳本，並在表單 (Form) 內放置對應的 Widget 容器：
 
 ```html
-<!-- 1. 引入防禦 SDK -->
+<!-- 1. 引入 Vynalth AI Shield SDK -->
 <script src="https://shield.sleepsomno.com/widget.js" defer></script>
 
 <!-- 2. 在表單內放置驗證容器 -->
@@ -42,49 +48,24 @@
   <input type="email" name="email" required />
   <input type="password" name="password" required />
   
-  <!-- Vynalth AI Shield 隱形防禦 Widget -->
-  <div id="Vynalth AI Shield-widget" 
+  <!-- Vynalth AI Shield Widget 容器 -->
+  <div id="vynalth-shield-widget" 
        data-sitekey="vms_pub_live_79a2b8e3df9102ca"
-       data-theme-primary="#00f2fe"></div>
+       data-theme-primary="#00c7b1"></div>
   
   <button type="submit">Sign In</button>
 </form>
 ```
-*SDK 將在表單提交時自動採集遙測數據，並注入隱藏輸入框 `<input type="hidden" name="vms-shield-token" />`。*
 
 #### 2. 後端驗證 API (POST /api/verify)
-當您的伺服器接收到表單請求時，將收到的 `vms-shield-token` 發送到 Vynalth AI Shield API 進行二次校驗：
 
-> **提示**：`/v1/verify` 也可作為別名使用，兩者等效。
-
-*   **請求端點**：`POST https://shield.sleepsomno.com/api/verify`
-*   **請求 Body**：
-    ```json
-    {
-      "secret": "vms_sec_live_9c0f73b18274d8a21f7c",
-      "token": "vmt_live_token_base64_telemetry_here",
-      "ip": "203.0.113.195"
-    }
-    ```
-*   **響應 JSON**：
-    ```json
-    {
-      "success": true,
-      "decision": "allow",
-      "scores": {
-        "risk_score": 12,
-        "trust_score": 92,
-        "reputation_score": 94
-      },
-      "detection_details": {
-        "is_ai_agent": false,
-        "agent_type": "none",
-        "device_anomalies": [],
-        "behavior_flags": [],
-        "network_flags": []
-      }
-    }
-    ```
+```json
+{
+  "secret": "vms_sec_live_9c0f73b18274d8a21f7c",
+  "token": "vmt_live_token_base64_telemetry_here",
+  "ip": "203.0.113.195"
+}
+```
 
 ---
 
@@ -94,78 +75,54 @@
 
 ### 🌟 Currently Implemented Features
 
-*   **Invisible Telemetry Sensors**: Captures mouse curves, sub-pixel coordinate floats, keypress delays, text revision (backspaces), copy-paste timing offsets, and WebGL virtualized GPU profiles.
-*   **Modular Risk Engine (Risk Engine v2)**: Evaluates kinetic gestures on the server side using `SignalAnalyzer` and `ScoreCalculator`, generating real-time Risk and Trust scores.
-*   **Progressive Challenge Loops**: Triggers visual slider captures ONLY when suspicious bot kinetics are flagged. Seamless pass-through for 95%+ of human users.
-*   **Credential Stuffing Paste-Submit Protection**: Detects automated stuffing scripts by checking if form submission occurs within 350ms of a copy-paste event with zero cursor motion.
-*   **Hesitation Pause Evaluator**: Flags machine-speed click executions (less than 25ms delay after moving) that bypass biological muscle deceleration curves.
-*   **Dynamic Theme Builder**: Exposes color-picking settings that output custom themes (`data-theme-primary`, `data-theme-bg`, `data-theme-text`) read directly by frontend widget runtimes.
-*   **Live Landing Sandbox Console**: Includes an interactive demo form on the public landing page to inspect and output your own real-time gesture straightness, typing deviations, and scoring flags.
-*   **Local Bot Simulator Script (`scripts/test-bot.js`)**: Executable simulation test suite evaluating human vs automated webdriver bot vs headless VM crawler profiles.
+*   **Vynalth HumanProof™ 3-Tier AI Decision Engine**:
+    *   **Low Risk (Score ≥ 80)**: ✅ Allow (Human Verified) — Invisible transparent pass-through.
+    *   **Medium Risk (40 ≤ Score < 80)**: ⚠️ Vynalth HumanProof™ Challenge (interactive micro-gestures or liveness check).
+    *   **High Risk (Score < 40)**: ❌ Block / Custom Enterprise Action.
+*   **Multi-Signal Score Fusion (+20 / +20 / +25 / +35 = 100)**:
+    *   🖱️ Mouse trajectory entropy & curvature: Up to **+20**
+    *   📱 Touch/gesture kinematics variance: Up to **+20**
+    *   💻 Device & WebGL renderer reputation: Up to **+25**
+    *   🧩 Interactive / Liveness challenge result: **+35**
+*   **Vynalth HumanProof™ Liveness Verification**:
+    *   Web Camera API face reticle positioning.
+    *   Eye Blink Detection & Head Movement check against deepfakes and spoofing.
+    *   **Zero raw photo storage**: Encrypted 128-dimensional mathematical vector (`users.face_embedding_encrypted`).
+*   **10 Core Legal Policies Suite**:
+    *   Includes Privacy Policy, Human Verification Policy ⭐, Challenge Verification Policy, AI Transparency Policy, Anti-Abuse Policy, Developer & API Policy, Data Retention Policy (24h ephemeral wipe), Security Policy (AES-256 Supabase Vault), Responsible AI Policy, and Vulnerability Disclosure Policy.
+*   **Apple Design System Aesthetic**:
+    *   Built with Pure White (`#FFFFFF`), Soft Gray (`#F5F5F7`), Near Black (`#1D1D1F`), Deep Navy (`#0A2540`), and Soft Teal (`#00C7B1`).
 
-### 🗺️ Future Roadmap / In Progress
+### 🗺️ Regional Access Policy
 
-*   **Proof-of-Work Puzzle Scaling**: Automatic scaling of client-side PoW math challenges under high Edge CDN traffic volume.
-*   **Hardware Token Validation**: WebAuthn biometric security and physical security key (YubiKey) gateway validations for high-threat operations.
-*   **Real-time Online Machine Learning (Online Autoencoder)**: Dynamically cluster client telemetry packets on edge servers to detect novel browser automation packages.
-*   **Active Honeypot Traps**: Invisible form parameters and decoy API targets to trick automated crawlers into identifying themselves.
+*   🇲🇾 **Malaysia (MY) & 🇸🇬 Singapore (SG)**: Immediate full access enabled.
+*   🌏 **Global / Rest of World**: Time-gated to auto-open worldwide starting **August 2026 (Asia/Kuala_Lumpur MYT)**.
 
 ---
 
 ### 🚀 Quick Start Integration
 
 #### 1. Frontend SDK Embed
-Include the defense script in your HTML and place the verification target div inside your form:
 
 ```html
-<!-- Include SDK -->
+<!-- Include Vynalth AI Shield SDK -->
 <script src="https://shield.sleepsomno.com/widget.js" defer></script>
 
 <!-- Place verification placeholder inside form -->
 <form id="signup-form" action="/register" method="POST">
-  <div id="Vynalth AI Shield-widget" 
+  <div id="vynalth-shield-widget" 
        data-sitekey="vms_pub_live_79a2b8e3df9102ca"
-       data-theme-primary="#00f2fe"></div>
+       data-theme-primary="#00c7b1"></div>
   <button type="submit">Submit</button>
 </form>
 ```
 
 #### 2. Backend Verification (POST /api/verify)
-Send the token submitted by the form (`vms-shield-token`) to the verification API:
 
-*   **Endpoint**: `POST https://shield.sleepsomno.com/api/verify`
-*   **Payload**:
-    ```json
-    {
-      "secret": "vms_sec_live_your_private_secret_key",
-      "token": "base64_telemetry_token_submitted_by_form",
-      "ip": "203.0.113.195"
-    }
-    ```
-*   **Response**:
-    ```json
-    {
-      "success": true,
-      "decision": "allow",
-      "scores": {
-        "risk_score": 12,
-        "trust_score": 92,
-        "reputation_score": 94
-      },
-      "detection_details": {
-        "is_ai_agent": false,
-        "agent_type": "none",
-        "device_anomalies": [],
-        "behavior_flags": [],
-        "network_flags": []
-      }
-    }
-    ```
-
----
-
-## 📂 Project Modules
-
-*   `/api/verify.ts`: Serverless Node.js verify api parsing browser details and writing to database.
-*   `/public/widget.js`: High-fidelity SDK script collecting coordinates and rendering sliders.
-*   `/src/components/Dashboard.tsx`: Live multitenant console displaying logs and active metrics.
+```json
+{
+  "secret": "vms_sec_live_your_private_secret_key",
+  "token": "base64_telemetry_token_submitted_by_form",
+  "ip": "203.0.113.195"
+}
+```

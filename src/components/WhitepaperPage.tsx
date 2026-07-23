@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 
 interface WhitepaperPageProps {
   onBack?: () => void;
@@ -229,20 +229,20 @@ export const WhitepaperPage: React.FC<WhitepaperPageProps> = ({ onBack, onDeploy
           </div>
 
           <h2 style={{ color: '#f1f5f9', fontSize: '1.5rem', fontWeight: 700, marginTop: '2.5rem', marginBottom: '1rem', borderLeft: '3px solid #38bdf8', paddingLeft: '0.75rem' }}>
-            三、 Vynalth AI Shield 的防御实践：自适应双端校验机制
+            三、 Vynalth AI Shield 的防御实践：Vynalth HumanProof™ 3-Tier 决策引擎
           </h2>
           <p>
-            作为 **Vynalth AI** 旗下的核心安全系统，Vynalth AI Shield 基于微观行为学，结合边缘神经网络与多模态大模型对抗逻辑，设计了三层防御防线：
+            作为 **Vynalth AI** 旗下的核心安全系统，Vynalth AI Shield 基于微观行为学与活体验证技术，设计了完整的 **Vynalth HumanProof™ 三级自适应决策管线**：
           </p>
           <ol style={{ paddingLeft: '1.25rem' }}>
             <li style={{ marginBottom: '1rem' }}>
-              <strong>边缘自编码器模型（Edge Autoencoder）：</strong> 在用户浏览器端，Vynalth AI Shield 收集前 2500ms 的生理运动特征，不上传任何隐私文本，仅将其转化为行为曲率张量。通过轻量化 WASM/JS 神经网络对该张量进行自编码重构。由于重构误差在模拟脚本上会产生数量级的偏离，边缘端即可做出初步判定。
+              <strong>低风险透明通行 (Score ≥ 80)：</strong> 针对具有符合正态分布的滑鼠物理震颤、按键犹豫停顿的合法人类会话，系统判定为 `Human Verified`，实现 100% 零干擾透明通行。
             </li>
             <li style={{ marginBottom: '1rem' }}>
-              <strong>动态工作量证明（Dynamic Proof of Work）：</strong> 一旦自编码器识别到可疑迹象，服务端将向浏览器下发具有对抗性质的高强度 PoW 计算挑战。AI 代理的并发运行通常面临极高的时间与功耗成本，引入 PoW 增加了攻击者的计算单价，从而在经济学层面上阻止了大规模自动化行为。
+              <strong>中风险 Vynalth HumanProof™ Challenge (40 ≤ Score &lt; 80)：</strong> 当 AI 识别到边界不确定会话时，自动拉起多维验证挑战：包含微手勢拖拽与基于 Web Camera API 的 **人脸活体验证（Liveness Verification）**。通过自然眨眼（Eye Blink）与头部微轉（Head Tilt）判别活体真实性，并将其实时归一化转化为 **128 维加密特征向量（`users.face_embedding_encrypted`）**，绝对不出售或长期保存原始图片。
             </li>
             <li style={{ marginBottom: '1rem' }}>
-              <strong>自适应意图判定（Intent Governance）：</strong> Vynalth AI Shield 的自适应控制台允许对流量进行“分类共治”，而非粗暴封禁。例如，支持符合 IETF WBA 标准的合法搜索引擎与生产力 AI Agent 签名通过，保护业务生态的开放性；同时对未签名的恶意撞库 bot 予以拦截。
+              <strong>高风险即时阻断 (Score &lt; 40)：</strong> 针对零滑鼠轨迹、WebDriver 框架检测激活、瞬时批量提交的脚本，边缘网关直接返回 `403 Forbidden` 并触发企业级防火墙规则。
             </li>
           </ol>
 
