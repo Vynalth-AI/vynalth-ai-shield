@@ -479,9 +479,70 @@ export const useBehaviorTracker = () => {
     challengeMethod.current = method;
   };
 
+  const calculateMultiSignalScore = (): {
+    mouseScore: number;
+    touchScore: number;
+    deviceScore: number;
+    challengeScore: number;
+    totalHumanScore: number;
+    riskTier: 'low' | 'medium' | 'high';
+    riskLabel: string;
+  } => {
+    // 1. Mouse Behavior (Max 20)
+    let mouseScore = 0;
+    if (mouseEventsCount.current >= 8) mouseScore = 20;
+    else if (mouseEventsCount.current >= 3) mouseScore = 12;
+    else if (mouseEventsCount.current > 0) mouseScore = 6;
+
+    // 2. Touch Pattern / Gesture (Max 20)
+    let touchScore = 0;
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
+    if (isMobileDevice) {
+      if (touchEventsCount.current >= 2) touchScore = 20;
+      else if (touchEventsCount.current > 0) touchScore = 10;
+    } else {
+      // Desktop gesture equivalent (scroll & key timings)
+      if (scrollsCount.current > 0 || keyPressesCount.current > 0) touchScore = 20;
+      else touchScore = 15;
+    }
+
+    // 3. Device Reputation (Max 25)
+    let deviceScore = 0;
+    if (!navigator.webdriver && !isWebdriverSpoofed()) deviceScore += 10;
+    if (storageAvailabilityRef.current?.localStorage) deviceScore += 8;
+    if (webGLInfoRef.current?.renderer) deviceScore += 7;
+
+    // 4. Challenge Result (Max 35)
+    const challengeScore = challengeSolved.current ? 35 : 0;
+
+    const totalHumanScore = Math.min(100, mouseScore + touchScore + deviceScore + challengeScore);
+
+    let riskTier: 'low' | 'medium' | 'high' = 'medium';
+    let riskLabel = '中风险 - 需 HumanProof 验证';
+
+    if (totalHumanScore >= 80) {
+      riskTier = 'low';
+      riskLabel = '低风险 - 直接通过 (Human Verified)';
+    } else if (totalHumanScore < 40 && !challengeSolved.current) {
+      riskTier = 'high';
+      riskLabel = '高风险 - 已阻断 (Blocked)';
+    }
+
+    return {
+      mouseScore,
+      touchScore,
+      deviceScore,
+      challengeScore,
+      totalHumanScore,
+      riskTier,
+      riskLabel
+    };
+  };
+
   return {
     getTelemetryToken,
     solveChallenge,
+    calculateMultiSignalScore,
     mouseEventsCount: mouseEventsCount.current,
     isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent),
   };

@@ -1243,6 +1243,62 @@ curl -X POST https://shield.sleepsomno.com/api/verify \\
           </p>
         </div>
       </section>
+
+      {/* Legal Footer */}
+      <footer style={{
+        borderTop: '1px solid var(--border-color)',
+        background: 'var(--bg-secondary)',
+        padding: '3rem 2.5rem 2rem 2.5rem',
+        marginTop: 'auto'
+      }}>
+        <div style={{
+          maxWidth: '1100px',
+          margin: '0 auto',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '2.5rem',
+          textAlign: 'left'
+        }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+              <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: '0.75rem' }}>V</div>
+              <span style={{ fontSize: '0.98rem', fontWeight: 800, color: 'var(--primary)' }}>Vynalth AI Shield</span>
+            </div>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+              AI-Powered Frictionless Security & Behavioral Verification Gateway. Protecting APIs, portals, and infrastructure from advanced automated threats.
+            </p>
+          </div>
+
+          <div>
+            <h4 style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.85rem' }}>Legal & Governance</h4>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: 0, margin: 0, fontSize: '0.76rem' }}>
+              <li><a href="https://trust.sleepsomno.com" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Privacy Policy</a></li>
+              <li><a href="https://trust.sleepsomno.com" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Human Verification Policy ⭐</a></li>
+              <li><a href="https://trust.sleepsomno.com" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Challenge Verification Policy</a></li>
+              <li><a href="https://trust.sleepsomno.com" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>AI Transparency Policy</a></li>
+              <li><a href="https://trust.sleepsomno.com" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Security Policy</a></li>
+              <li><a href="https://trust.sleepsomno.com" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>API Terms</a></li>
+              <li><a href="https://trust.sleepsomno.com" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Responsible AI Policy</a></li>
+              <li><a href="https://trust.sleepsomno.com" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Data Retention Policy</a></li>
+              <li><a href="https://trust.sleepsomno.com" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Vulnerability Disclosure Policy</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.85rem' }}>System Subdomains</h4>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: 0, margin: 0, fontSize: '0.76rem' }}>
+              <li><a href="https://shield.sleepsomno.com" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>shield.sleepsomno.com (Gateway)</a></li>
+              <li><a href="https://trust.sleepsomno.com" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>trust.sleepsomno.com (Trust Center)</a></li>
+              <li><a href="https://status.sleepsomno.com" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>status.sleepsomno.com (Live Status)</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div style={{ maxWidth: '1100px', margin: '2rem auto 0 auto', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+          <div>© 2026 Vynalth AI Inc. All rights reserved. Vynalth HumanProof™ is a trademark of Vynalth AI Inc.</div>
+          <div>Protected by Supabase Vault & Cloudflare Edge Gateway</div>
+        </div>
+      </footer>
     </div>
   );
 };

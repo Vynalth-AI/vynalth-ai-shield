@@ -544,6 +544,96 @@ export const TrustCenter: React.FC<TrustCenterProps> = ({ logs, isStandalone = f
         </div>
       </div>
 
+      {/* ─── Vynalth AI Shield Legal Policies & HumanProof™ Architecture ─── */}
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm" style={{ padding: '1.75rem', marginTop: '1rem' }}>
+        <div style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem', marginBottom: '1.25rem' }}>
+          <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#6d28d9', letterSpacing: '0.08em', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
+            Vynalth AI Shield Governance
+          </span>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0f172a', margin: 0, letterSpacing: '-0.02em' }}>
+            Vynalth AI Shield Policy Suite & HumanProof™ Flow
+          </h3>
+          <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0.25rem 0 0 0', lineHeight: 1.5 }}>
+            Comprehensive disclosures governing AI decision making, 3-tier risk engine thresholds, data minimization, and vulnerability reporting.
+          </p>
+        </div>
+
+        {/* AI Decision Flow Visual Diagram */}
+        <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '1.25rem', marginBottom: '1.5rem' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            AI Human Risk Engine Decision Flow
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem', fontSize: '0.78rem' }}>
+            <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '8px', padding: '0.85rem' }}>
+              <div style={{ color: '#047857', fontWeight: 800, fontSize: '0.82rem' }}>✅ 低风险 (Score ≥ 80)</div>
+              <div style={{ color: '#065f46', fontSize: '0.72rem', marginTop: '4px' }}>直接通过 (Human Verified) — 无感透明通行</div>
+            </div>
+            <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px', padding: '0.85rem' }}>
+              <div style={{ color: '#b45309', fontWeight: 800, fontSize: '0.82rem' }}>⚠️ 中风险 (40 ≤ Score &lt; 80)</div>
+              <div style={{ color: '#92400e', fontSize: '0.72rem', marginTop: '4px' }}>HumanProof™ Challenge (互动验证/活体性)</div>
+            </div>
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '0.85rem' }}>
+              <div style={{ color: '#b91c1c', fontWeight: 800, fontSize: '0.82rem' }}>❌ 高风险 (Score &lt; 40)</div>
+              <div style={{ color: '#991b1b', fontSize: '0.72rem', marginTop: '4px' }}>Block 阻断 / 企业规则拦截</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 10 Policies Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1rem' }}>
+          {[
+            {
+              num: '1', title: 'Privacy Policy (隐私政策)', tag: 'Data Protection',
+              desc: '收集 Device/Browser/Network/Interaction 信号用以区分真人与 Bot。承诺：不出售数据、不用于广告追踪、不未经授权共享。'
+            },
+            {
+              num: '2', title: 'Human Verification Policy (人类验证政策) ⭐', tag: 'Core Verification',
+              desc: '说明 AI 行为分析原理、Human Confidence Score 计算以及 Invisible Verification、Adaptive Challenge 与 Human Challenge 机制。'
+            },
+            {
+              num: '3', title: 'Challenge Verification Policy (挑战验证政策)', tag: 'HumanProof™',
+              desc: '当 AI Confidence 属于中风险（如 50%）时，启动点击、按住、划线、视觉任务或活体验证，数据于 24 小时内即时销毁。'
+            },
+            {
+              num: '4', title: 'AI Decision & Transparency Policy (AI 决策透明政策)', tag: 'AI Ethics',
+              desc: '公开说明 Bot Risk Analysis、Human Behavior Analysis 与 Threat Detection 的模型原理、非 100% 绝对性及企业自定义控制机制。'
+            },
+            {
+              num: '5', title: 'Anti-Abuse Policy (反滥用政策)', tag: 'Security',
+              desc: '严格禁止绕过 Shield 验证、制造虚假 Token、对客户网站发动 Bot 攻击、滥用 API 与逆向工程 SDK。'
+            },
+            {
+              num: '6', title: 'Developer & API Policy (开发者 API 政策)', tag: 'Developer Terms',
+              desc: '规定 API Key 管理规范、Rate Limit 速率限制、SDK 正式版本集成与数据处理责任与服务限制。'
+            },
+            {
+              num: '7', title: 'Data Retention Policy (数据保存政策)', tag: 'Compliance',
+              desc: '临时验证数据 24 小时即时自动销毁、安全审计日志保存 30-90 天、企业客户自定义保存周期。'
+            },
+            {
+              num: '8', title: 'Security Policy (安全政策)', tag: 'Architecture',
+              desc: '数据静态/传输加密 (AES-256 / TLS 1.3)、Supabase Vault、Zero Trust 零信任架构与连续漏洞监控。'
+            },
+            {
+              num: '9', title: 'Responsible AI Policy (负责任 AI 政策)', tag: 'AI Ethics',
+              desc: '致力于降低误判、持续优化模型、保护隐私以及避免对特殊群体产生不公平判断。'
+            },
+            {
+              num: '10', title: 'Vulnerability Disclosure Policy (漏洞披露政策)', tag: 'Security Research',
+              desc: '面向安全研究人员的漏洞报告规范、联系邮箱 security@sleepsomno.com 与 24h 响应处理流程。'
+            }
+          ].map(p => (
+            <div key={p.num} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0f172a' }}>{p.title}</span>
+                <span style={{ fontSize: '0.62rem', fontWeight: 800, color: '#0d9488', background: '#ccfbf1', border: '1px solid #99f6e4', borderRadius: '4px', padding: '1px 5px' }}>{p.tag}</span>
+              </div>
+              <p style={{ fontSize: '0.74rem', color: '#64748b', lineHeight: 1.4, margin: 0 }}>{p.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Stripe-style Drawer Panel for detailed log inspections */}
       {selectedLog && (
         <div style={styles.drawerOverlay} onClick={() => setSelectedLogId(null)}>
