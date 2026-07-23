@@ -24,6 +24,7 @@ import { WhitepaperPage } from './components/WhitepaperPage';
 import { PrivacyCompliance } from './components/PrivacyCompliance';
 import { HealthContext } from './components/HealthContext';
 import { BotBounty } from './components/BotBounty';
+import { DocsPage } from './components/DocsPage';
 import { getApiBaseUrl } from './lib/api';
 
 import type { ShieldConfig, VerificationLog } from './types';
@@ -211,7 +212,7 @@ function App() {
     );
   }
 
-  const [viewMode, setViewMode] = useState<'marketing' | 'auth' | 'console' | 'pricing' | 'whitepaper'>('marketing');
+  const [viewMode, setViewMode] = useState<'marketing' | 'auth' | 'console' | 'pricing' | 'whitepaper' | 'docs'>('marketing');
 
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [user, setUser] = useState<any>(() => {
@@ -524,12 +525,42 @@ function App() {
         return <SearchIntelligence logs={logs} />;
       case 'status':
         return <StatusPage />;
+      case 'docs':
+        return (
+          <DocsPage 
+            onBackToHome={() => setViewMode('marketing')}
+            onEnterConsole={() => {
+              if (user) {
+                setViewMode('console');
+                setActiveTab('dashboard');
+              } else {
+                setViewMode('auth');
+              }
+            }}
+          />
+        );
       case 'media':
         return <MediaPage />;
       default:
         return <Dashboard config={config} logs={logs} onAddLog={handleAddLog} />;
     }
   };
+
+  if (viewMode === 'docs') {
+    return (
+      <DocsPage 
+        onBackToHome={() => setViewMode('marketing')}
+        onEnterConsole={() => {
+          if (user) {
+            setViewMode('console');
+            setActiveTab('dashboard');
+          } else {
+            setViewMode('auth');
+          }
+        }}
+      />
+    );
+  }
 
   if (viewMode === 'marketing') {
     return (
@@ -544,6 +575,7 @@ function App() {
         }} 
         onNavigateToPricing={() => setViewMode('pricing')}
         onNavigateToWhitepaper={() => setViewMode('whitepaper')}
+        onNavigateToDocs={() => setViewMode('docs')}
       />
     );
   }

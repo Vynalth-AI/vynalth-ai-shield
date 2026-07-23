@@ -10,12 +10,14 @@ interface MarketingPortalProps {
   onEnterConsole: () => void;
   onNavigateToPricing?: () => void;
   onNavigateToWhitepaper?: () => void;
+  onNavigateToDocs?: () => void;
 }
 
 export const MarketingPortal: React.FC<MarketingPortalProps> = ({ 
   onEnterConsole,
   onNavigateToPricing,
-  onNavigateToWhitepaper
+  onNavigateToWhitepaper,
+  onNavigateToDocs
 }) => {
   const [activeStep, setActiveStep] = useState<number>(0);
   const [demoResults, setDemoResults] = useState<any>(null);
@@ -257,7 +259,12 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({
           <a href="#features" style={styles.navLink}>FEATURES</a>
           <a href="#pipeline" style={styles.navLink}>HOW IT WORKS</a>
           <a href="#matrix" style={styles.navLink}>DEFENSE MATRIX</a>
-          <a href="#docs" style={styles.navLink}>DOCUMENTATION</a>
+          <button 
+            onClick={onNavigateToDocs} 
+            style={{ ...styles.navLink, background: 'none', border: 'none', cursor: 'pointer', padding: 0, textTransform: 'uppercase' }}
+          >
+            DOCUMENTATION
+          </button>
           <button 
             onClick={onNavigateToPricing} 
             style={{ ...styles.navLink, background: 'none', border: 'none', cursor: 'pointer', padding: 0, textTransform: 'uppercase' }}
