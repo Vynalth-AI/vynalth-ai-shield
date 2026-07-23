@@ -5,9 +5,11 @@ interface SidebarProps {
   setActiveTab: (tab: string) => void;
   onReturnHome?: () => void;
   onLogout?: () => void;
+  theme?: 'light' | 'dark';
+  toggleTheme?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onReturnHome, onLogout }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onReturnHome, onLogout, theme = 'light', toggleTheme }) => {
   const menuItems = [
     {
       id: 'dashboard',
@@ -297,6 +299,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
                       setActiveTab(item.id);
                     }
                   }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      const anyItem = item as any;
+                      if (anyItem.isExternalLink && anyItem.url) {
+                        window.location.href = anyItem.url;
+                      } else {
+                        setActiveTab(item.id);
+                      }
+                    }
+                  }}
+                  aria-label={item.label}
                   className={isActive ? "active-nav-item" : ""}
                   style={{
                     ...styles.navButton,
@@ -320,11 +334,44 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
 
       {/* Engine Status & Footer */}
       <div style={styles.footer}>
+        {toggleTheme && (
+          <button 
+            onClick={toggleTheme}
+            style={{ ...styles.exitBtn, marginBottom: '0.45rem' }}
+            title="Toggle Light / Dark theme mode"
+            aria-label="Toggle Light or Dark Theme"
+          >
+            {theme === 'dark' ? (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px' }}>
+                  <circle cx="12" cy="12" r="5"/>
+                  <line x1="12" y1="1" x2="12" y2="3"/>
+                  <line x1="12" y1="21" x2="12" y2="23"/>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                  <line x1="1" y1="12" x2="3" y2="12"/>
+                  <line x1="21" y1="12" x2="23" y2="12"/>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+                Light Theme
+              </>
+            ) : (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px' }}>
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+                Dark Theme
+              </>
+            )}
+          </button>
+        )}
         {onLogout && (
           <button 
             onClick={onLogout}
-            style={{ ...styles.exitBtn, background: 'rgba(239, 68, 68, 0.08)', color: '#f87171', borderColor: 'rgba(239, 68, 68, 0.2)', marginBottom: '0.45rem' }}
+            style={{ ...styles.exitBtn, color: 'var(--danger)', marginBottom: '0.45rem' }}
             title="Sign out of developer console"
+            aria-label="Sign out of developer console"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: '6px' }}>
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -339,6 +386,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
             onClick={onReturnHome}
             style={styles.exitBtn}
             title="Return to public marketing homepage"
+            aria-label="Return to public marketing homepage"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: '6px' }}>
               <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -367,123 +415,120 @@ const styles: { [key: string]: React.CSSProperties } = {
     position: 'fixed',
     top: 0,
     left: 0,
-    background: 'rgba(9, 13, 23, 0.85)',
+    background: 'var(--bg-glass)',
     backdropFilter: 'blur(20px)',
     borderRight: '1px solid var(--border-color)',
     display: 'flex',
     flexDirection: 'column',
-    padding: '1.75rem 1rem',
-    zIndex: 100,
-    boxShadow: '8px 0 32px rgba(0, 0, 0, 0.25)'
+    padding: '1.5rem 1rem',
+    zIndex: 100
   },
   brandContainer: {
     display: 'flex',
     alignItems: 'center',
     gap: '0.75rem',
-    padding: '0.5rem 0.75rem 2rem 0.75rem',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.04)'
+    padding: '0.5rem 0.75rem 1.5rem 0.75rem',
+    borderBottom: '1px solid var(--border-color)'
   },
   logoIcon: {
-    width: '40px',
-    height: '40px',
+    width: '38px',
+    height: '38px',
     borderRadius: '10px',
-    background: 'rgba(6, 182, 212, 0.08)',
-    border: '1px solid rgba(6, 182, 212, 0.2)',
+    background: 'var(--bg-secondary)',
+    border: '1px solid var(--border-color)',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    overflow: 'hidden'
   },
   brandText: {
     display: 'flex',
     flexDirection: 'column'
   },
   brandTitle: {
-    fontSize: '1.15rem',
-    fontWeight: '700',
-    color: '#fff',
+    fontSize: '1.05rem',
+    fontWeight: '800',
+    color: 'var(--primary)',
     letterSpacing: '-0.02em'
   },
   brandSubtitle: {
     fontSize: '0.62rem',
     fontWeight: '800',
     color: 'var(--secondary)',
-    letterSpacing: '0.12em',
+    letterSpacing: '0.1em',
     marginTop: '0.1rem'
   },
   nav: {
     flex: 1,
     marginTop: '1rem',
     overflowY: 'auto',
-    maxHeight: 'calc(100vh - 200px)',
+    maxHeight: 'calc(100vh - 220px)',
     scrollbarWidth: 'none',
     msOverflowStyle: 'none'
   },
-
   navList: {
     listStyle: 'none',
     display: 'flex',
     flexDirection: 'column',
-    gap: '0.5rem'
+    gap: '0.35rem'
   },
   navButton: {
     width: '100%',
     display: 'flex',
     alignItems: 'center',
     gap: '0.85rem',
-    padding: '0.85rem 1rem',
+    padding: '0.75rem 0.85rem',
     background: 'transparent',
     border: 'none',
-    borderRadius: '10px',
+    borderRadius: '8px',
     color: 'var(--text-muted)',
-    fontSize: '0.92rem',
+    fontSize: '0.88rem',
     fontWeight: '600',
     textAlign: 'left',
     cursor: 'pointer',
     position: 'relative',
-    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+    transition: 'all 0.15s ease-out'
   },
   navButtonActive: {
-    color: '#fff',
-    background: 'rgba(255, 255, 255, 0.03)',
-    boxShadow: 'inset 0 0 12px rgba(6, 182, 212, 0.05)'
+    color: 'var(--primary)',
+    background: 'var(--primary-glow)',
+    fontWeight: '700'
   },
   iconWrapper: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    transition: 'color 0.2s ease'
+    transition: 'color 0.15s ease'
   },
   activeIndicator: {
     position: 'absolute',
     left: '0',
-    top: '25%',
-    bottom: '25%',
-    width: '3.5px',
-    background: 'linear-gradient(to bottom, var(--secondary), var(--primary))',
-    borderRadius: '0 4px 4px 0',
-    boxShadow: '0 0 10px rgba(6, 182, 212, 0.8)'
+    top: '20%',
+    bottom: '20%',
+    width: '3px',
+    background: 'var(--secondary)',
+    borderRadius: '0 4px 4px 0'
   },
   footer: {
     marginTop: 'auto',
-    borderTop: '1px solid rgba(255, 255, 255, 0.04)',
-    paddingTop: '1.25rem'
+    borderTop: '1px solid var(--border-color)',
+    paddingTop: '1rem'
   },
   statusBox: {
     display: 'flex',
     alignItems: 'center',
     gap: '0.75rem',
-    background: 'rgba(0, 0, 0, 0.25)',
+    background: 'var(--bg-secondary)',
     border: '1px solid var(--border-color)',
-    borderRadius: '10px',
-    padding: '0.65rem 0.75rem',
-    marginBottom: '1rem'
+    borderRadius: '8px',
+    padding: '0.55rem 0.75rem',
+    marginBottom: '0.75rem'
   },
   statusDot: {
     width: '8px',
     height: '8px',
     borderRadius: '50%',
-    background: 'var(--success)',
-    boxShadow: '0 0 8px var(--success)',
+    background: 'var(--secondary)',
     display: 'inline-block',
     animation: 'dot-pulse 2s infinite'
   },
@@ -492,18 +537,18 @@ const styles: { [key: string]: React.CSSProperties } = {
     flexDirection: 'column'
   },
   statusTitle: {
-    fontSize: '0.78rem',
-    fontWeight: '600',
-    color: '#f8fafc'
+    fontSize: '0.75rem',
+    fontWeight: '700',
+    color: 'var(--text-main)'
   },
   statusDesc: {
     fontSize: '0.65rem',
-    color: 'var(--text-dark)',
+    color: 'var(--text-muted)',
     marginTop: '0.05rem'
   },
   footerVersion: {
     fontSize: '0.68rem',
-    color: 'var(--text-dark)',
+    color: 'var(--text-muted)',
     textAlign: 'center'
   },
   exitBtn: {
@@ -512,14 +557,14 @@ const styles: { [key: string]: React.CSSProperties } = {
     justifyContent: 'center',
     width: '100%',
     padding: '0.5rem',
-    background: 'rgba(239, 68, 68, 0.06)',
-    border: '1px solid rgba(239, 68, 68, 0.2)',
-    color: '#f87171',
+    background: 'var(--bg-secondary)',
+    border: '1px solid var(--border-color)',
+    color: 'var(--text-main)',
     borderRadius: '8px',
     fontSize: '0.78rem',
     fontWeight: '700',
     cursor: 'pointer',
-    marginBottom: '0.85rem',
-    transition: 'all 0.2s ease'
+    marginBottom: '0.5rem',
+    transition: 'all 0.15s ease-out'
   }
 };

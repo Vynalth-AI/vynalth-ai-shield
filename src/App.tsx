@@ -124,6 +124,31 @@ const INITIAL_LOGS: VerificationLog[] = [
 ];
 
 function App() {
+  // Global theme switcher ('light' | 'dark')
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('vms_theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+      return 'light'; // Default to light mode
+    }
+    return 'light';
+  });
+
+  // Apply theme dynamically to documentElement and body
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', theme);
+      if (theme === 'dark') {
+        document.body.classList.add('dark');
+        document.documentElement.classList.add('dark');
+      } else {
+        document.body.classList.remove('dark');
+        document.documentElement.classList.remove('dark');
+      }
+      localStorage.setItem('vms_theme', theme);
+    }
+  }, [theme]);
+
   // Check if standalone status page mode is requested
   const isStatusSubdomain = typeof window !== 'undefined' && (
     window.location.hostname.includes('status') || 
@@ -581,6 +606,8 @@ function App() {
           setUser(null);
           setViewMode('marketing');
         }}
+        theme={theme}
+        toggleTheme={() => setTheme(prev => prev === 'light' ? 'dark' : 'light')}
       />
       
       {/* Main viewport area */}

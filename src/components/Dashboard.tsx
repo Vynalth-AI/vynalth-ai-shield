@@ -698,7 +698,8 @@ const styles: { [key: string]: React.CSSProperties } = {
   container: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '1.75rem'
+    gap: '1.75rem',
+    color: 'var(--text-main)'
   },
   header: {
     display: 'flex',
@@ -710,7 +711,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   title: {
     fontSize: '2rem',
     fontWeight: '800',
-    color: '#fff',
+    color: 'var(--primary)',
     letterSpacing: '-0.03em'
   },
   subtitle: {
@@ -721,13 +722,13 @@ const styles: { [key: string]: React.CSSProperties } = {
   presetBadge: {
     display: 'flex',
     alignItems: 'center',
-    background: 'rgba(6, 182, 212, 0.04)',
-    border: '1px solid rgba(6, 182, 212, 0.18)',
+    background: 'var(--bg-secondary)',
+    border: '1px solid var(--border-color)',
     padding: '0.45rem 0.9rem',
-    borderRadius: '10px',
+    borderRadius: '8px',
     fontSize: '0.8rem',
     fontWeight: '600',
-    color: '#fff'
+    color: 'var(--text-main)'
   },
   threatBadge: {
     display: 'flex',
@@ -736,10 +737,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderWidth: '1px',
     borderStyle: 'solid',
     padding: '0.45rem 0.9rem',
-    borderRadius: '10px',
+    borderRadius: '8px',
     fontSize: '0.8rem',
     fontWeight: '600',
-    color: '#fff',
+    color: 'var(--text-main)',
     transition: 'all 0.3s'
   },
   threatPulse: {
@@ -753,10 +754,9 @@ const styles: { [key: string]: React.CSSProperties } = {
     gridTemplateColumns: '240px 1fr',
     gap: '1.75rem',
     padding: '1.5rem',
-    background: 'rgba(5, 7, 12, 0.65)',
-    border: '1px solid rgba(6, 182, 212, 0.12)',
-    boxShadow: 'var(--glow-shadow)',
-    borderRadius: '16px',
+    background: 'var(--bg-glass)',
+    border: '1px solid var(--border-color)',
+    borderRadius: '12px',
     alignItems: 'center'
   },
   radarVisualContainer: {
@@ -765,7 +765,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: 'center',
     justifyContent: 'center',
     gap: '0.75rem',
-    borderRight: '1px solid rgba(255, 255, 255, 0.05)',
+    borderRight: '1px solid var(--border-color)',
     paddingRight: '1.75rem'
   },
   radarWrapper: {
@@ -773,16 +773,15 @@ const styles: { [key: string]: React.CSSProperties } = {
     width: '120px',
     height: '120px',
     borderRadius: '50%',
-    background: 'rgba(6, 182, 212, 0.02)',
-    border: '1px solid rgba(6, 182, 212, 0.25)',
-    boxShadow: 'inset 0 0 15px rgba(6, 182, 212, 0.1)',
+    background: 'var(--bg-secondary)',
+    border: '1px solid var(--border-color)',
     overflow: 'hidden'
   },
   radarSweeper: {
     position: 'absolute',
     width: '100%',
     height: '100%',
-    background: 'conic-gradient(from 0deg, rgba(6, 182, 212, 0.15) 0deg, rgba(6, 182, 212, 0.05) 90deg, transparent 180deg)',
+    background: 'conic-gradient(from 0deg, var(--secondary-glow) 0deg, rgba(0, 212, 170, 0.05) 90deg, transparent 180deg)',
     borderRadius: '50%',
     animation: 'radar-scan 4s linear infinite',
     transformOrigin: 'center'
@@ -793,7 +792,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     borderRadius: '50%',
-    border: '1px dashed rgba(6, 182, 212, 0.12)'
+    border: '1px dashed var(--border-color)'
   },
   radarAxisH: {
     position: 'absolute',
@@ -801,7 +800,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     left: 0,
     width: '100%',
     height: '1px',
-    background: 'rgba(6, 182, 212, 0.1)'
+    background: 'var(--border-color)'
   },
   radarAxisV: {
     position: 'absolute',
@@ -809,15 +808,15 @@ const styles: { [key: string]: React.CSSProperties } = {
     top: 0,
     width: '1px',
     height: '100%',
-    background: 'rgba(6, 182, 212, 0.1)'
+    background: 'var(--border-color)'
   },
   radarThreatDot: {
     position: 'absolute',
     width: '6px',
     height: '6px',
     borderRadius: '50%',
-    background: '#ef4444',
-    boxShadow: '0 0 8px #ef4444',
+    background: 'var(--danger)',
+    boxShadow: '0 0 6px var(--danger)',
     animation: 'blink-threat 2.5s infinite'
   },
   radarFeedContainer: {
@@ -828,9 +827,9 @@ const styles: { [key: string]: React.CSSProperties } = {
   radarLiveBadge: {
     fontSize: '0.62rem',
     fontWeight: '800',
-    color: '#00ffff',
-    background: 'rgba(6, 182, 212, 0.15)',
-    border: '1px solid rgba(6, 182, 212, 0.3)',
+    color: 'var(--secondary)',
+    background: 'var(--secondary-glow)',
+    border: '1px solid var(--secondary)',
     borderRadius: '4px',
     padding: '1px 6px',
     letterSpacing: '0.05em'
@@ -848,22 +847,23 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: 'center',
     fontSize: '0.74rem',
     fontFamily: 'var(--font-mono)',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.03)',
+    fontVariantNumeric: 'tabular-nums',
+    borderBottom: '1px solid var(--border-color)',
     paddingBottom: '4px',
     color: 'var(--text-muted)'
   },
   radarBlockBadge: {
     fontSize: '0.62rem',
     fontWeight: '800',
-    color: '#ef4444',
-    background: 'rgba(239, 68, 68, 0.15)',
-    border: '1px solid rgba(239, 68, 68, 0.3)',
+    color: 'var(--danger)',
+    background: 'var(--danger-glow)',
+    border: '1px solid var(--danger)',
     borderRadius: '4px',
     padding: '1px 4px',
     textAlign: 'center'
   },
   radarRowIp: {
-    color: '#fff',
+    color: 'var(--text-main)',
     fontWeight: '600'
   },
   radarRowLoc: {
@@ -871,7 +871,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     opacity: 0.85
   },
   radarRowEvt: {
-    color: '#f59e0b',
+    color: 'var(--warning)',
     opacity: 0.9
   },
   radarRowTime: {
@@ -899,7 +899,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   panelTitle: {
     fontSize: '1.1rem',
     fontWeight: '700',
-    color: '#fff',
+    color: 'var(--primary)',
     letterSpacing: '-0.02em'
   },
   panelSubtitle: {
@@ -939,13 +939,13 @@ const styles: { [key: string]: React.CSSProperties } = {
     position: 'absolute',
     top: '15px',
     transform: 'translateX(-50%)',
-    background: 'rgba(5, 7, 12, 0.95)',
-    border: '1px solid var(--border-color-glow)',
-    boxShadow: 'var(--glow-shadow)',
+    background: 'var(--bg-secondary)',
+    border: '1px solid var(--border-color)',
     borderRadius: '8px',
     padding: '0.65rem 0.9rem',
     fontSize: '0.75rem',
     fontFamily: 'var(--font-mono)',
+    fontVariantNumeric: 'tabular-nums',
     zIndex: 10,
     pointerEvents: 'none',
     display: 'flex',
@@ -954,8 +954,8 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   tooltipTitle: {
     fontWeight: '700',
-    color: '#fff',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+    color: 'var(--text-main)',
+    borderBottom: '1px solid var(--border-color)',
     paddingBottom: '0.2rem',
     marginBottom: '0.2rem'
   },
@@ -988,12 +988,14 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   metricValueText: {
     fontWeight: '700',
-    color: '#fff'
+    color: 'var(--text-main)',
+    fontFamily: 'var(--font-mono)',
+    fontVariantNumeric: 'tabular-nums'
   },
   progressContainer: {
     width: '100%',
     height: '4px',
-    background: 'rgba(255, 255, 255, 0.03)',
+    background: 'var(--border-color)',
     borderRadius: '2px',
     overflow: 'hidden'
   },
@@ -1004,30 +1006,28 @@ const styles: { [key: string]: React.CSSProperties } = {
   warningBox: {
     display: 'flex',
     gap: '0.6rem',
-    background: 'rgba(245, 158, 11, 0.02)',
-    border: '1px solid rgba(245, 158, 11, 0.1)',
-    borderRadius: '10px',
+    background: 'var(--warning-glow)',
+    border: '1px solid var(--warning)',
+    borderRadius: '8px',
     padding: '0.75rem 0.9rem',
     marginTop: '1.25rem'
   },
   warningText: {
     fontSize: '0.72rem',
     lineHeight: '1.4',
-    color: 'var(--text-muted)'
+    color: 'var(--text-main)'
   },
   simulatorPanel: {
     padding: '1.25rem',
-    background: 'rgba(6, 182, 212, 0.02)',
-    border: '1px solid rgba(6, 182, 212, 0.1)',
-    borderRadius: '12px',
-    boxShadow: '0 4px 30px rgba(0, 0, 0, 0.3)',
-    backdropFilter: 'blur(8px)',
+    background: 'var(--bg-glass)',
+    border: '1px solid var(--border-color)',
+    borderRadius: '12px'
   },
   simulatorHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+    borderBottom: '1px solid var(--border-color)',
     paddingBottom: '0.5rem',
     marginBottom: '0.5rem'
   },
@@ -1040,19 +1040,19 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   simSelect: {
     width: '100%',
-    background: 'rgba(5, 7, 12, 0.8)',
-    border: '1px solid rgba(255, 255, 255, 0.06)',
+    background: 'var(--bg-secondary)',
+    border: '1px solid var(--border-color)',
     padding: '0.4rem 0.65rem',
     borderRadius: '8px',
-    color: '#fff',
+    color: 'var(--text-main)',
     fontSize: '0.76rem',
     cursor: 'pointer',
     outline: 'none',
     transition: 'border-color 0.3s'
   },
   simFeedConsole: {
-    background: 'rgba(5, 7, 12, 0.9)',
-    border: '1px solid rgba(255, 255, 255, 0.06)',
+    background: 'var(--bg-secondary)',
+    border: '1px solid var(--border-color)',
     borderRadius: '8px',
     padding: '0.45rem 0.65rem',
     height: '56px',
@@ -1060,6 +1060,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     flexDirection: 'column',
     gap: '3px',
     overflowY: 'hidden',
-    fontFamily: 'var(--font-mono)'
+    fontFamily: 'var(--font-mono)',
+    fontVariantNumeric: 'tabular-nums'
   }
 };

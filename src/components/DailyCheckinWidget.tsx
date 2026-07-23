@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface CheckinState {
@@ -453,7 +453,7 @@ const Task3PatternMemory: React.FC<{ onComplete: (r: Partial<TaskResult>) => voi
   return (
     <div style={{ textAlign: 'center' }}>
       <p style={{ color: '#94a3b8', fontSize: '13px', marginBottom: '12px' }}>
-        {phase === 'watch' && '👀 记住顺序...'}
+        {phase === 'watch' && '👀 记住顺序…'}
         {phase === 'repeat' && `🔁 重复序列 (${userSeq.length}/${pattern.length})`}
         {phase === 'done' && '🎉 完美记忆！'}
       </p>

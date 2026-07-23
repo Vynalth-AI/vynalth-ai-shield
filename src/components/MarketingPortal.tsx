@@ -1250,47 +1250,28 @@ curl -X POST https://shield.sleepsomno.com/api/verify \\
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
     minHeight: '100vh',
-    background: '#000000',
-    color: '#f8fafc',
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif",
+    background: 'var(--bg-primary)',
+    color: 'var(--text-main)',
+    fontFamily: "var(--font-sans)",
     position: 'relative',
     overflowX: 'hidden'
   },
   glowOverlayPurple: {
-    position: 'absolute',
-    top: '10%',
-    left: '20%',
-    width: '450px',
-    height: '450px',
-    borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(139, 92, 246, 0.05) 0%, transparent 70%)',
-    filter: 'blur(80px)',
-    pointerEvents: 'none',
-    zIndex: 0
+    display: 'none'
   },
   glowOverlayCyan: {
-    position: 'absolute',
-    top: '40%',
-    right: '15%',
-    width: '500px',
-    height: '500px',
-    borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(0, 102, 204, 0.04) 0%, transparent 70%)',
-    filter: 'blur(80px)',
-    pointerEvents: 'none',
-    zIndex: 0
+    display: 'none'
   },
   topHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '1.25rem 2.5rem',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+    padding: '1rem 2.5rem',
+    borderBottom: '1px solid var(--border-color)',
     position: 'sticky',
     top: 0,
-    background: 'rgba(0, 0, 0, 0.85)',
-    backdropFilter: 'blur(12px)',
-    WebkitBackdropFilter: 'blur(12px)',
+    background: '#0a2540',
+    color: '#ffffff',
     zIndex: 100
   },
   brand: {
@@ -1307,19 +1288,19 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    border: '1px solid rgba(255,255,255,0.08)'
+    border: '1px solid rgba(255,255,255,0.2)'
   },
   brandName: {
     fontSize: '0.98rem',
-    fontWeight: 900,
-    color: '#fff',
+    fontWeight: 800,
+    color: '#ffffff',
     letterSpacing: '-0.02em',
     display: 'block',
     lineHeight: 1
   },
   brandSub: {
     fontSize: '0.58rem',
-    color: '#8b5cf6',
+    color: '#00d4aa',
     fontWeight: 800,
     letterSpacing: '0.08em',
     display: 'block',
@@ -1334,17 +1315,17 @@ const styles: { [key: string]: React.CSSProperties } = {
   navLink: {
     fontSize: '0.72rem',
     fontWeight: 700,
-    color: 'var(--text-muted)',
+    color: 'rgba(255, 255, 255, 0.85)',
     textDecoration: 'none',
     transition: 'color 0.2s ease',
     letterSpacing: '0.05em'
   },
   consoleBtn: {
-    background: 'transparent',
-    border: '1px solid rgba(255,255,255,0.08)',
-    color: '#fff',
+    background: '#00d4aa',
+    border: 'none',
+    color: '#0a2540',
     padding: '0.45rem 1rem',
-    borderRadius: '4px',
+    borderRadius: '6px',
     fontSize: '0.72rem',
     fontWeight: 800,
     cursor: 'pointer',
@@ -1353,11 +1334,12 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   heroSection: {
     position: 'relative',
-    padding: '8rem 2rem 5rem 2rem',
+    padding: '6rem 2rem 4rem 2rem',
     display: 'flex',
     justifyContent: 'center',
     textAlign: 'center',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    background: 'var(--bg-primary)'
   },
   heroContent: {
     maxWidth: '850px',
@@ -1371,10 +1353,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     alignItems: 'center',
     gap: '0.5rem',
-    background: 'rgba(255, 255, 255, 0.02)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    background: 'var(--bg-secondary)',
+    border: '1px solid var(--border-color)',
     padding: '0.4rem 0.85rem',
-    borderRadius: '4px',
+    borderRadius: '20px',
     fontSize: '0.68rem',
     fontWeight: 800,
     color: 'var(--text-muted)',
@@ -1384,16 +1366,15 @@ const styles: { [key: string]: React.CSSProperties } = {
     width: '6px',
     height: '6px',
     borderRadius: '50%',
-    background: '#0066cc',
-    boxShadow: '0 0 6px #0066cc'
+    background: '#00d4aa'
   },
   heroTitle: {
     fontSize: '2.8rem',
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif",
-    fontWeight: 900,
+    fontFamily: "var(--font-sans)",
+    fontWeight: 800,
     lineHeight: '1.05',
     letterSpacing: '-0.04em',
-    color: '#f8fafc',
+    color: 'var(--primary)',
     textTransform: 'uppercase'
   },
   heroSubtitle: {
@@ -1409,22 +1390,21 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginTop: '1rem'
   },
   primaryCta: {
-    background: '#0066cc',
+    background: '#00d4aa',
     border: 'none',
-    color: '#fff',
+    color: '#0a2540',
     padding: '0.75rem 1.75rem',
     borderRadius: '6px',
     fontSize: '0.82rem',
     fontWeight: 800,
     cursor: 'pointer',
-    boxShadow: '0 0 16px rgba(0, 102, 204, 0.3)',
     transition: 'all 0.2s ease',
     letterSpacing: '0.05em'
   },
   secondaryCta: {
     background: 'transparent',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
-    color: '#fff',
+    border: '1px solid var(--border-color)',
+    color: 'var(--text-main)',
     padding: '0.75rem 1.75rem',
     borderRadius: '6px',
     fontSize: '0.82rem',
@@ -1453,9 +1433,9 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   sectionTitle: {
     fontSize: '1.5rem',
-    fontWeight: 900,
+    fontWeight: 800,
     letterSpacing: '-0.03em',
-    color: '#f8fafc',
+    color: 'var(--primary)',
     textTransform: 'uppercase'
   },
   sectionSubtitle: {
@@ -1465,8 +1445,8 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   gridCard: {
     padding: '2rem',
-    background: 'rgba(255,255,255,0.01)',
-    border: '1px solid rgba(255,255,255,0.06)',
+    background: 'var(--bg-glass)',
+    border: '1px solid var(--border-color)',
     borderRadius: '8px',
     textAlign: 'left',
     display: 'flex',
@@ -1474,18 +1454,17 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: '12px'
   },
   widgetWrapper: {
-    background: 'rgba(5, 7, 12, 0.95)',
-    border: '1px solid rgba(255,255,255,0.06)',
+    background: 'var(--bg-glass)',
+    border: '1px solid var(--border-color)',
     borderRadius: '8px',
-    padding: '1.5rem',
-    boxShadow: '0 0 30px rgba(139, 92, 246, 0.04)'
+    padding: '1.5rem'
   },
   pipelineBox: {
     width: '100%',
     maxWidth: '1100px',
     padding: '2.5rem 1.5rem',
-    background: 'rgba(255,255,255,0.01)',
-    border: '1px solid rgba(255,255,255,0.06)',
+    background: 'var(--bg-glass)',
+    border: '1px solid var(--border-color)',
     borderRadius: '8px'
   },
   pipelineNodes: {
@@ -1498,8 +1477,8 @@ const styles: { [key: string]: React.CSSProperties } = {
   nodeCard: {
     flex: 1,
     minWidth: '200px',
-    background: 'rgba(255,255,255,0.005)',
-    border: '1px solid rgba(255,255,255,0.04)',
+    background: 'var(--bg-secondary)',
+    border: '1px solid var(--border-color)',
     borderRadius: '6px',
     padding: '1.25rem',
     textAlign: 'center',
@@ -1507,28 +1486,27 @@ const styles: { [key: string]: React.CSSProperties } = {
     flexDirection: 'column',
     alignItems: 'center',
     gap: '0.5rem',
-    transition: 'all 0.3s ease'
+    transition: 'all 0.2s ease'
   },
   nodeCardActive: {
-    borderColor: '#0066cc',
-    boxShadow: '0 0 16px rgba(0, 102, 204, 0.15)',
-    background: 'rgba(0, 102, 204, 0.015)'
+    borderColor: '#00d4aa',
+    background: 'var(--secondary-glow)'
   },
   nodeIconWrapper: {
     width: '40px',
     height: '40px',
     borderRadius: '50%',
-    background: 'rgba(255,255,255,0.03)',
+    background: 'var(--bg-primary)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     color: 'var(--text-muted)',
-    border: '1px solid rgba(255,255,255,0.05)'
+    border: '1px solid var(--border-color)'
   },
   nodeTitle: {
     fontSize: '0.8rem',
     fontWeight: 800,
-    color: '#fff',
+    color: 'var(--primary)',
     letterSpacing: '-0.01em'
   },
   nodeDesc: {
@@ -1539,7 +1517,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   connectionLine: {
     width: '60px',
     height: '2px',
-    background: 'rgba(255,255,255,0.04)',
+    background: 'var(--border-color)',
     position: 'relative',
     display: 'flex',
     alignItems: 'center'
@@ -1548,13 +1526,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     position: 'absolute',
     height: '2px',
     width: '0%',
-    background: '#0066cc',
+    background: '#00d4aa',
     left: 0,
     transition: 'width 2.5s linear'
   },
   linePulseActive: {
-    width: '100%',
-    boxShadow: '0 0 6px #0066cc'
+    width: '100%'
   },
   productGrid: {
     display: 'grid',
@@ -1566,15 +1543,15 @@ const styles: { [key: string]: React.CSSProperties } = {
   eyebrow: {
     fontSize: '0.62rem',
     fontWeight: 800,
-    color: 'var(--text-dark)',
+    color: 'var(--text-muted)',
     letterSpacing: '0.08em',
     marginBottom: '4px',
     display: 'block'
   },
   productCard: {
     padding: '1.5rem',
-    background: 'rgba(255,255,255,0.01)',
-    border: '1px solid rgba(255,255,255,0.05)',
+    background: 'var(--bg-glass)',
+    border: '1px solid var(--border-color)',
     borderRadius: '6px',
     textAlign: 'left',
     display: 'flex',
@@ -1585,7 +1562,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   productTitle: {
     fontSize: '0.98rem',
     fontWeight: 800,
-    color: '#fff',
+    color: 'var(--primary)',
     letterSpacing: '-0.02em',
     margin: 0
   },
