@@ -1300,7 +1300,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   brandSub: {
     fontSize: '0.58rem',
-    color: '#00d4aa',
+    color: '#00c7b1',
     fontWeight: 800,
     letterSpacing: '0.08em',
     display: 'block',
@@ -1321,16 +1321,16 @@ const styles: { [key: string]: React.CSSProperties } = {
     letterSpacing: '0.05em'
   },
   consoleBtn: {
-    background: '#00d4aa',
+    background: '#00c7b1',
     border: 'none',
-    color: '#0a2540',
-    padding: '0.45rem 1rem',
-    borderRadius: '6px',
+    color: '#ffffff',
+    padding: '0.45rem 1.15rem',
+    borderRadius: '20px',
     fontSize: '0.72rem',
-    fontWeight: 800,
+    fontWeight: 700,
     cursor: 'pointer',
     transition: 'all 0.2s ease',
-    letterSpacing: '0.05em'
+    letterSpacing: '0.03em'
   },
   heroSection: {
     position: 'relative',
@@ -1366,7 +1366,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     width: '6px',
     height: '6px',
     borderRadius: '50%',
-    background: '#00d4aa'
+    background: '#00c7b1'
   },
   heroTitle: {
     fontSize: '2.8rem',
@@ -1390,30 +1390,30 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginTop: '1rem'
   },
   primaryCta: {
-    background: '#00d4aa',
+    background: '#00c7b1',
     border: 'none',
-    color: '#0a2540',
-    padding: '0.75rem 1.75rem',
-    borderRadius: '6px',
+    color: '#ffffff',
+    padding: '0.75rem 1.85rem',
+    borderRadius: '24px',
     fontSize: '0.82rem',
-    fontWeight: 800,
+    fontWeight: 700,
     cursor: 'pointer',
     transition: 'all 0.2s ease',
-    letterSpacing: '0.05em'
+    letterSpacing: '0.03em'
   },
   secondaryCta: {
-    background: 'transparent',
+    background: 'var(--bg-primary)',
     border: '1px solid var(--border-color)',
     color: 'var(--text-main)',
-    padding: '0.75rem 1.75rem',
-    borderRadius: '6px',
+    padding: '0.75rem 1.85rem',
+    borderRadius: '24px',
     fontSize: '0.82rem',
-    fontWeight: 800,
+    fontWeight: 700,
     textDecoration: 'none',
     transition: 'all 0.2s ease',
     display: 'inline-flex',
     alignItems: 'center',
-    letterSpacing: '0.05em'
+    letterSpacing: '0.03em'
   },
   section: {
     padding: '4rem 2.5rem',

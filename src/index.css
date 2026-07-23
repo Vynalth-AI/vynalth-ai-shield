@@ -3,68 +3,68 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-  /* Colors - Light mode (Default) */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
-  --bg-glass: rgba(255, 255, 255, 0.8);
-  --bg-glass-active: rgba(241, 245, 249, 0.95);
-  --border-color: #e2e8f0;
-  --border-color-glow: rgba(0, 212, 170, 0.2);
+  /* Colors - Light mode (Apple Minimalist Standard) */
+  --bg-primary: #ffffff;        /* Pure White */
+  --bg-secondary: #f5f5f7;      /* Soft Gray (Apple Card/Section Background) */
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  --bg-glass-active: rgba(245, 245, 247, 0.95);
+  --border-color: #d2d2d7;      /* Subtle Border */
+  --border-color-glow: rgba(0, 199, 177, 0.25);
   
-  --primary: #0a2540;          /* Deep Navy (Primary Brand Color) */
+  --primary: #0a2540;          /* Deep Navy (Logo, Primary Headers) */
   --primary-glow: rgba(10, 37, 64, 0.05);
-  --secondary: #00d4aa;        /* Teal/Cyan (Accent / Highlight Color) */
-  --secondary-glow: rgba(0, 212, 170, 0.15);
-  --accent: #0066cc;           /* Royal Blue / Apple Primary */
+  --secondary: #00c7b1;        /* Soft Teal (Apple Accent & Highlights) */
+  --secondary-glow: rgba(0, 199, 177, 0.12);
+  --accent: #00c7b1;           /* Soft Teal CTA */
   
-  --success: #00d4aa;          /* Teal */
-  --success-glow: rgba(0, 212, 170, 0.08);
-  --warning: #f59e0b;          /* Gold / Amber */
+  --success: #00c7b1;          /* Soft Teal */
+  --success-glow: rgba(0, 199, 177, 0.1);
+  --warning: #f59e0b;          /* Amber / Security Accent */
   --warning-glow: rgba(245, 158, 11, 0.08);
   --danger: #ef4444;           /* Red */
   --danger-glow: rgba(239, 68, 68, 0.08);
   
-  --text-main: #0f172a;        /* Dark Navy Text */
-  --text-muted: #64748b;       /* Cool Gray Secondary Text */
-  --text-dark: #334155;
+  --text-main: #1d1d1f;        /* Near Black (Apple Classic Text) */
+  --text-muted: #6e6e73;       /* Medium Gray (Subtitles/Secondary Text) */
+  --text-dark: #86868b;        /* Light Gray (Auxiliary/Footer Text) */
   
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, sans-serif;
   --font-mono: 'DM Mono', monospace;
   
   --sidebar-width: 260px;
   --header-height: 72px;
-  --border-radius: 12px;
-  --glow-shadow: 0 4px 20px rgba(0, 212, 170, 0.08);
-  --glow-shadow-purple: 0 4px 20px rgba(10, 37, 64, 0.05);
+  --border-radius: 14px;
+  --glow-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  --glow-shadow-purple: 0 4px 16px rgba(10, 37, 64, 0.05);
 }
 
 :root[data-theme="dark"], body.dark {
-  /* Colors - Dark mode */
-  --bg-primary: #0f172a;       /* Dark Navy Background */
-  --bg-secondary: #1e293b;     /* Slate-800 Card Base */
-  --bg-glass: rgba(15, 23, 42, 0.85);
-  --bg-glass-active: rgba(30, 41, 59, 0.95);
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-color-glow: rgba(0, 212, 170, 0.35);
+  /* Colors - Dark mode (Apple Charcoal Standard) */
+  --bg-primary: #1d1d1f;       /* Charcoal Background */
+  --bg-secondary: #2c2c2e;     /* Apple Dark Soft Gray */
+  --bg-glass: rgba(29, 29, 31, 0.85);
+  --bg-glass-active: rgba(44, 44, 46, 0.95);
+  --border-color: rgba(255, 255, 255, 0.12);
+  --border-color-glow: rgba(0, 199, 177, 0.3);
   
   --primary: #ffffff;
-  --primary-glow: rgba(255, 255, 255, 0.05);
-  --secondary: #00d4aa;
-  --secondary-glow: rgba(0, 212, 170, 0.2);
-  --accent: #2f80ed;
+  --primary-glow: rgba(255, 255, 255, 0.06);
+  --secondary: #00c7b1;
+  --secondary-glow: rgba(0, 199, 177, 0.2);
+  --accent: #00c7b1;
   
-  --success: #00d4aa;
-  --success-glow: rgba(0, 212, 170, 0.15);
+  --success: #00c7b1;
+  --success-glow: rgba(0, 199, 177, 0.15);
   --warning: #f59e0b;
   --warning-glow: rgba(245, 158, 11, 0.15);
   --danger: #ef4444;
   --danger-glow: rgba(239, 68, 68, 0.15);
   
-  --text-main: #f8fafc;        /* Main Light Text */
-  --text-muted: #94a3b8;       /* Muted Text */
-  --text-dark: #64748b;
+  --text-main: #f5f5f7;        /* Near White Light Text */
+  --text-muted: #86868b;       /* Medium Gray Text */
+  --text-dark: #6e6e73;
   
-  --glow-shadow: 0 4px 20px rgba(0, 212, 170, 0.15);
+  --glow-shadow: 0 4px 20px rgba(0, 199, 177, 0.15);
   --glow-shadow-purple: 0 4px 20px rgba(255, 255, 255, 0.05);
 }
 
