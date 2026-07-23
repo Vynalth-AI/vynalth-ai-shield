@@ -246,7 +246,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({ onAuthSuccess, onBackToH
                 boxShadow: authMethod === 'face_id' ? '0 1px 4px rgba(0,0,0,0.05)' : 'none'
               }}
             >
-              👁️ HumanProof™ 活体验证
+              👁️ HumanProof™ Liveness Verification
             </button>
           </div>
         )}
