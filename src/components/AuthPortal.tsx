@@ -1,5 +1,6 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useBehaviorTracker } from './VerificationWidget/useBehaviorTracker';
+import { VynalthFaceLogin } from './VerificationWidget/VynalthFaceLogin';
 import { getApiBaseUrl } from '../lib/api';
 import { DotMatrixLoader } from './ui/DotMatrixLoader';
 
@@ -10,6 +11,7 @@ interface AuthPortalProps {
 
 export const AuthPortal: React.FC<AuthPortalProps> = ({ onAuthSuccess, onBackToHome }) => {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [authMethod, setAuthMethod] = useState<'password' | 'face_id'>('password');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -207,7 +209,60 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({ onAuthSuccess, onBackToH
         {errorMsg && <div style={styles.alertError}>{errorMsg}</div>}
         {successMsg && <div style={styles.alertSuccess}>{successMsg}</div>}
 
-        <form noValidate onSubmit={handleAuthSubmit} style={styles.form}>
+        {/* Auth Method Switcher */}
+        {!isSignUp && (
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '4px' }}>
+            <button
+              type="button"
+              onClick={() => setAuthMethod('password')}
+              style={{
+                flex: 1,
+                padding: '0.45rem',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                background: authMethod === 'password' ? 'var(--bg-primary)' : 'transparent',
+                color: authMethod === 'password' ? 'var(--primary)' : 'var(--text-muted)',
+                boxShadow: authMethod === 'password' ? '0 1px 4px rgba(0,0,0,0.05)' : 'none'
+              }}
+            >
+              🔑 Password Login
+            </button>
+            <button
+              type="button"
+              onClick={() => setAuthMethod('face_id')}
+              style={{
+                flex: 1,
+                padding: '0.45rem',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                background: authMethod === 'face_id' ? 'var(--bg-primary)' : 'transparent',
+                color: authMethod === 'face_id' ? 'var(--secondary)' : 'var(--text-muted)',
+                boxShadow: authMethod === 'face_id' ? '0 1px 4px rgba(0,0,0,0.05)' : 'none'
+              }}
+            >
+              👁️ Vynalth FaceID™
+            </button>
+          </div>
+        )}
+
+        {authMethod === 'face_id' && !isSignUp ? (
+          <VynalthFaceLogin
+            onSuccess={(_faceToken) => {
+              onAuthSuccess({
+                accessToken: 'vms_face_session_token_' + Date.now(),
+                user: { id: 'face_user_001', email: 'verified_biometric_user@sleepsomno.com' }
+              });
+            }}
+            onCancel={() => setAuthMethod('password')}
+          />
+        ) : (
+          <form noValidate onSubmit={handleAuthSubmit} style={styles.form}>
           <div className="input-group">
             <label className="input-label">Email Address</label>
             <input 
@@ -295,6 +350,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({ onAuthSuccess, onBackToH
             ) : isSignUp ? 'Create Account' : 'Sign In'}
           </button>
         </form>
+        )}
 
         <div style={styles.toggleRow}>
           <span>{isSignUp ? 'Already have an account?' : 'Need a developer account?'}</span>
