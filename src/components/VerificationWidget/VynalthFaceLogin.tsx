@@ -262,14 +262,14 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     flexDirection: 'column',
     gap: '1rem',
-    background: 'var(--bg-glass)',
-    border: '1px solid var(--border-color)',
+    background: '#ffffff',
+    border: '1px solid #d2d2d7',
     borderRadius: '16px',
     padding: '1.25rem',
     width: '100%',
     maxWidth: '420px',
     margin: '0 auto',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)'
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
   },
   headerRow: {
     display: 'flex',
