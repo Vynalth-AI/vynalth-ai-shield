@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { ShieldConfig } from '../types';
 import { VerificationWidget } from './VerificationWidget/VerificationWidget';
 import { getApiBaseUrl } from '../lib/api';
@@ -244,7 +244,7 @@ export const WidgetPlayground: React.FC<WidgetPlaygroundProps> = ({ config, onAd
 
       <div style={styles.layout}>
         {/* Left Column: Form Simulator */}
-        <div className="glass-panel" style={styles.formPanel}>
+        <div className="premium-card" style={styles.formPanel}>
           <div style={styles.formPanelHeader}>
             <span style={styles.panelTitle}>Target Form Simulator</span>
             <select 
@@ -336,7 +336,7 @@ export const WidgetPlayground: React.FC<WidgetPlaygroundProps> = ({ config, onAd
         </div>
 
         {/* Right Column: Live API Log Console */}
-        <div className="glass-panel" style={styles.consolePanel}>
+        <div className="premium-card" style={styles.consolePanel}>
           <div style={styles.consoleHeader}>
             <div style={styles.consoleIndicatorRow}>
               <span style={styles.consoleDot} />
@@ -408,7 +408,7 @@ export const WidgetPlayground: React.FC<WidgetPlaygroundProps> = ({ config, onAd
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
 
           {/* ── 1. Keystroke Dynamics ── */}
-          <div className="glass-panel" style={{ padding: '1.5rem' }}>
+          <div className="premium-card" style={{ padding: '1.5rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <div>
                 <p style={{ margin: 0, fontSize: '0.7rem', fontWeight: 700, color: '#38bdf8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Keystroke Dynamics</p>
@@ -449,7 +449,7 @@ export const WidgetPlayground: React.FC<WidgetPlaygroundProps> = ({ config, onAd
           </div>
 
           {/* ── 2. Mouse Trajectory Visualizer ── */}
-          <div className="glass-panel" style={{ padding: '1.5rem' }}>
+          <div className="premium-card" style={{ padding: '1.5rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <div>
                 <p style={{ margin: 0, fontSize: '0.7rem', fontWeight: 700, color: '#818cf8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Mouse Trajectory</p>
@@ -500,7 +500,7 @@ export const WidgetPlayground: React.FC<WidgetPlaygroundProps> = ({ config, onAd
           </div>
 
           {/* ── 3. Device & Hardware Fingerprint ── */}
-          <div className="glass-panel" style={{ padding: '1.5rem' }}>
+          <div className="premium-card" style={{ padding: '1.5rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <div>
                 <p style={{ margin: 0, fontSize: '0.7rem', fontWeight: 700, color: '#f59e0b', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Hardware Fingerprint</p>
@@ -529,7 +529,7 @@ export const WidgetPlayground: React.FC<WidgetPlaygroundProps> = ({ config, onAd
         </div>
 
         {/* ── Touch / Gesture Velocity (mobile-style demo) ── */}
-        <div className="glass-panel" style={{ padding: '1.5rem' }}>
+        <div className="premium-card" style={{ padding: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <div>
               <p style={{ margin: 0, fontSize: '0.7rem', fontWeight: 700, color: '#10b981', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Touch & Gesture Velocity</p>
@@ -559,7 +559,7 @@ export const WidgetPlayground: React.FC<WidgetPlaygroundProps> = ({ config, onAd
         </div>
 
         {/* ── AI Edge Trust Score breakdown ── */}
-        <div className="glass-panel" style={{ padding: '1.5rem' }}>
+        <div className="premium-card" style={{ padding: '1.5rem' }}>
           <p style={{ margin: '0 0 1rem', fontSize: '0.7rem', fontWeight: 700, color: '#38bdf8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
             AI Trust Engine — Real-Time Signal Fusion
           </p>

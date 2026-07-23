@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { VerificationWidget } from './VerificationWidget/VerificationWidget';
 import { useBehaviorTracker } from './VerificationWidget/useBehaviorTracker';
 import { MATRIX_CATEGORIES } from './SystemSpecs';
@@ -231,7 +231,7 @@ export const MarketingPortal: React.FC<MarketingPortalProps> = ({
       } catch (err) {
         // fail silently
       }
-    }, 150);
+    }, 1000);
     return () => clearInterval(interval);
   }, [getTelemetryToken]);
 

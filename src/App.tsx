@@ -134,6 +134,8 @@ function App() {
     return <StatusPage isStandalone={true} />;
   }
 
+
+
   // Redirect old subdomain vitashield.sleepsomno.com to new shield.sleepsomno.com domain
   if (typeof window !== 'undefined') {
     if (window.location.hostname === 'vitashield.sleepsomno.com') {
@@ -415,6 +417,16 @@ function App() {
       ogDesc.setAttribute('content', description);
     }
   }, [viewMode, activeTab, currentPath, cleanPath, isPlaybookRoute]);
+
+  // Check if standalone trust center mode is requested
+  const isTrustSubdomain = typeof window !== 'undefined' && (
+    window.location.hostname.includes('trust') || 
+    window.location.search.includes('trust=true')
+  );
+  
+  if (isTrustSubdomain) {
+    return <TrustCenter logs={logs} isStandalone={true} />;
+  }
 
   // Appends verification telemetry dynamically from widget triggers
   const handleAddLog = (

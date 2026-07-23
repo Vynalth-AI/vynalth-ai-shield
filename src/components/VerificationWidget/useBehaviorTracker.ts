@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import type { TelemetryPayload, TouchPoint, MotionSample, OrientationSample } from './types';
 
 const SDK_VERSION = '2.2';
@@ -33,6 +33,13 @@ export const useBehaviorTracker = () => {
   const sensorAvailable   = useRef<boolean>(false);
   const sensorIsStatic    = useRef<boolean>(false);
   const decoyTriggered    = useRef<boolean>(false);
+
+  // Performance cache stores to prevent layout thrashing
+  const canvasFingerprintRef   = useRef<string>('');
+  const fontDetectionHashRef   = useRef<string>('');
+  const webGLInfoRef           = useRef<any>(null);
+  const storageAvailabilityRef = useRef<any>(null);
+  const networkInfoRef         = useRef<any>(null);
 
   useEffect(() => {
     // Inject global decoy API trap
@@ -312,9 +319,17 @@ export const useBehaviorTracker = () => {
   // ── Token generator ─────────────────────────────────────────────────────────
   const getTelemetryToken = (siteKey?: string, difficulty: number = 3): string => {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const glInfo = getWebGLInfo();
-    const storageAvail = getStorageAvailability();
-    const networkInfo = getNetworkInfo();
+    
+    // Performance optimization: cache DOM queries and canvas operations
+    if (!canvasFingerprintRef.current)  canvasFingerprintRef.current  = getCanvasFingerprint();
+    if (!fontDetectionHashRef.current)  fontDetectionHashRef.current  = getFontDetectionHash();
+    if (!webGLInfoRef.current)          webGLInfoRef.current          = getWebGLInfo();
+    if (!storageAvailabilityRef.current) storageAvailabilityRef.current = getStorageAvailability();
+    if (!networkInfoRef.current)        networkInfoRef.current        = getNetworkInfo();
+
+    const glInfo = webGLInfoRef.current;
+    const storageAvail = storageAvailabilityRef.current;
+    const networkInfo = networkInfoRef.current;
     const perfTiming = getPerformanceTiming();
 
     // Accelerometer gravity + stddev
@@ -370,8 +385,8 @@ export const useBehaviorTracker = () => {
         permissionQueryMismatch:  permissionQueryMismatch.current,
         outerDimensionsZeroed:    window.outerWidth === 0 && window.outerHeight === 0,
         debuggerDetected:         detectDebugger(),
-        canvasFingerprint:    getCanvasFingerprint(),
-        fontDetectionHash:    getFontDetectionHash(),
+        canvasFingerprint:    canvasFingerprintRef.current,
+        fontDetectionHash:    fontDetectionHashRef.current,
         webglRenderer:        glInfo.renderer,
         webglVendor:          glInfo.vendor,
         webglVersion:         glInfo.version,

@@ -269,7 +269,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ config, logs, onAddLog }) 
       </div>
 
       {/* Global Defense Map & Live Radar Screen */}
-      <div className="glass-panel glowing" style={styles.radarLayout}>
+      <div className="premium-card" style={{ ...styles.radarLayout, boxShadow: 'var(--glow-shadow)' }}>
         {/* Left Side: Dynamic Spinning Radar Screen */}
         <div style={styles.radarVisualContainer}>
           <div style={styles.radarWrapper}>
@@ -319,7 +319,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ config, logs, onAddLog }) 
       </div>
 
       {/* Live Gateway Simulator Control Card */}
-      <div className="glass-panel" style={styles.simulatorPanel}>
+      <div className="premium-card" style={styles.simulatorPanel}>
         <div style={styles.simulatorHeader}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <span style={{
@@ -413,7 +413,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ config, logs, onAddLog }) 
       {/* KPI Cards Grid */}
       <div className="kpi-grid">
         {kpis.map((kpi, i) => (
-          <div key={i} className="glass-panel kpi-card" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '1.25rem' }}>
+          <div key={i} className="premium-card kpi-card" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '1.25rem' }}>
             <div className="kpi-header">
               <span className="kpi-title" style={{ fontSize: '0.74rem', letterSpacing: '0.06em' }}>{kpi.title}</span>
               <div className="kpi-icon-wrapper" style={{ width: '36px', height: '36px' }}>{kpi.icon}</div>
@@ -432,7 +432,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ config, logs, onAddLog }) 
       {/* Analytics & Geo Splits */}
       <div style={styles.chartsGrid}>
         {/* Verification Traffic Smooth Bezier Line Chart */}
-        <div className="glass-panel" style={styles.chartPanel}>
+        <div className="premium-card" style={styles.chartPanel}>
           <div style={styles.panelHeader}>
             <div>
               <h3 style={styles.panelTitle}>Verification Traffic Analytics</h3>
@@ -598,7 +598,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ config, logs, onAddLog }) 
         </div>
 
         {/* Threat Intelligence / Bot Origins */}
-        <div className="glass-panel" style={styles.sidePanel}>
+        <div className="premium-card" style={styles.sidePanel}>
           <h3 style={styles.panelTitle}>Threat Analytics</h3>
           <p style={styles.panelSubtitle}>Key traffic channels and automated bot fingerprints</p>
 

@@ -22,6 +22,25 @@ export const StatusPage: React.FC<{ isStandalone?: boolean }> = ({ isStandalone 
     return Array.from({ length: 24 }, () => 14 + Math.floor(Math.random() * 14));
   });
 
+  // Dynamic light mode theme application on body layer for trust/status subdomains
+  useEffect(() => {
+    if (isStandalone) {
+      const priorBg = document.body.style.backgroundColor;
+      const priorColor = document.body.style.color;
+      const priorBgImg = document.body.style.backgroundImage;
+
+      document.body.style.backgroundColor = '#f8fafc';
+      document.body.style.color = '#0f172a';
+      document.body.style.backgroundImage = 'none';
+
+      return () => {
+        document.body.style.backgroundColor = priorBg;
+        document.body.style.color = priorColor;
+        document.body.style.backgroundImage = priorBgImg;
+      };
+    }
+  }, [isStandalone]);
+
   // Pull real-time system status audits from our backend API status.ts & measure RTT
   useEffect(() => {
     // 1. Measure Cloudflare Edge RTT (Real-time client ping)
@@ -605,13 +624,14 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: '1.5rem',
     padding: '1.5rem',
     minHeight: '100vh',
-    color: 'var(--text-main)'
+    color: '#0f172a',
+    fontFamily: 'Inter, system-ui, sans-serif'
   },
   header: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottom: '1px solid rgba(255,255,255,0.04)',
+    borderBottom: '1px solid #e2e8f0',
     paddingBottom: '1rem',
     marginBottom: '0.5rem'
   },
@@ -620,17 +640,17 @@ const styles: { [key: string]: React.CSSProperties } = {
     height: '40px',
     borderRadius: '8px',
     overflow: 'hidden',
-    border: '1px solid rgba(6,182,212,0.15)'
+    border: '1px solid #e2e8f0'
   },
   brandTitle: {
     fontSize: '1.15rem',
     fontWeight: '800',
-    color: '#fff',
+    color: '#0f172a',
     letterSpacing: '-0.02em'
   },
   brandSubtitle: {
     fontSize: '0.78rem',
-    color: 'var(--text-muted)'
+    color: '#64748b'
   },
   timeBadge: {
     display: 'flex',
@@ -638,7 +658,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: '0.4rem',
     borderWidth: '1px',
     borderStyle: 'solid',
-    borderRadius: '6px',
+    borderRadius: '20px',
     padding: '0.35rem 0.75rem',
     fontSize: '0.75rem',
     fontWeight: '700',
@@ -656,22 +676,25 @@ const styles: { [key: string]: React.CSSProperties } = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '1.25rem 1.5rem',
+    border: '1px solid #e2e8f0',
+    borderRadius: '12px',
+    boxShadow: '0 1px 3px 0 rgba(0,0,0,0.05)',
+    background: '#ffffff',
     transition: 'all 0.3s'
   },
   bannerGlowDot: {
     width: '10px',
     height: '10px',
-    borderRadius: '50%',
-    animation: 'pulse-glow 2s infinite'
+    borderRadius: '50%'
   },
   bannerTitle: {
     fontSize: '1.05rem',
-    fontWeight: '700',
-    color: '#fff'
+    fontWeight: '800',
+    color: '#0f172a'
   },
   bannerSubtitle: {
     fontSize: '0.78rem',
-    color: 'var(--text-muted)',
+    color: '#64748b',
     marginTop: '0.1rem'
   },
   uptimeBadge: {
@@ -682,12 +705,16 @@ const styles: { [key: string]: React.CSSProperties } = {
     transition: 'all 0.3s'
   },
   panel: {
-    padding: '1.5rem'
+    padding: '1.5rem',
+    background: '#ffffff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '12px',
+    boxShadow: '0 1px 3px 0 rgba(0,0,0,0.05)'
   },
   sectionHeader: {
     fontSize: '0.75rem',
     fontWeight: '800',
-    color: 'var(--text-dark)',
+    color: '#475569',
     letterSpacing: '0.08em',
     marginBottom: '1rem',
     textTransform: 'uppercase'
@@ -709,21 +736,21 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontWeight: '600'
   },
   componentName: {
-    color: '#f8fafc'
+    color: '#0f172a'
   },
   statusTextBadge: {
     fontSize: '0.74rem',
     fontWeight: 700
   },
   componentUptimeVal: {
-    color: 'var(--text-dark)',
+    color: '#64748b',
     fontSize: '0.78rem'
   },
   uptimeBarWrapper: {
     display: 'flex',
     gap: '2px',
     height: '24px',
-    background: 'rgba(255,255,255,0.01)',
+    background: '#f8fafc',
     padding: '3px 0'
   },
   uptimeTick: {
@@ -737,7 +764,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     justifyContent: 'space-between',
     fontSize: '0.68rem',
-    color: 'var(--text-dark)',
+    color: '#64748b',
     marginTop: '0.1rem'
   },
   splitGrid: {
@@ -748,7 +775,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   panelSubtitle: {
     fontSize: '0.75rem',
-    color: 'var(--text-muted)',
+    color: '#64748b',
     marginTop: '0.05rem',
     marginBottom: '1rem'
   },
@@ -766,7 +793,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     justifyContent: 'space-between',
     fontSize: '0.7rem',
-    color: 'var(--text-dark)'
+    color: '#64748b'
   },
   timelineWrapper: {
     display: 'flex',
@@ -794,7 +821,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   timelineLineTrack: {
     width: '1px',
     flex: 1,
-    background: 'rgba(255, 255, 255, 0.05)',
+    background: '#e2e8f0',
     margin: '4px 0'
   },
   timelineContent: {
@@ -816,17 +843,17 @@ const styles: { [key: string]: React.CSSProperties } = {
   incidentTitle: {
     fontSize: '0.82rem',
     fontWeight: '700',
-    color: '#fff'
+    color: '#0f172a'
   },
   incidentDate: {
     fontSize: '0.68rem',
-    color: 'var(--text-dark)',
+    color: '#64748b',
     marginTop: '0.2rem',
     marginBottom: '0.35rem'
   },
   incidentDesc: {
     fontSize: '0.74rem',
     lineHeight: '1.45',
-    color: 'var(--text-muted)'
+    color: '#475569'
   }
 };

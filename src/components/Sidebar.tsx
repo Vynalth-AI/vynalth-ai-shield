@@ -235,7 +235,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
 
 
   return (
-    <aside style={styles.sidebar}>
+    <aside className="floating-sidebar" style={styles.sidebar}>
       {/* Brand Header */}
       <div style={styles.brandContainer}>
         <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
@@ -248,7 +248,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 0 10px rgba(139, 92, 246, 0.15)'
+            boxShadow: '0 0 10px rgba(157, 78, 221, 0.25)'
           }} title="Vynalth AI (Parent Company) - Building the Future of Health AI">
             <img src="/vynalth_ai_logo.jpg" alt="Vynalth AI Official Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>
@@ -265,7 +265,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 0 10px rgba(6, 182, 212, 0.15)'
+            boxShadow: '0 0 10px rgba(0, 242, 254, 0.25)'
           }} title="Vynalth AI Shield Gateway - Invisible Trust, Everywhere">
             <img src="/vynalth_ai_shield_logo.jpg" alt="Vynalth AI Shield Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
@@ -297,7 +297,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
                       setActiveTab(item.id);
                     }
                   }}
-
+                  className={isActive ? "active-nav-item" : ""}
                   style={{
                     ...styles.navButton,
                     ...(isActive ? styles.navButtonActive : {})
@@ -305,7 +305,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onRet
                 >
                   <span style={{ 
                     ...styles.iconWrapper, 
-                    color: isActive ? '#06b6d4' : '#94a3b8' 
+                    color: isActive ? 'var(--secondary)' : 'var(--text-muted)' 
                   }}>
                     {item.icon}
                   </span>

@@ -1,13 +1,33 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { VerificationLog } from '../types';
 import { jsPDF } from 'jspdf';
 import { getApiBaseUrl } from '../lib/api';
 
 interface TrustCenterProps {
   logs: VerificationLog[];
+  isStandalone?: boolean;
 }
 
-export const TrustCenter: React.FC<TrustCenterProps> = ({ logs }) => {
+export const TrustCenter: React.FC<TrustCenterProps> = ({ logs, isStandalone = false }) => {
+  // Dynamic light mode theme application on body layer for trust subdomain
+  useEffect(() => {
+    if (isStandalone) {
+      const priorBg = document.body.style.backgroundColor;
+      const priorColor = document.body.style.color;
+      const priorBgImg = document.body.style.backgroundImage;
+
+      document.body.style.backgroundColor = '#f8fafc';
+      document.body.style.color = '#0f172a';
+      document.body.style.backgroundImage = 'none';
+
+      return () => {
+        document.body.style.backgroundColor = priorBg;
+        document.body.style.color = priorColor;
+        document.body.style.backgroundImage = priorBgImg;
+      };
+    }
+  }, [isStandalone]);
+
   const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<'all' | 'passed' | 'blocked'>('all');
   const [autoencoderThreshold, setAutoencoderThreshold] = useState<number>(60);
@@ -700,35 +720,37 @@ const styles: { [key: string]: React.CSSProperties } = {
     flexDirection: 'column',
     gap: '1.5rem',
     position: 'relative',
-    maxWidth: '1200px',
+    maxWidth: '840px',
     margin: '0 auto',
-    padding: '1rem 0'
+    padding: '1.5rem 0',
+    color: '#0f172a',
+    fontFamily: 'Inter, system-ui, sans-serif'
   },
   commandBanner: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    background: 'rgba(6, 182, 212, 0.03)',
-    border: '1px solid rgba(6, 182, 212, 0.1)',
+    background: '#f1f5f9',
+    border: '1px solid #e2e8f0',
     borderRadius: '8px',
     padding: '0.65rem 1rem',
     flexWrap: 'wrap',
     gap: '0.75rem'
   },
   commandKey: {
-    background: 'rgba(255, 255, 255, 0.08)',
-    border: '1px solid rgba(255, 255, 255, 0.12)',
+    background: '#fff',
+    border: '1px solid #cbd5e1',
     borderRadius: '4px',
     padding: '0.15rem 0.4rem',
-    fontFamily: 'var(--font-mono)',
+    fontFamily: 'DM Mono, monospace',
     fontSize: '0.75rem',
-    color: '#fff',
+    color: '#0f172a',
     fontWeight: '700'
   },
   inlineCode: {
-    fontFamily: 'var(--font-mono)',
-    color: '#00ffff',
-    background: 'rgba(0, 0, 0, 0.2)',
+    fontFamily: 'DM Mono, monospace',
+    color: '#0f766e',
+    background: '#f1f5f9',
     padding: '0.1rem 0.25rem',
     borderRadius: '3px'
   },
@@ -736,8 +758,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     width: '6px',
     height: '6px',
     borderRadius: '50%',
-    background: '#00ffff',
-    boxShadow: '0 0 8px #00ffff',
+    background: '#0d9488',
+    boxShadow: '0 0 8px rgba(13, 148, 136, 0.4)',
     display: 'inline-block',
     animation: 'dot-pulse 1.5s infinite'
   },
@@ -746,16 +768,18 @@ const styles: { [key: string]: React.CSSProperties } = {
     justifyContent: 'space-between',
     alignItems: 'center',
     flexWrap: 'wrap',
-    gap: '1.5rem'
+    gap: '1.5rem',
+    borderBottom: '1px solid #e2e8f0',
+    paddingBottom: '1rem'
   },
   title: {
     fontSize: '2rem',
-    fontWeight: '800',
-    color: '#fff',
+    fontWeight: '900',
+    color: '#0f172a',
     letterSpacing: '-0.03em'
   },
   subtitle: {
-    color: 'var(--text-muted)',
+    color: '#475569',
     fontSize: '0.92rem',
     marginTop: '0.25rem',
     maxWidth: '650px'
@@ -764,30 +788,31 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     alignItems: 'center',
     gap: '0.75rem',
-    background: 'rgba(255, 255, 255, 0.02)',
-    border: '1px solid rgba(255, 255, 255, 0.04)',
+    background: '#fff',
+    border: '1px solid #e2e8f0',
     borderRadius: '10px',
-    padding: '0.75rem 1rem'
+    padding: '0.75rem 1rem',
+    boxShadow: '0 1px 3px 0 rgba(0,0,0,0.05)'
   },
   uptimePercentage: {
     fontSize: '1.25rem',
     fontWeight: '800',
-    color: '#00ffff',
+    color: '#0d9488',
     display: 'block',
-    letterSpacing: '-0.02em'
+    letterSpacing: '-0.02em',
+    fontFamily: 'DM Mono, monospace'
   },
   uptimeLabel: {
     fontSize: '0.65rem',
     fontWeight: '800',
-    color: 'var(--text-muted)',
+    color: '#475569',
     letterSpacing: '0.08em'
   },
   uptimeChartDot: {
     width: '8px',
     height: '8px',
     borderRadius: '50%',
-    background: '#10b981',
-    boxShadow: '0 0 10px #10b981'
+    background: '#10b981'
   },
   nodesGrid: {
     display: 'grid',
@@ -797,7 +822,10 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   nodeCard: {
     padding: '1.25rem',
-    background: 'rgba(0, 0, 0, 0.2)',
+    background: '#fff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '12px',
+    boxShadow: '0 1px 3px 0 rgba(0,0,0,0.05)',
     display: 'flex',
     flexDirection: 'column',
     gap: '0.75rem',
@@ -811,13 +839,12 @@ const styles: { [key: string]: React.CSSProperties } = {
   nodeName: {
     fontSize: '0.85rem',
     fontWeight: '700',
-    color: '#fff'
+    color: '#0f172a'
   },
   nodeIndicator: {
     width: '6px',
     height: '6px',
-    borderRadius: '50%',
-    boxShadow: '0 0 6px rgba(6, 182, 212, 0.6)'
+    borderRadius: '50%'
   },
   nodeCardBody: {
     display: 'flex',
@@ -831,18 +858,18 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   nodeStatLabel: {
     fontSize: '0.75rem',
-    color: 'var(--text-muted)'
+    color: '#475569'
   },
   nodeStatValue: {
     fontSize: '0.82rem',
     fontWeight: '700',
-    color: '#fff',
-    fontFamily: 'var(--font-mono)'
+    color: '#0f172a',
+    fontFamily: 'DM Mono, monospace'
   },
   nodeIpAddress: {
     fontSize: '0.68rem',
-    color: 'rgba(255, 255, 255, 0.15)',
-    fontFamily: 'var(--font-mono)',
+    color: '#94a3b8',
+    fontFamily: 'DM Mono, monospace',
     marginTop: '0.25rem'
   },
   workspaceLayout: {
@@ -857,6 +884,10 @@ const styles: { [key: string]: React.CSSProperties } = {
   } as any,
   autopsyPanel: {
     padding: '1.5rem',
+    background: '#fff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '12px',
+    boxShadow: '0 1px 3px 0 rgba(0,0,0,0.05)',
     display: 'flex',
     flexDirection: 'column',
     gap: '1.25rem'
@@ -867,13 +898,13 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: 'center',
     flexWrap: 'wrap',
     gap: '1rem',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+    borderBottom: '1px solid #e2e8f0',
     paddingBottom: '1rem'
   },
   panelTitle: {
     fontSize: '1.1rem',
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: '800',
+    color: '#0f172a',
     letterSpacing: '-0.01em'
   },
   filterControls: {
@@ -883,19 +914,19 @@ const styles: { [key: string]: React.CSSProperties } = {
     flexWrap: 'wrap'
   },
   searchBar: {
-    background: 'rgba(0, 0, 0, 0.3)',
-    border: '1px solid var(--border-color)',
+    background: '#fff',
+    border: '1px solid #cbd5e1',
     borderRadius: '6px',
     padding: '0.45rem 0.75rem',
     fontSize: '0.8rem',
-    color: '#fff',
+    color: '#0f172a',
     outline: 'none',
     width: '160px'
   },
   buttonGroup: {
     display: 'flex',
-    background: 'rgba(0, 0, 0, 0.25)',
-    border: '1px solid var(--border-color)',
+    background: '#f1f5f9',
+    border: '1px solid #e2e8f0',
     borderRadius: '6px',
     padding: '2px'
   },
@@ -905,14 +936,15 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '4px',
     padding: '0.35rem 0.75rem',
     fontSize: '0.78rem',
-    color: 'var(--text-muted)',
+    color: '#475569',
     fontWeight: '600',
     cursor: 'pointer',
     transition: 'all 0.15s ease'
   },
   filterBtnActive: {
-    background: 'rgba(255, 255, 255, 0.05)',
-    color: '#fff'
+    background: '#fff',
+    color: '#0f172a',
+    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
   },
   logList: {
     display: 'flex',
@@ -925,11 +957,12 @@ const styles: { [key: string]: React.CSSProperties } = {
   emptyLogs: {
     padding: '2.5rem 0',
     textAlign: 'center',
-    color: 'var(--text-muted)',
+    color: '#64748b',
     fontSize: '0.85rem'
   },
   logRow: {
-    border: '1px solid',
+    background: '#fff',
+    border: '1px solid #e2e8f0',
     borderRadius: '8px',
     padding: '0.85rem 1rem',
     display: 'flex',
@@ -940,16 +973,11 @@ const styles: { [key: string]: React.CSSProperties } = {
     flexWrap: 'wrap',
     gap: '0.75rem'
   },
-  logRowLeft: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '1rem'
-  },
   statusBadge: {
     fontSize: '0.68rem',
     fontWeight: '800',
     padding: '0.2rem 0.5rem',
-    borderRadius: '4px',
+    borderRadius: '20px',
     border: '1px solid',
     letterSpacing: '0.04em'
   },
@@ -960,12 +988,12 @@ const styles: { [key: string]: React.CSSProperties } = {
   logIp: {
     fontSize: '0.88rem',
     fontWeight: '700',
-    color: '#fff',
-    fontFamily: 'var(--font-mono)'
+    color: '#0f172a',
+    fontFamily: 'DM Mono, monospace'
   },
   logMeta: {
     fontSize: '0.75rem',
-    color: 'var(--text-muted)',
+    color: '#475569',
     marginTop: '0.1rem'
   },
   logRowRight: {
@@ -977,15 +1005,19 @@ const styles: { [key: string]: React.CSSProperties } = {
   riskIndicator: {
     fontSize: '0.82rem',
     fontWeight: '700',
-    fontFamily: 'var(--font-mono)'
+    fontFamily: 'DM Mono, monospace'
   },
   logTime: {
     fontSize: '0.7rem',
-    color: 'var(--text-dark)',
+    color: '#64748b',
     marginTop: '0.15rem'
   },
   tunerPanel: {
     padding: '1.5rem',
+    background: '#fff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '12px',
+    boxShadow: '0 1px 3px 0 rgba(0,0,0,0.05)',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
@@ -999,97 +1031,73 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   tunerDesc: {
     fontSize: '0.78rem',
-    color: 'var(--text-muted)',
-    lineHeight: '1.45'
+    color: '#475569',
+    lineHeight: 1.45
   },
-  controlGroup: {
+  tunerMetricRow: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '1rem'
+  },
+  tunerMetricCard: {
+    background: '#f8fafc',
+    border: '1px solid #e2e8f0',
+    borderRadius: '8px',
+    padding: '0.75rem'
+  },
+  tunerMetricLabel: {
+    fontSize: '0.7rem',
+    color: '#475569',
+    textTransform: 'uppercase',
+    fontWeight: '700',
+    letterSpacing: '0.04em'
+  },
+  tunerMetricValue: {
+    fontSize: '1rem',
+    fontWeight: '800',
+    color: '#0f172a',
+    marginTop: '0.15rem',
+    fontFamily: 'DM Mono, monospace'
+  },
+  sliderContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '0.5rem',
-    marginTop: '0.5rem'
+    gap: '0.5rem'
   },
-  controlHeader: {
+  sliderLabelRow: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  controlLabel: {
-    fontSize: '0.82rem',
-    fontWeight: '600',
-    color: '#fff'
-  },
-  controlValue: {
-    fontSize: '0.82rem',
+    fontSize: '0.78rem',
     fontWeight: '700',
-    color: '#00ffff',
-    fontFamily: 'var(--font-mono)'
+    color: '#0f172a'
   },
   slider: {
     width: '100%',
-    accentColor: '#00ffff',
-    background: 'rgba(255, 255, 255, 0.08)',
-    height: '6px',
-    borderRadius: '3px',
-    outline: 'none',
+    accentColor: '#6d28d9',
     cursor: 'pointer'
   },
-  sliderLabels: {
+  sliderLegendRow: {
     display: 'flex',
     justifyContent: 'space-between',
     fontSize: '0.65rem',
-    color: 'var(--text-dark)',
-    fontWeight: '700'
-  },
-  matrixBox: {
-    background: 'rgba(0, 0, 0, 0.25)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '8px',
-    padding: '0.85rem',
-    marginTop: '0.5rem'
-  },
-  matrixTitle: {
-    fontSize: '0.72rem',
-    fontWeight: '800',
-    color: 'var(--text-muted)',
-    letterSpacing: '0.04em',
-    textTransform: 'uppercase',
-    display: 'block',
-    marginBottom: '0.5rem'
-  },
-  matrixGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '0.5rem'
-  },
-  matrixCell: {
-    fontFamily: 'var(--font-mono)',
-    fontSize: '0.75rem',
-    color: 'var(--secondary)',
-    background: 'rgba(6, 182, 212, 0.04)',
-    border: '1px solid rgba(6, 182, 212, 0.1)',
-    borderRadius: '4px',
-    padding: '0.35rem',
-    textAlign: 'center'
-  },
-  tunerActionBox: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.75rem'
+    color: '#64748b',
+    fontWeight: '600'
   },
   deployBtn: {
     width: '100%',
+    padding: '0.75rem',
+    background: '#6d28d9',
+    color: '#fff',
     border: 'none',
     borderRadius: '8px',
-    padding: '0.75rem',
     fontSize: '0.85rem',
     fontWeight: '700',
-    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    textAlign: 'center'
   },
-  deploySuccessMessage: {
-    fontSize: '0.75rem',
-    color: 'var(--success)',
-    textAlign: 'center',
-    fontWeight: '600'
+  deployBtnSuccess: {
+    background: '#10b981'
   },
   drawerOverlay: {
     position: 'fixed',
@@ -1097,45 +1105,43 @@ const styles: { [key: string]: React.CSSProperties } = {
     left: 0,
     right: 0,
     bottom: 0,
-    background: 'rgba(0, 0, 0, 0.6)',
-    backdropFilter: 'blur(8px)',
+    background: 'rgba(0, 0, 0, 0.2)',
     zIndex: 200,
     display: 'flex',
-    justifyContent: 'flex-end',
-    animation: 'fadeIn 0.25s ease'
+    justifyContent: 'flex-end'
   },
-  drawerPanel: {
+  drawer: {
     width: '100%',
-    maxWidth: '460px',
-    height: '100vh',
-    background: 'rgba(15, 23, 42, 0.95)',
-    borderLeft: '1px solid rgba(255, 255, 255, 0.06)',
-    boxShadow: '-10px 0 40px rgba(0,0,0,0.5)',
+    maxWidth: '420px',
+    height: '100%',
+    background: '#fff',
+    borderLeft: '1px solid #e2e8f0',
+    boxShadow: '-10px 0 30px rgba(0,0,0,0.05)',
     display: 'flex',
     flexDirection: 'column',
-    animation: 'slideLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+    animation: 'drawer-slide 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
   },
   drawerHeader: {
+    padding: '1.25rem 1.5rem',
+    borderBottom: '1px solid #e2e8f0',
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '1.5rem',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
+    alignItems: 'center'
   },
   drawerTitle: {
-    fontSize: '1.05rem',
-    fontWeight: '700',
-    color: '#fff'
+    fontSize: '1rem',
+    fontWeight: '800',
+    color: '#0f172a'
   },
   drawerId: {
     fontSize: '0.72rem',
-    fontFamily: 'var(--font-mono)',
-    color: 'var(--text-muted)'
+    fontFamily: 'DM Mono, monospace',
+    color: '#64748b'
   },
   closeBtn: {
     background: 'transparent',
     border: 'none',
-    color: 'var(--text-muted)',
+    color: '#64748b',
     cursor: 'pointer',
     padding: '0.25rem',
     borderRadius: '4px',
@@ -1159,10 +1165,10 @@ const styles: { [key: string]: React.CSSProperties } = {
   drawerSectionTitle: {
     fontSize: '0.72rem',
     fontWeight: '800',
-    color: 'var(--text-muted)',
+    color: '#475569',
     letterSpacing: '0.06em',
     textTransform: 'uppercase',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+    borderBottom: '1px solid #e2e8f0',
     paddingBottom: '0.35rem'
   },
   drawerTable: {
@@ -1172,14 +1178,14 @@ const styles: { [key: string]: React.CSSProperties } = {
   drawerTableLabel: {
     padding: '0.45rem 0',
     fontSize: '0.8rem',
-    color: 'var(--text-muted)',
+    color: '#64748b',
     width: '40%'
   },
   drawerTableValue: {
     padding: '0.45rem 0',
     fontSize: '0.82rem',
-    color: '#fff',
-    fontFamily: 'var(--font-mono)'
+    color: '#0f172a',
+    fontFamily: 'DM Mono, monospace'
   },
   anomalyList: {
     display: 'flex',
@@ -1188,9 +1194,9 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   cleanTelemetryMessage: {
     fontSize: '0.78rem',
-    color: 'var(--success)',
-    background: 'rgba(16, 185, 129, 0.06)',
-    border: '1px solid rgba(16, 185, 129, 0.15)',
+    color: '#0d9488',
+    background: '#f0fdfa',
+    border: '1px solid #ccfbf1',
     borderRadius: '6px',
     padding: '0.65rem 0.85rem'
   },
@@ -1198,8 +1204,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     alignItems: 'center',
     gap: '0.5rem',
-    background: 'rgba(244, 63, 94, 0.06)',
-    border: '1px solid rgba(244, 63, 94, 0.15)',
+    background: '#fff1f2',
+    border: '1px solid #ffe4e6',
     borderRadius: '6px',
     padding: '0.5rem 0.75rem'
   },
@@ -1207,41 +1213,41 @@ const styles: { [key: string]: React.CSSProperties } = {
     width: '5px',
     height: '5px',
     borderRadius: '50%',
-    background: '#f43f5e',
+    background: '#e11d48',
     display: 'inline-block'
   },
   anomalyDotAmber: {
     width: '5px',
     height: '5px',
     borderRadius: '50%',
-    background: '#f59e0b',
+    background: '#d97706',
     display: 'inline-block'
   },
   anomalyText: {
     fontSize: '0.75rem',
-    color: '#f8fafc',
+    color: '#0f172a',
     textTransform: 'capitalize'
   },
   codeBlock: {
-    background: '#090d16',
-    border: '1px solid rgba(255, 255, 255, 0.06)',
+    background: '#f8fafc',
+    border: '1px solid #e2e8f0',
     borderRadius: '8px',
     padding: '1rem',
-    fontFamily: 'var(--font-mono)',
+    fontFamily: 'DM Mono, monospace',
     fontSize: '0.72rem',
     lineHeight: '1.5'
   },
   codeLine: {
-    color: '#cbd5e1'
+    color: '#334155'
   },
   codeKeyword: {
-    color: '#f472b6'
+    color: '#be185d'
   },
   codeString: {
-    color: '#34d399'
+    color: '#0f766e'
   },
   codeNumber: {
-    color: '#60a5fa'
+    color: '#1d4ed8'
   },
   commandOverlay: {
     position: 'fixed',
@@ -1249,7 +1255,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     left: 0,
     right: 0,
     bottom: 0,
-    background: 'rgba(0, 0, 0, 0.4)',
+    background: 'rgba(0, 0, 0, 0.15)',
     backdropFilter: 'blur(4px)',
     zIndex: 250,
     display: 'flex',
@@ -1260,10 +1266,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     width: '100%',
     maxWidth: '520px',
     maxHeight: '340px',
-    background: 'rgba(15, 23, 42, 0.96)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    background: '#fff',
+    border: '1px solid #cbd5e1',
     borderRadius: '12px',
-    boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden'
@@ -1273,13 +1279,13 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: 'center',
     gap: '0.75rem',
     padding: '0.85rem 1.25rem',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.06)'
+    borderBottom: '1px solid #e2e8f0'
   },
   commandInput: {
     flex: 1,
     background: 'transparent',
     border: 'none',
-    color: '#fff',
+    color: '#0f172a',
     fontSize: '0.9rem',
     outline: 'none'
   },
@@ -1291,7 +1297,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   commandGroupTitle: {
     fontSize: '0.65rem',
     fontWeight: '800',
-    color: 'var(--text-dark)',
+    color: '#64748b',
     letterSpacing: '0.08em',
     textTransform: 'uppercase',
     padding: '0.5rem 0.75rem 0.25rem 0.75rem'
@@ -1303,21 +1309,21 @@ const styles: { [key: string]: React.CSSProperties } = {
     padding: '0.65rem 0.75rem',
     borderRadius: '6px',
     fontSize: '0.82rem',
-    color: '#cbd5e1',
+    color: '#334155',
     cursor: 'pointer',
     transition: 'all 0.15s ease',
     ':hover': {
-      background: 'rgba(255,255,255,0.03)',
-      color: '#fff'
+      background: '#f1f5f9',
+      color: '#0f172a'
     }
   } as any,
   commandShortcut: {
-    background: 'rgba(255, 255, 255, 0.06)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+    background: '#f1f5f9',
+    border: '1px solid #cbd5e1',
     borderRadius: '4px',
     padding: '0.1rem 0.35rem',
     fontSize: '0.68rem',
-    fontFamily: 'var(--font-mono)',
-    color: 'var(--text-muted)'
+    fontFamily: 'DM Mono, monospace',
+    color: '#475569'
   }
 };
