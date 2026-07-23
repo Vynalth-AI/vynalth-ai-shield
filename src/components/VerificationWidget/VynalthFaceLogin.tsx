@@ -173,12 +173,12 @@ export const VynalthFaceLogin: React.FC<VynalthFaceLoginProps> = ({
   return (
     <div style={styles.container}>
       <div style={styles.headerRow}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <div style={styles.brandBadge}>Vynalth Vision Login™</div>
-          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Vynalth FaceID V2.4</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <div style={styles.brandBadge}>Vynalth HumanProof™ 活体验证</div>
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Vynalth AI Shield · 人类真实性确认</span>
         </div>
         {!allowedRegion && (
-          <span style={styles.regionBadge}>Preview Mode (Full release Aug 2026)</span>
+          <span style={styles.regionBadge}>Preview Mode (Aug 2026 Release)</span>
         )}
       </div>
 
