@@ -229,22 +229,124 @@ export const WhitepaperPage: React.FC<WhitepaperPageProps> = ({ onBack, onDeploy
           </div>
 
           <h2 style={{ color: '#f1f5f9', fontSize: '1.5rem', fontWeight: 700, marginTop: '2.5rem', marginBottom: '1rem', borderLeft: '3px solid #38bdf8', paddingLeft: '0.75rem' }}>
-            三、 Vynalth AI Shield 的防御实践：Vynalth HumanProof™ 3-Tier 决策引擎
+            三、 核心架构：Vynalth Adaptive Trust Decision Engine™ (ATDE)
           </h2>
           <p>
-            作为 **Vynalth AI** 旗下的核心安全系统，Vynalth AI Shield 基于微观行为学与活体验证技术，设计了完整的 **Vynalth HumanProof™ 三级自适应决策管线**：
+            Vynalth AI Shield 决策引擎判断链路（Decision Engine Flow）是整个 Shield 的核心逻辑层，定位为：
+            <strong style={{ color: '#38bdf8' }}>"A real-time AI decision layer that evaluates identity, behavior, device reputation, and threat intelligence to deliver adaptive trust decisions. 🛡️"</strong>
           </p>
-          <ol style={{ paddingLeft: '1.25rem' }}>
-            <li style={{ marginBottom: '1rem' }}>
-              <strong>低风险透明通行 (Score ≥ 80)：</strong> 针对具有符合正态分布的滑鼠物理震颤、按键犹豫停顿的合法人类会话，系统判定为 `Human Verified`，实现 100% 零干擾透明通行。
-            </li>
-            <li style={{ marginBottom: '1rem' }}>
-              <strong>中风险 Vynalth HumanProof™ Challenge (40 ≤ Score &lt; 80)：</strong> 当 AI 识别到边界不确定会话时，自动拉起多维验证挑战：包含微手勢拖拽与基于 Web Camera API 的 **人脸活体验证（Liveness Verification）**。通过自然眨眼（Eye Blink）与头部微轉（Head Tilt）判别活体真实性，并将其实时归一化转化为 **128 维加密特征向量（`users.face_embedding_encrypted`）**，绝对不出售或长期保存原始图片。
-            </li>
-            <li style={{ marginBottom: '1rem' }}>
-              <strong>高风险即时阻断 (Score &lt; 40)：</strong> 针对零滑鼠轨迹、WebDriver 框架检测激活、瞬时批量提交的脚本，边缘网关直接返回 `403 Forbidden` 并触发企业级防火墙规则。
-            </li>
-          </ol>
+          <p>
+            它将「实时用户行为数据 → 风险分析 → 信任评分 → 安全动作」转换成边缘级的实时决策，包含以下 6 大企业级核心模块：
+          </p>
+
+          {/* ATDE 6-Stage Architecture Diagram */}
+          <div style={{
+            background: '#0a101f',
+            border: '1px solid rgba(56, 189, 248, 0.2)',
+            borderRadius: '0.75rem',
+            padding: '1.5rem',
+            margin: '2rem 0',
+            fontFamily: 'DM Mono, monospace',
+            fontSize: '0.8rem',
+            lineHeight: 1.5,
+            color: '#38bdf8',
+            overflowX: 'auto'
+          }}>
+            <div style={{ fontWeight: 800, color: '#f1f5f9', marginBottom: '1rem', textAlign: 'center' }}>
+              📐 Vynalth Adaptive Trust Decision Engine™ (ATDE) 6-Stage Flow
+            </div>
+            <pre style={{ margin: 0, color: '#38bdf8' }}>{`              User Request / Client Signals
+                           │
+                           ▼
+               ┌───────────────────────┐
+               │ 1. Data Collection    │  ← Mouse, Typing, Device, IP, Network
+               └───────────────────────┘
+                           │
+                           ▼
+               ┌───────────────────────┐
+               │ 2. Feature Engine     │  ← Jitter, Entropy, Velocity, Bursts
+               └───────────────────────┘
+                           │
+                           ▼
+               ┌───────────────────────┐
+               │ 3. Risk Analysis      │  ← Bot, Fraud, Abuse & Anomaly AI
+               └───────────────────────┘
+                           │
+                           ▼
+               ┌───────────────────────┐
+               │ 4. Trust Engine       │  ← Identity + Behavior + Device - Risk
+               └───────────────────────┘
+                           │
+                           ▼
+               ┌───────────────────────┐
+               │ 5. Decision Engine    │  ← Allow (≥80) | Challenge | Block (<40)
+               └───────────────────────┘
+                           │
+           ┌───────────────┼───────────────┐
+           ▼               ▼               ▼
+        ALLOW          CHALLENGE         BLOCK
+       (透明放行)      (二次验证/活体)    (403 阻断)
+           │               │               │
+           └───────────────┼───────────────┘
+                           ▼
+               ┌───────────────────────┐
+               │ 6. Continuous Loop    │  ← Feedback Engine & Model Re-Train
+               └───────────────────────┘`}</pre>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '1.25rem', marginBottom: '2rem' }}>
+            <h3 style={{ color: '#f1f5f9', fontSize: '1.1rem', margin: '0 0 0.75rem 0' }}>1. Data Collection Layer（数据采集层）</h3>
+            <p style={{ fontSize: '0.88rem', margin: '0 0 0.5rem 0' }}>实时无感采集以下 3 大维度信号：</p>
+            <ul style={{ fontSize: '0.85rem', margin: 0, paddingLeft: '1.25rem' }}>
+              <li><strong>用户行为信号:</strong> Mouse movement, Click pattern, Typing rhythm, Navigation flow, Session duration.</li>
+              <li><strong>设备环境信号:</strong> Device fingerprint, Browser environment, OS information, WebGL renderer.</li>
+              <li><strong>安全网络信号:</strong> IP reputation, Request frequency, Cloudflare Worker Impossible Travel, Previous risk events.</li>
+            </ul>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '1.25rem', marginBottom: '2rem' }}>
+            <h3 style={{ color: '#f1f5f9', fontSize: '1.1rem', margin: '0 0 0.75rem 0' }}>2. Feature Engine（特征提取引擎）</h3>
+            <p style={{ fontSize: '0.88rem', margin: '0 0 0.5rem 0' }}>把原始采样点转化为 AI 神经网络识别特征：</p>
+            <ul style={{ fontSize: '0.85rem', margin: 0, paddingLeft: '1.25rem' }}>
+              <li><strong>Human Behavior Features:</strong> Sub-pixel Jitter (微观生理震颤), Hesitation Window (费茨法则犹豫窗口), Movement Entropy (运动轨迹熵).</li>
+              <li><strong>Threat Features:</strong> Automation Pattern (匀速/整数对齐轨迹), Abnormal Velocity (超音速移动), Request Burst (瞬间高频提交).</li>
+            </ul>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '1.25rem', marginBottom: '2rem' }}>
+            <h3 style={{ color: '#f1f5f9', fontSize: '1.1rem', margin: '0 0 0.75rem 0' }}>3. Risk Analysis Engine（风险分析引擎）</h3>
+            <p style={{ fontSize: '0.88rem', margin: '0 0 0.5rem 0' }}>四重模型并行打分计算风险分值：</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem', marginTop: '0.75rem' }}>
+              <div style={{ background: '#0a101f', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', fontSize: '0.8rem' }}>Bot Model<br/><strong style={{ color: '#ef4444' }}>bot_risk: 0.12</strong></div>
+              <div style={{ background: '#0a101f', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', fontSize: '0.8rem' }}>Fraud Model<br/><strong style={{ color: '#ef4444' }}>fraud_risk: 0.05</strong></div>
+              <div style={{ background: '#0a101f', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', fontSize: '0.8rem' }}>Abuse Model<br/><strong style={{ color: '#ef4444' }}>abuse_risk: 0.08</strong></div>
+              <div style={{ background: '#0a101f', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', fontSize: '0.8rem' }}>Anomaly AI<br/><strong style={{ color: '#ef4444' }}>anomaly_score: 0.18</strong></div>
+            </div>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '1.25rem', marginBottom: '2rem' }}>
+            <h3 style={{ color: '#f1f5f9', fontSize: '1.1rem', margin: '0 0 0.75rem 0' }}>4. Trust Engine（信任评分模型）</h3>
+            <p style={{ fontSize: '0.88rem', margin: '0 0 0.5rem 0' }}>动态信任计算公式：</p>
+            <div style={{ background: '#0a2540', padding: '0.75rem 1rem', borderRadius: '6px', fontFamily: 'DM Mono, monospace', fontSize: '0.82rem', color: '#00c7b1', marginBottom: '0.5rem' }}>
+              Trust Score = Identity Confidence (+25) + Behavior Confidence (+40) + Device Reputation (+20) - Risk Penalty (-5) = 80/100
+            </div>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '1.25rem', marginBottom: '2rem' }}>
+            <h3 style={{ color: '#f1f5f9', fontSize: '1.1rem', margin: '0 0 0.75rem 0' }}>5. Decision Engine（决策引擎）</h3>
+            <ul style={{ fontSize: '0.85rem', margin: 0, paddingLeft: '1.25rem' }}>
+              <li><strong>高信任 (Trust Score ≥ 80) → ALLOW:</strong> 100% 无感静默通行。</li>
+              <li><strong>中风险 (40 ≤ Trust Score &lt; 80) → CHALLENGE:</strong> 触发 Vynalth HumanProof™ 微手势或人脸活体验证（Eye Blink & Head Tilt）。</li>
+              <li><strong>高风险 (Trust Score &lt; 40) → BLOCK:</strong> HTTP 403 阻断，记录 Security Audit Log，并更新威胁库。</li>
+            </ul>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '1.25rem', marginBottom: '2rem' }}>
+            <h3 style={{ color: '#f1f5f9', fontSize: '1.1rem', margin: '0 0 0.75rem 0' }}>6. Continuous Learning Loop（持续学习闭环）</h3>
+            <p style={{ fontSize: '0.85rem', margin: 0, lineHeight: 1.6 }}>
+              决策执行后，反向闭环反馈：<code>Decision Result → User Outcome → Feedback Engine → Model Improvement</code>。确保新型 Bot 变种攻击被拦截后，模型自动完成对抗重训练（Adversarial Retraining）。
+            </p>
+          </div>
 
           <h2 style={{ color: '#f1f5f9', fontSize: '1.5rem', fontWeight: 700, marginTop: '2.5rem', marginBottom: '1rem', borderLeft: '3px solid #38bdf8', paddingLeft: '0.75rem' }}>
             四、 区域合规实践：迎合马来西亚金融级 RMiT 规范
